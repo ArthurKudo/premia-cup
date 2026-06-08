@@ -213,7 +213,7 @@ tr:hover td{background:rgba(255,255,255,0.02);}
             <label class="cat-chip" id="chip-Bronze"><input type="checkbox" value="Bronze" onchange="updateChip(this,'Bronze')"> 🥉 Bronze</label>
             <label class="cat-chip" id="chip-Iniciante"><input type="checkbox" value="Iniciante" onchange="updateChip(this,'Iniciante')"> 💜 Iniciante</label>
             <label class="cat-chip" id="chip-Mista"><input type="checkbox" value="Mista Iniciante" onchange="updateChip(this,'Mista')"> 🟢 Mista Iniciante</label>
-            <label class="cat-chip" id="chip-Estreante"><input type="checkbox" value="Estreante" onchange="updateChip(this,'Estreante')"> 🩷 Estreante</label>
+            <label class="cat-chip" id="chip-Estreante"><input type="checkbox" value="Estreante" onchange="updateChip(this,'Estreante')"> ⭐ Estreante</label>
           </div>
         </div>
         <div class="form-grid" style="margin-bottom:14px;">
@@ -316,7 +316,7 @@ tr:hover td{background:rgba(255,255,255,0.02);}
           <tr><td>🥉 Bronze</td><td>R$ 1.000</td><td>R$ 500</td><td>R$ 250</td><td>R$ 100</td><td style="color:var(--lime);font-weight:700;">R$ 1.850</td></tr>
           <tr><td>💜 Iniciante</td><td>R$ 600</td><td>R$ 350</td><td>R$ 150</td><td>—</td><td style="color:var(--lime);font-weight:700;">R$ 1.100</td></tr>
           <tr><td>🟢 Mista Iniciante</td><td>R$ 450</td><td>R$ 300</td><td>R$ 100</td><td>—</td><td style="color:var(--lime);font-weight:700;">R$ 850</td></tr>
-          <tr><td>🩷 Estreante</td><td>R$ 240</td><td>—</td><td>—</td><td>—</td><td style="color:var(--lime);font-weight:700;">R$ 240</td></tr>
+          <tr><td>⭐ Estreante</td><td>R$ 240</td><td>—</td><td>—</td><td>—</td><td style="color:var(--lime);font-weight:700;">R$ 240</td></tr>
           <tr class="tr-total"><td>Total</td><td>R$ 2.290</td><td>R$ 1.150</td><td>R$ 500</td><td>R$ 100</td><td style="color:var(--lime);">R$ 4.040</td></tr>
         </tbody>
       </table></div>
@@ -458,7 +458,7 @@ tr:hover td{background:rgba(255,255,255,0.02);}
         <label class="cat-chip" id="e-chip-Bronze"><input type="checkbox" value="Bronze" onchange="updateEditChip(this,'Bronze')"> 🥉 Bronze</label>
         <label class="cat-chip" id="e-chip-Iniciante"><input type="checkbox" value="Iniciante" onchange="updateEditChip(this,'Iniciante')"> 💜 Iniciante</label>
         <label class="cat-chip" id="e-chip-Mista"><input type="checkbox" value="Mista Iniciante" onchange="updateEditChip(this,'Mista')"> 🟢 Mista Iniciante</label>
-        <label class="cat-chip" id="e-chip-Estreante"><input type="checkbox" value="Estreante" onchange="updateEditChip(this,'Estreante')"> 🩷 Estreante</label>
+        <label class="cat-chip" id="e-chip-Estreante"><input type="checkbox" value="Estreante" onchange="updateEditChip(this,'Estreante')"> ⭐ Estreante</label>
       </div>
     </div>
     <div style="display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;">
@@ -890,38 +890,77 @@ function renderUniformes(){
   const TAMANHOS=['PP','P','M','G','GG','XGG'];
   const masc=S.jogadores.filter(j=>j.gen==='M'||!j.gen);
   const fem=S.jogadores.filter(j=>j.gen==='F');
-  const contTam={};TAMANHOS.forEach(t=>contTam[t]=0);
-  S.jogadores.forEach(j=>{const t=j.tam||'M';if(contTam[t]!==undefined)contTam[t]++;});
   const total=S.jogadores.length;
   const el=document.getElementById('fin-uniformes');
   if(!el)return;
   if(!total){el.innerHTML='<div style="color:var(--text3);font-size:13px;text-align:center;padding:12px 0;">Nenhum jogador cadastrado ainda.</div>';return;}
+
+  // count per tamanho per genero
+  const contM={};const contF={};
+  TAMANHOS.forEach(t=>{contM[t]=0;contF[t]=0;});
+  S.jogadores.forEach(j=>{
+    const t=j.tam||'M';
+    if(j.gen==='F'){if(contF[t]!==undefined)contF[t]++;}
+    else{if(contM[t]!==undefined)contM[t]++;}
+  });
+  const totalM=masc.length;const totalF=fem.length;
+
   el.innerHTML=`
-    <div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:18px;">
-      <div style="display:flex;flex-direction:column;gap:4px;">
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);">Total</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--text);">${total}</div>
+    <div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:20px;">
+      <div style="background:var(--black3);border:1px solid var(--purple);border-radius:var(--r);padding:14px 20px;display:flex;flex-direction:column;gap:4px;">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--purple-light);">Total geral</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--text);line-height:1;">${total}</div>
       </div>
-      <div style="display:flex;flex-direction:column;gap:4px;">
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);">Masculino</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--purple-light);">${masc.length}</div>
+      <div style="background:var(--black3);border:1px solid rgba(176,106,255,0.4);border-radius:var(--r);padding:14px 20px;display:flex;flex-direction:column;gap:4px;">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--purple-light);">Masculino</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--purple-light);line-height:1;">${totalM}</div>
       </div>
-      <div style="display:flex;flex-direction:column;gap:4px;">
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);">Feminino</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--pink);">${fem.length}</div>
+      <div style="background:var(--black3);border:1px solid rgba(255,27,173,0.4);border-radius:var(--r);padding:14px 20px;display:flex;flex-direction:column;gap:4px;">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--pink);">Feminino</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--pink);line-height:1;">${totalF}</div>
       </div>
     </div>
-    <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;">Por tamanho</div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;">
-      ${TAMANHOS.map(t=>{
-        const n=contTam[t];
-        const pct=total?Math.round(n/total*100):0;
-        return`<div style="background:var(--black3);border:1px solid ${n>0?'var(--purple)':'var(--border)'};border-radius:var(--r);padding:12px 16px;min-width:70px;text-align:center;">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:${n>0?'var(--lime)':'var(--text3)'};">${n}</div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--text2);">${t}</div>
-          ${n>0?`<div style="font-size:11px;color:var(--text3);margin-top:2px;">${pct}%</div>`:''}
-        </div>`;
-      }).join('')}
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;">
+      <div style="background:var(--black3);border:1px solid rgba(176,106,255,0.3);border-radius:var(--rl);overflow:hidden;">
+        <div style="padding:10px 16px;border-bottom:1px solid var(--border);font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:var(--purple-light);">Masculino — por tamanho</div>
+        <div style="padding:8px 0;">
+          ${TAMANHOS.map(t=>{
+            const n=contM[t];
+            const pct=totalM?Math.round(n/totalM*100):0;
+            return`<div style="display:flex;align-items:center;gap:12px;padding:8px 16px;border-bottom:1px solid var(--border);">
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--text);width:36px;">${t}</div>
+              <div style="flex:1;height:6px;background:var(--black4);border-radius:3px;">
+                <div style="height:6px;border-radius:3px;background:var(--purple-light);width:${pct}%;transition:width .4s;"></div>
+              </div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:${n>0?'var(--purple-light)':'var(--text3)'};min-width:28px;text-align:right;">${n}</div>
+            </div>`;
+          }).join('')}
+          <div style="display:flex;justify-content:space-between;padding:10px 16px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);">
+            <span>Total masculino</span><span style="color:var(--purple-light);font-size:14px;">${totalM}</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:var(--black3);border:1px solid rgba(255,27,173,0.3);border-radius:var(--rl);overflow:hidden;">
+        <div style="padding:10px 16px;border-bottom:1px solid var(--border);font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:var(--pink);">Feminino — por tamanho</div>
+        <div style="padding:8px 0;">
+          ${TAMANHOS.map(t=>{
+            const n=contF[t];
+            const pct=totalF?Math.round(n/totalF*100):0;
+            return`<div style="display:flex;align-items:center;gap:12px;padding:8px 16px;border-bottom:1px solid var(--border);">
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--text);width:36px;">${t}</div>
+              <div style="flex:1;height:6px;background:var(--black4);border-radius:3px;">
+                <div style="height:6px;border-radius:3px;background:var(--pink);width:${pct}%;transition:width .4s;"></div>
+              </div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:${n>0?'var(--pink)':'var(--text3)'};min-width:28px;text-align:right;">${n}</div>
+            </div>`;
+          }).join('')}
+          <div style="display:flex;justify-content:space-between;padding:10px 16px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);">
+            <span>Total feminino</span><span style="color:var(--pink);font-size:14px;">${totalF}</span>
+          </div>
+        </div>
+      </div>
     </div>`;
 }
 function salvarParametros(){
