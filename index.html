@@ -178,6 +178,9 @@ tr:hover td{background:rgba(255,255,255,0.02);}
     <div class="nav-item" onclick="goTo('patrocinios',this)"><span class="nav-icon">🤝</span> Patrocínios<span class="nav-badge" id="nb-pat">0</span></div>
     <div class="nav-label">Análise</div>
     <div class="nav-item" onclick="goTo('dashboard',this)"><span class="nav-icon">📈</span> Dashboard</div>
+    <div class="nav-item" onclick="goTo('marketing',this)"><span class="nav-icon">📱</span> Marketing<span class="nav-badge" id="nb-mkt">0</span></div>
+    <div class="nav-item" onclick="goTo('chaveamento',this)"><span class="nav-icon">🏟</span> Chaveamento</div>
+    <div class="nav-item" onclick="goTo('simulacao',this)"><span class="nav-icon">🔢</span> Simulação</div>
   </nav>
   <div class="sidebar-footer">Dados na <span>nuvem</span> · JSONBin</div>
 </aside>
@@ -436,6 +439,174 @@ tr:hover td{background:rgba(255,255,255,0.02);}
       </div>
     </div>
   </div>
+
+  <!-- MARKETING -->
+  <div class="page" id="page-marketing">
+    <div class="page-header"><div class="page-header-title">Marketing</div><div class="page-header-sub">planejamento de posts · @premiacup</div></div>
+
+    <div class="metrics" id="mkt-metrics"></div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">✚ <span class="accent">Novo</span> Post</div>
+      </div>
+      <div class="card-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+          <div style="display:flex;flex-direction:column;gap:5px;">
+            <label>Título do post</label>
+            <input type="text" id="mkt-titulo" placeholder="Ex: Abertura de inscrições">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px;">
+            <label>Tipo</label>
+            <select id="mkt-tipo">
+              <option>Feed — Foto</option>
+              <option>Feed — Carrossel</option>
+              <option>Feed — Vídeo</option>
+              <option>Stories</option>
+              <option>Reels</option>
+            </select>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px;">
+            <label>Data</label>
+            <input type="date" id="mkt-data">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px;">
+            <label>Horário</label>
+            <input type="time" id="mkt-hora" value="18:00">
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:12px;">
+          <label>Legenda</label>
+          <textarea id="mkt-legenda" rows="3" placeholder="Escreva a legenda do post aqui..." style="resize:vertical;"></textarea>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px;">
+          <label>Hashtags</label>
+          <input type="text" id="mkt-hashtags" placeholder="#premiacup #futevolei #itajai">
+        </div>
+        <div style="display:flex;justify-content:flex-end;">
+          <button class="btn btn-lime" onclick="addPost()">✚ Adicionar post</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">📅 Calendário de <span class="accent">Posts</span></div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <button class="btn btn-sm btn-ghost" onclick="mesAnterior()">‹</button>
+          <span id="mkt-mes-label" style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;min-width:140px;text-align:center;"></span>
+          <button class="btn btn-sm btn-ghost" onclick="mesSeguinte()">›</button>
+        </div>
+      </div>
+      <div class="card-body" style="padding:12px;">
+        <div id="mkt-calendario"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">📋 Todos os <span class="accent">Posts</span></div>
+        <div style="display:flex;gap:8px;">
+          <select id="mkt-filtro-status" onchange="renderPosts()" style="width:140px;">
+            <option value="">Todos os status</option>
+            <option>Ideia</option>
+            <option>Agendado</option>
+            <option>Publicado</option>
+            <option>Atrasado</option>
+          </select>
+          <select id="mkt-filtro-tipo" onchange="renderPosts()" style="width:140px;">
+            <option value="">Todos os tipos</option>
+            <option>Feed — Foto</option>
+            <option>Feed — Carrossel</option>
+            <option>Feed — Vídeo</option>
+            <option>Stories</option>
+            <option>Reels</option>
+          </select>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Data</th><th>Hora</th><th>Título</th><th>Tipo</th><th>Status</th><th>Alcance</th><th>Curtidas</th><th>Salvamentos</th><th></th></tr></thead>
+          <tbody id="mkt-tbody"></tbody>
+        </table>
+        <div id="mkt-empty" class="empty-state" style="display:none;">
+          <div class="empty-icon">📱</div>
+          <div class="empty-text">Nenhum post cadastrado ainda</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- CHAVEAMENTO -->
+  <div class="page" id="page-chaveamento">
+    <div class="page-header"><div class="page-header-title">Chaveamento</div><div class="page-header-sub">eliminatória dupla · 3 quadras</div></div>
+
+    <div class="metrics" id="chv-metrics"></div>
+
+    <!-- CALCULADORA DE TEMPO -->
+    <div class="card">
+      <div class="card-header"><div class="card-title">⏱ Calculadora de <span class="accent">Tempo</span></div></div>
+      <div class="card-body">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px;">
+          <div style="display:flex;flex-direction:column;gap:5px;">
+            <label>Quadras disponíveis</label>
+            <input type="number" id="chv-quadras" value="3" min="1" max="10" oninput="renderChaveamento()">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px;">
+            <label>Intervalo entre jogos (min)</label>
+            <input type="number" id="chv-intervalo" value="5" min="0" oninput="renderChaveamento()">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px;">
+            <label>Horário de início</label>
+            <input type="time" id="chv-inicio" value="08:00" oninput="renderChaveamento()">
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:16px;" id="chv-params-cats"></div>
+        <div id="chv-timeline"></div>
+      </div>
+    </div>
+
+    <!-- CHAVEAMENTO POR CATEGORIA -->
+    <div id="chv-brackets"></div>
+  </div>
+
+
+  <!-- SIMULAÇÃO -->
+  <div class="page" id="page-simulacao">
+    <div class="page-header"><div class="page-header-title">Simulação</div><div class="page-header-sub">teste livre de cenários de chaveamento</div></div>
+
+    <div class="card">
+      <div class="card-header"><div class="card-title">🔢 Parâmetros da <span class="accent">Simulação</span></div></div>
+      <div class="card-body">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px;">
+          <div style="display:flex;flex-direction:column;gap:5px;">
+            <label>Quadras disponíveis</label>
+            <input type="number" id="sim-quadras" value="3" min="1" max="10" oninput="renderSimulacao()">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px;">
+            <label>Intervalo entre jogos (min)</label>
+            <input type="number" id="sim-intervalo" value="5" min="0" oninput="renderSimulacao()">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px;">
+            <label>Horário de início</label>
+            <input type="time" id="sim-inicio" value="08:00" oninput="renderSimulacao()">
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;" id="sim-cat-inputs"></div>
+      </div>
+    </div>
+
+    <div class="metrics" id="sim-metrics"></div>
+    <div id="sim-timeline-wrap" style="display:none;">
+      <div class="card">
+        <div class="card-header"><div class="card-title">⏱ Linha do <span class="accent">Tempo</span></div></div>
+        <div class="card-body" id="sim-timeline"></div>
+      </div>
+    </div>
+    <div id="sim-brackets"></div>
+  </div>
+
 </div>
 </div>
 
@@ -469,6 +640,48 @@ tr:hover td{background:rgba(255,255,255,0.02);}
     </div>
   </div>
 </div>
+<!-- MODAL POST -->
+<div class="modal-backdrop" id="modal-post">
+  <div class="modal" style="max-width:560px;">
+    <div class="modal-header">
+      <div class="modal-title" id="mp-titulo-header">Post</div>
+      <button class="btn btn-sm btn-ghost" onclick="closeModalPost()">✕</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+      <div style="display:flex;flex-direction:column;gap:5px;"><label>Título</label><input type="text" id="mp-titulo"></div>
+      <div style="display:flex;flex-direction:column;gap:5px;"><label>Tipo</label>
+        <select id="mp-tipo"><option>Feed — Foto</option><option>Feed — Carrossel</option><option>Feed — Vídeo</option><option>Stories</option><option>Reels</option></select>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:5px;"><label>Data</label><input type="date" id="mp-data"></div>
+      <div style="display:flex;flex-direction:column;gap:5px;"><label>Horário</label><input type="time" id="mp-hora"></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:12px;">
+      <label>Legenda</label>
+      <textarea id="mp-legenda" rows="3" style="resize:vertical;"></textarea>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px;">
+      <label>Hashtags</label>
+      <input type="text" id="mp-hashtags">
+    </div>
+    <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px;">
+      <label>Status</label>
+      <select id="mp-status"><option>Ideia</option><option>Agendado</option><option>Publicado</option></select>
+    </div>
+    <div style="border-top:1px solid var(--border);padding-top:14px;margin-bottom:14px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:var(--lime);margin-bottom:10px;">Métricas (preencher após publicar)</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+        <div style="display:flex;flex-direction:column;gap:5px;"><label>Alcance</label><input type="number" id="mp-alcance" min="0" placeholder="0"></div>
+        <div style="display:flex;flex-direction:column;gap:5px;"><label>Curtidas</label><input type="number" id="mp-curtidas" min="0" placeholder="0"></div>
+        <div style="display:flex;flex-direction:column;gap:5px;"><label>Salvamentos</label><input type="number" id="mp-salvamentos" min="0" placeholder="0"></div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <button class="btn btn-sm btn-danger btn-ghost" onclick="remPostModal()">🗑 Remover</button>
+      <button class="btn btn-lime" onclick="salvarPost()">Salvar</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
@@ -490,6 +703,8 @@ async function loadFromCloud() {
     if(!S.jogadores) S.jogadores = [];
     if(!S.resultados) S.resultados = {};
     if(!S.duplas) S.duplas = {};
+    if(!S.posts) S.posts = [];
+    if(!S.chvParams) S.chvParams = {};
     if(!S.params) S.params = {uniforme:70,trofeuQtd:24,trofeuVal:33,arbQtd:8,arbVal:300,premiacao:4040};
     if(!S.sponsors) S.sponsors = [
       {id:1,nome:'Lonu',cat:'Ouro (R$ 800)',val:0,status:'Confirmado'},
@@ -587,12 +802,15 @@ function goTo(id,btn){
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
   btn.classList.add('active');
-  const titles={jogadores:'Jogadores',categorias:'Categorias',premiacao:'Premiação',financeiro:'Financeiro',patrocinios:'Patrocínios',dashboard:'Dashboard'};
+  const titles={jogadores:'Jogadores',categorias:'Categorias',premiacao:'Premiação',financeiro:'Financeiro',patrocinios:'Patrocínios',dashboard:'Dashboard',marketing:'Marketing',chaveamento:'Chaveamento',simulacao:'Simulação'};
   document.getElementById('topbar-title').textContent=titles[id]||id;
   if(id==='financeiro')renderFinanceiro();
   if(id==='categorias')renderCategorias();
   if(id==='patrocinios')renderPatrocinios();
   if(id==='dashboard')renderDashboard();
+  if(id==='marketing')renderMarketing();
+  if(id==='chaveamento')renderChaveamento();
+  if(id==='simulacao')renderSimulacao();
   closeSidebar();
 }
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').classList.toggle('open');}
@@ -1080,6 +1298,617 @@ function exportarCSV(){
 }
 
 function renderAll(){renderJogadores();renderMetricas();renderPremiacao();renderPatrocinios();simular();}
+
+// ===== CHAVEAMENTO =====
+// Double elimination logic
+function calcRoundsWB(n){ return Math.ceil(Math.log2(n)); }
+function calcJogosWB(n){
+  // winners bracket total matches
+  let matches=0; let teams=n;
+  while(teams>1){ matches+=Math.floor(teams/2); teams=Math.ceil(teams/2); }
+  return matches;
+}
+function calcRoundsLB(n){
+  // losers bracket rounds = 2*(WB rounds - 1)
+  return Math.max(1, 2*(calcRoundsWB(n)-1));
+}
+function calcJogosLB(n){
+  // losers bracket total matches
+  const wbRounds=calcRoundsWB(n);
+  let losers=0;
+  let lbTeams=0;
+  for(let r=1;r<=wbRounds-1;r++){
+    const wbMatchesThisRound=Math.floor(n/Math.pow(2,r));
+    lbTeams+=wbMatchesThisRound;
+    const lbMatchesRound1=Math.floor(lbTeams/2);
+    losers+=lbMatchesRound1;
+    lbTeams=lbTeams-lbMatchesRound1;
+  }
+  return losers;
+}
+function calcTotalJogos(n){
+  return calcJogosWB(n)+calcJogosLB(n)+1; // +1 grand final
+}
+
+function getChvParams(){
+  if(!S.chvParams) S.chvParams={};
+  return S.chvParams;
+}
+
+function salvarChvParams(){
+  if(!S.chvParams) S.chvParams={};
+  CATS.forEach(c=>{
+    const el=document.getElementById('chv-tempo-'+c.replace(/ /g,'_'));
+    if(el) S.chvParams[c]=parseInt(el.value)||25;
+  });
+  save(); renderChaveamento(); toast('Parâmetros salvos!');
+}
+
+function getTemplo(cat){
+  const p=getChvParams();
+  return p[cat]||25;
+}
+
+function getNDuplas(cat){
+  if(!S.duplas||!S.duplas[cat]) return 0;
+  return S.duplas[cat].length;
+}
+
+function renderChaveamento(){
+  if(!S.chvParams) S.chvParams={};
+  const quadras=parseInt(document.getElementById('chv-quadras')?.value)||3;
+  const intervalo=parseInt(document.getElementById('chv-intervalo')?.value)||5;
+  const inicioStr=document.getElementById('chv-inicio')?.value||'08:00';
+
+  // Cat params inputs
+  const pEl=document.getElementById('chv-params-cats');
+  if(pEl){
+    pEl.innerHTML=CATS.map(c=>{
+      const key=c.replace(/ /g,'_');
+      const val=S.chvParams[c]||25;
+      const nd=getNDuplas(c);
+      return`<div style="background:var(--black3);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <span class="badge ${catBadge[c]||'badge-gray'}" style="font-size:12px;">${c}</span>
+          <span style="font-size:11px;color:var(--text3);font-family:'Barlow Condensed',sans-serif;">${nd} dupla${nd!==1?'s':''}</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <label>Tempo por jogo (min)</label>
+          <input type="number" id="chv-tempo-${key}" value="${val}" min="10" max="120" style="width:100%;" oninput="renderChaveamento()">
+        </div>
+      </div>`;
+    }).join('');
+    pEl.innerHTML+=`<div style="display:flex;align-items:flex-end;"><button class="btn btn-lime btn-sm" onclick="salvarChvParams()" style="width:100%;">💾 Salvar tempos</button></div>`;
+  }
+
+  // Metrics
+  let totalJogosGeral=0;
+  CATS.forEach(c=>{
+    const nd=getNDuplas(c);
+    if(nd>=2) totalJogosGeral+=calcTotalJogos(nd);
+  });
+
+  // Timeline calculation — sequential with parallel from semis
+  // Each cat runs sequentially on all quadras until semis, then parallel
+  const [hIni,mIni]=inicioStr.split(':').map(Number);
+  let minAtual=hIni*60+mIni;
+
+  const catTimings=[];
+  CATS.forEach(c=>{
+    const nd=getNDuplas(c);
+    if(nd<2){catTimings.push({cat:c,nd,skip:true});return;}
+    const tempo=getTemplo(c);
+    const jogosPorRodada=[];
+    // WB rounds
+    let teamsWB=nd;
+    while(teamsWB>1){
+      jogosPorRodada.push({fase:'Winners',jogos:Math.floor(teamsWB/2)});
+      teamsWB=Math.ceil(teamsWB/2);
+    }
+    // LB rounds (simplified: pairs of rounds)
+    const wbR=calcRoundsWB(nd);
+    let lbTeams=0;
+    for(let r=1;r<=wbR-1;r++){
+      const dropped=Math.floor(nd/Math.pow(2,r));
+      lbTeams+=dropped;
+      const jLB1=Math.floor(lbTeams/2);
+      if(jLB1>0) jogosPorRodada.push({fase:'Losers',jogos:jLB1});
+      lbTeams-=jLB1;
+      if(lbTeams>1){
+        const jLB2=Math.floor(lbTeams/2);
+        if(jLB2>0) jogosPorRodada.push({fase:'Losers',jogos:jLB2});
+        lbTeams-=jLB2;
+      }
+    }
+    jogosPorRodada.push({fase:'Final',jogos:1});
+
+    const totalJogos=jogosPorRodada.reduce((s,r)=>s+r.jogos,0);
+    const inicioMin=minAtual;
+
+    // calc duration: each round takes ceil(jogos/quadras) * (tempo+intervalo)
+    let duracaoMin=0;
+    jogosPorRodada.forEach(r=>{
+      const slots=Math.ceil(r.jogos/quadras);
+      duracaoMin+=slots*(tempo+intervalo);
+    });
+
+    const fimMin=inicioMin+duracaoMin;
+    minAtual=fimMin;
+
+    catTimings.push({cat:c,nd,totalJogos,jogosPorRodada,inicioMin,fimMin,duracaoMin,tempo});
+  });
+
+  // Total duration
+  const totalMin=minAtual-(hIni*60+mIni);
+  const fimGeral=minAtual;
+
+  // Metrics
+  document.getElementById('chv-metrics').innerHTML=`
+    <div class="metric-card purple"><div class="mc-label">Total de jogos</div><div class="mc-value">${totalJogosGeral}</div></div>
+    <div class="metric-card lime"><div class="mc-label">Duração total</div><div class="mc-value green">${Math.floor(totalMin/60)}h${(totalMin%60).toString().padStart(2,'0')}m</div></div>
+    <div class="metric-card amber"><div class="mc-label">Quadras</div><div class="mc-value amber">${quadras}</div></div>
+    <div class="metric-card pink"><div class="mc-label">Previsão fim</div><div class="mc-value">${fmtHora(fimGeral)}</div></div>
+  `;
+
+  // Timeline
+  const tlEl=document.getElementById('chv-timeline');
+  if(tlEl){
+    const barTotal=fimGeral-(hIni*60+mIni)||1;
+    tlEl.innerHTML=`
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;">Linha do tempo estimada</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        ${catTimings.filter(t=>!t.skip&&t.nd>=2).map((t,i)=>{
+          const colors=['var(--lime)','var(--purple-light)','var(--pink)','#EF9F27'];
+          const cor=colors[i%4];
+          const left=Math.round((t.inicioMin-(hIni*60+mIni))/barTotal*100);
+          const width=Math.max(2,Math.round(t.duracaoMin/barTotal*100));
+          return`<div style="display:flex;align-items:center;gap:10px;">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:var(--text2);width:120px;flex-shrink:0;">${t.cat}</div>
+            <div style="flex:1;height:28px;background:var(--black4);border-radius:4px;position:relative;">
+              <div style="position:absolute;left:${left}%;width:${width}%;height:100%;background:${cor};border-radius:4px;opacity:0.85;"></div>
+              <div style="position:absolute;left:${left}%;width:${width}%;height:100%;display:flex;align-items:center;justify-content:center;">
+                <span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:#000;white-space:nowrap;">${fmtHora(t.inicioMin)} – ${fmtHora(t.fimMin)} (${t.totalJogos} jogos)</span>
+              </div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);font-family:'Barlow Condensed',sans-serif;margin-top:6px;">
+        <span>${fmtHora(hIni*60+mIni)}</span><span>${fmtHora(fimGeral)}</span>
+      </div>`;
+  }
+
+  // Bracket cards
+  const brEl=document.getElementById('chv-brackets');
+  if(brEl){
+    brEl.innerHTML=catTimings.map(t=>{
+      if(t.skip||t.nd<2) return`<div class="card"><div class="card-header"><div class="card-title"><span class="badge ${catBadge[t.cat]||'badge-gray'}" style="font-size:13px;">${t.cat}</span></div></div><div class="card-body"><div class="empty-state" style="padding:16px;"><div class="empty-icon">🤝</div><div class="empty-text">Forme ao menos 2 duplas nesta categoria</div></div></div></div>`;
+      const nd=t.nd;
+      const wbR=calcRoundsWB(nd);
+      // Build WB rounds summary
+      let wbRounds=[]; let tw=nd;
+      for(let r=0;r<wbR;r++){
+        const jogos=Math.floor(tw/2);
+        const nomeFase=r===0?'Oitavas':r===1?'Quartas':r===2?'Semifinal':r===3?'Final WB':'Fase '+(r+1);
+        wbRounds.push({nome:nomeFase,jogos});
+        tw=Math.ceil(tw/2);
+      }
+      // LB summary
+      let lbRounds=[];
+      let lbT=0;
+      for(let r=1;r<=wbR-1;r++){
+        const dropped=Math.floor(nd/Math.pow(2,r));
+        lbT+=dropped;
+        const j1=Math.floor(lbT/2);
+        if(j1>0) lbRounds.push({nome:'LB Fase '+(lbRounds.length+1),jogos:j1});
+        lbT-=j1;
+        if(lbT>1){const j2=Math.floor(lbT/2);if(j2>0){lbRounds.push({nome:'LB Fase '+(lbRounds.length+1),jogos:j2});lbT-=j2;}}
+      }
+
+      const totalJogos=wbRounds.reduce((s,r)=>s+r.jogos,0)+lbRounds.reduce((s,r)=>s+r.jogos,0)+1;
+      const durMin=t.duracaoMin;
+
+      return`<div class="card">
+        <div class="card-header">
+          <div class="card-title"><span class="badge ${catBadge[t.cat]||'badge-gray'}" style="font-size:13px;">${t.cat}</span> <span style="color:var(--text3);font-weight:400;font-size:13px;">${nd} duplas · ${totalJogos} jogos · ${Math.floor(durMin/60)}h${(durMin%60).toString().padStart(2,'0')}m</span></div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;color:var(--text3);">${fmtHora(t.inicioMin)} – ${fmtHora(t.fimMin)}</div>
+        </div>
+        <div class="card-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:var(--lime);margin-bottom:10px;">Winners Bracket</div>
+              ${wbRounds.map(r=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;">
+                <span style="font-family:'Barlow Condensed',sans-serif;font-weight:600;">${r.nome}</span>
+                <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--lime);">${r.jogos} jogo${r.jogos!==1?'s':''}</span>
+              </div>`).join('')}
+            </div>
+            <div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:var(--purple-light);margin-bottom:10px;">Losers Bracket</div>
+              ${lbRounds.map(r=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;">
+                <span style="font-family:'Barlow Condensed',sans-serif;font-weight:600;">${r.nome}</span>
+                <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--purple-light);">${r.jogos} jogo${r.jogos!==1?'s':''}</span>
+              </div>`).join('')}
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:13px;">
+                <span style="font-family:'Barlow Condensed',sans-serif;font-weight:600;color:var(--pink);">Grand Final</span>
+                <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--pink);">1 jogo</span>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:14px;padding:10px 14px;background:var(--black3);border-radius:var(--r);display:flex;gap:24px;flex-wrap:wrap;">
+            <div><div style="font-size:11px;color:var(--text3);font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.06em;">Tempo por jogo</div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--text);">${t.tempo} min</div></div>
+            <div><div style="font-size:11px;color:var(--text3);font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.06em;">Total de jogos</div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--lime);">${totalJogos}</div></div>
+            <div><div style="font-size:11px;color:var(--text3);font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.06em;">Duração estimada</div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--purple-light);">${Math.floor(durMin/60)}h${(durMin%60).toString().padStart(2,'0')}m</div></div>
+            <div><div style="font-size:11px;color:var(--text3);font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.06em;">Início / Fim</div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--pink);">${fmtHora(t.inicioMin)} – ${fmtHora(t.fimMin)}</div></div>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+}
+
+function fmtHora(min){
+  const h=Math.floor(min/60)%24;
+  const m=min%60;
+  return h.toString().padStart(2,'0')+':'+m.toString().padStart(2,'0');
+}
+
+// ===== SIMULAÇÃO =====
+function renderSimulacao(){
+  const quadras=parseInt(document.getElementById('sim-quadras')?.value)||3;
+  const intervalo=parseInt(document.getElementById('sim-intervalo')?.value)||5;
+  const inicioStr=document.getElementById('sim-inicio')?.value||'08:00';
+  const [hIni,mIni]=inicioStr.split(':').map(Number);
+
+  // Build cat input cards
+  const inputEl=document.getElementById('sim-cat-inputs');
+  if(inputEl && !inputEl.dataset.built){
+    inputEl.dataset.built='1';
+    inputEl.innerHTML=CATS.map(c=>{
+      const key=c.replace(/ /g,'_');
+      return`<div style="background:var(--black3);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;">
+        <div style="margin-bottom:10px;"><span class="badge ${catBadge[c]||'badge-gray'}" style="font-size:12px;">${c}</span></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <label>Duplas</label>
+            <input type="number" id="sim-nd-${key}" value="8" min="2" max="64" oninput="renderSimulacao()" style="width:100%;">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <label>Tempo/jogo (min)</label>
+            <input type="number" id="sim-tp-${key}" value="25" min="5" max="120" oninput="renderSimulacao()" style="width:100%;">
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // Collect inputs
+  const simCats=CATS.map(c=>{
+    const key=c.replace(/ /g,'_');
+    const nd=parseInt(document.getElementById('sim-nd-'+key)?.value)||2;
+    const tempo=parseInt(document.getElementById('sim-tp-'+key)?.value)||25;
+    return{cat:c,nd,tempo};
+  });
+
+  // Calc timings (same logic as chaveamento)
+  let minAtual=hIni*60+mIni;
+  const catTimings=simCats.map(({cat,nd,tempo})=>{
+    if(nd<2) return{cat,nd,skip:true,tempo};
+    const wbR=calcRoundsWB(nd);
+    const jogosPorRodada=[];
+    let tw=nd;
+    for(let r=0;r<wbR;r++){
+      const j=Math.floor(tw/2);
+      jogosPorRodada.push({fase:'WB',jogos:j});
+      tw=Math.ceil(tw/2);
+    }
+    let lbT=0;
+    for(let r=1;r<=wbR-1;r++){
+      const dropped=Math.floor(nd/Math.pow(2,r));
+      lbT+=dropped;
+      const j1=Math.floor(lbT/2);
+      if(j1>0) jogosPorRodada.push({fase:'LB',jogos:j1});
+      lbT-=j1;
+      if(lbT>1){const j2=Math.floor(lbT/2);if(j2>0){jogosPorRodada.push({fase:'LB',jogos:j2});lbT-=j2;}}
+    }
+    jogosPorRodada.push({fase:'Final',jogos:1});
+    const totalJogos=jogosPorRodada.reduce((s,r)=>s+r.jogos,0);
+    let duracaoMin=0;
+    jogosPorRodada.forEach(r=>{
+      duracaoMin+=Math.ceil(r.jogos/quadras)*(tempo+intervalo);
+    });
+    const inicioMin=minAtual;
+    const fimMin=inicioMin+duracaoMin;
+    minAtual=fimMin;
+
+    // WB/LB rounds for display
+    let wbRounds=[]; let tw2=nd;
+    for(let r=0;r<wbR;r++){
+      const j=Math.floor(tw2/2);
+      const nome=r===0?'Oitavas':r===1?'Quartas':r===2?'Semifinal':r===3?'Final WB':'Fase '+(r+1);
+      wbRounds.push({nome,jogos:j}); tw2=Math.ceil(tw2/2);
+    }
+    let lbRounds=[]; let lbT2=0;
+    for(let r=1;r<=wbR-1;r++){
+      const dropped=Math.floor(nd/Math.pow(2,r));
+      lbT2+=dropped;
+      const j1=Math.floor(lbT2/2);
+      if(j1>0) lbRounds.push({nome:'LB Fase '+(lbRounds.length+1),jogos:j1});
+      lbT2-=j1;
+      if(lbT2>1){const j2=Math.floor(lbT2/2);if(j2>0){lbRounds.push({nome:'LB Fase '+(lbRounds.length+1),jogos:j2});lbT2-=j2;}}
+    }
+    return{cat,nd,tempo,totalJogos,wbRounds,lbRounds,jogosPorRodada,inicioMin,fimMin,duracaoMin};
+  });
+
+  const valid=catTimings.filter(t=>!t.skip);
+  const totalJogosGeral=valid.reduce((s,t)=>s+t.totalJogos,0);
+  const totalMin=minAtual-(hIni*60+mIni);
+  const fimGeral=minAtual;
+
+  // Metrics
+  document.getElementById('sim-metrics').innerHTML=`
+    <div class="metric-card purple"><div class="mc-label">Total de jogos</div><div class="mc-value">${totalJogosGeral}</div></div>
+    <div class="metric-card lime"><div class="mc-label">Duração total</div><div class="mc-value green">${Math.floor(totalMin/60)}h${(totalMin%60).toString().padStart(2,'0')}m</div></div>
+    <div class="metric-card amber"><div class="mc-label">Quadras</div><div class="mc-value amber">${quadras}</div></div>
+    <div class="metric-card pink"><div class="mc-label">Previsão fim</div><div class="mc-value">${fmtHora(fimGeral)}</div></div>
+  `;
+
+  // Timeline
+  const tlWrap=document.getElementById('sim-timeline-wrap');
+  const tlEl=document.getElementById('sim-timeline');
+  if(valid.length && tlWrap && tlEl){
+    tlWrap.style.display='block';
+    const barTotal=fimGeral-(hIni*60+mIni)||1;
+    const colors=['var(--lime)','var(--purple-light)','var(--pink)','#EF9F27'];
+    tlEl.innerHTML=`
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px;">
+        ${valid.map((t,i)=>{
+          const cor=colors[i%4];
+          const left=Math.round((t.inicioMin-(hIni*60+mIni))/barTotal*100);
+          const width=Math.max(2,Math.round(t.duracaoMin/barTotal*100));
+          return`<div style="display:flex;align-items:center;gap:10px;">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:var(--text2);width:120px;flex-shrink:0;">${t.cat}</div>
+            <div style="flex:1;height:28px;background:var(--black4);border-radius:4px;position:relative;">
+              <div style="position:absolute;left:${left}%;width:${width}%;height:100%;background:${cor};border-radius:4px;opacity:0.85;"></div>
+              <div style="position:absolute;left:${left}%;width:${width}%;height:100%;display:flex;align-items:center;justify-content:center;">
+                <span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:#000;white-space:nowrap;">${fmtHora(t.inicioMin)} – ${fmtHora(t.fimMin)} · ${t.nd} duplas · ${t.totalJogos} jogos</span>
+              </div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);font-family:'Barlow Condensed',sans-serif;">
+        <span>${fmtHora(hIni*60+mIni)}</span><span>${fmtHora(fimGeral)}</span>
+      </div>`;
+  }
+
+  // Bracket cards
+  const brEl=document.getElementById('sim-brackets');
+  if(brEl){
+    brEl.innerHTML=catTimings.map(t=>{
+      if(t.skip||t.nd<2) return`<div class="card"><div class="card-header"><div class="card-title"><span class="badge ${catBadge[t.cat]||'badge-gray'}" style="font-size:13px;">${t.cat}</span></div></div><div class="card-body"><div class="empty-state" style="padding:16px;"><div class="empty-icon">🔢</div><div class="empty-text">Mínimo de 2 duplas para gerar chaveamento</div></div></div></div>`;
+      return`<div class="card">
+        <div class="card-header">
+          <div class="card-title"><span class="badge ${catBadge[t.cat]||'badge-gray'}" style="font-size:13px;">${t.cat}</span> <span style="color:var(--text3);font-weight:400;font-size:13px;">${t.nd} duplas · ${t.totalJogos} jogos · ${Math.floor(t.duracaoMin/60)}h${(t.duracaoMin%60).toString().padStart(2,'0')}m</span></div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;color:var(--text3);">${fmtHora(t.inicioMin)} – ${fmtHora(t.fimMin)}</div>
+        </div>
+        <div class="card-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:var(--lime);margin-bottom:10px;">Winners Bracket</div>
+              ${t.wbRounds.map(r=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;">
+                <span style="font-family:'Barlow Condensed',sans-serif;font-weight:600;">${r.nome}</span>
+                <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--lime);">${r.jogos} jogo${r.jogos!==1?'s':''}</span>
+              </div>`).join('')}
+            </div>
+            <div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:var(--purple-light);margin-bottom:10px;">Losers Bracket</div>
+              ${t.lbRounds.map(r=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;">
+                <span style="font-family:'Barlow Condensed',sans-serif;font-weight:600;">${r.nome}</span>
+                <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--purple-light);">${r.jogos} jogo${r.jogos!==1?'s':''}</span>
+              </div>`).join('')}
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:13px;">
+                <span style="font-family:'Barlow Condensed',sans-serif;font-weight:600;color:var(--pink);">Grand Final</span>
+                <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--pink);">1 jogo</span>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:14px;padding:10px 14px;background:var(--black3);border-radius:var(--r);display:flex;gap:24px;flex-wrap:wrap;">
+            <div><div style="font-size:11px;color:var(--text3);font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.06em;">Tempo por jogo</div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--text);">${t.tempo} min</div></div>
+            <div><div style="font-size:11px;color:var(--text3);font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.06em;">Total de jogos</div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--lime);">${t.totalJogos}</div></div>
+            <div><div style="font-size:11px;color:var(--text3);font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.06em;">Duração</div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--purple-light);">${Math.floor(t.duracaoMin/60)}h${(t.duracaoMin%60).toString().padStart(2,'0')}m</div></div>
+            <div><div style="font-size:11px;color:var(--text3);font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.06em;">Início / Fim</div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--pink);">${fmtHora(t.inicioMin)} – ${fmtHora(t.fimMin)}</div></div>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+}
+
+// ===== MARKETING =====
+let mktMesAtual = new Date();
+mktMesAtual.setDate(1);
+let editingPostId = null;
+
+const TIPO_ICON = {'Feed — Foto':'🖼','Feed — Carrossel':'🗂','Feed — Vídeo':'🎬','Stories':'⭕','Reels':'🎵'};
+const STATUS_BADGE = {'Ideia':'badge-gray','Agendado':'badge-purple','Publicado':'badge-lime','Atrasado':'badge-red'};
+
+function statusAutoPost(p){
+  if(p.status==='Publicado') return 'Publicado';
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const data = new Date(p.data+'T00:00:00');
+  if(data < hoje && p.status!=='Publicado') return 'Atrasado';
+  return p.status||'Ideia';
+}
+
+function addPost(){
+  const titulo=document.getElementById('mkt-titulo').value.trim();
+  const data=document.getElementById('mkt-data').value;
+  if(!titulo){toast('Informe o título do post','pink');return;}
+  if(!data){toast('Informe a data do post','pink');return;}
+  if(!S.posts) S.posts=[];
+  S.posts.push({
+    id:uid(), titulo,
+    tipo:document.getElementById('mkt-tipo').value,
+    data, hora:document.getElementById('mkt-hora').value,
+    legenda:document.getElementById('mkt-legenda').value.trim(),
+    hashtags:document.getElementById('mkt-hashtags').value.trim(),
+    status:'Agendado', alcance:0, curtidas:0, salvamentos:0
+  });
+  save();
+  document.getElementById('mkt-titulo').value='';
+  document.getElementById('mkt-data').value='';
+  document.getElementById('mkt-legenda').value='';
+  document.getElementById('mkt-hashtags').value='';
+  renderMarketing(); toast('Post adicionado!');
+}
+
+function abrirPost(id){
+  const p=(S.posts||[]).find(p=>p.id===id);
+  if(!p)return;
+  editingPostId=id;
+  document.getElementById('mp-titulo-header').textContent=p.titulo;
+  document.getElementById('mp-titulo').value=p.titulo;
+  document.getElementById('mp-tipo').value=p.tipo;
+  document.getElementById('mp-data').value=p.data;
+  document.getElementById('mp-hora').value=p.hora||'18:00';
+  document.getElementById('mp-legenda').value=p.legenda||'';
+  document.getElementById('mp-hashtags').value=p.hashtags||'';
+  document.getElementById('mp-status').value=p.status==='Atrasado'?'Agendado':p.status;
+  document.getElementById('mp-alcance').value=p.alcance||0;
+  document.getElementById('mp-curtidas').value=p.curtidas||0;
+  document.getElementById('mp-salvamentos').value=p.salvamentos||0;
+  document.getElementById('modal-post').classList.add('open');
+}
+function closeModalPost(){document.getElementById('modal-post').classList.remove('open');editingPostId=null;}
+function salvarPost(){
+  const p=(S.posts||[]).find(p=>p.id===editingPostId);
+  if(!p)return;
+  p.titulo=document.getElementById('mp-titulo').value.trim();
+  p.tipo=document.getElementById('mp-tipo').value;
+  p.data=document.getElementById('mp-data').value;
+  p.hora=document.getElementById('mp-hora').value;
+  p.legenda=document.getElementById('mp-legenda').value.trim();
+  p.hashtags=document.getElementById('mp-hashtags').value.trim();
+  p.status=document.getElementById('mp-status').value;
+  p.alcance=parseInt(document.getElementById('mp-alcance').value)||0;
+  p.curtidas=parseInt(document.getElementById('mp-curtidas').value)||0;
+  p.salvamentos=parseInt(document.getElementById('mp-salvamentos').value)||0;
+  save(); closeModalPost(); renderMarketing(); toast('Post salvo!');
+}
+function remPostModal(){
+  if(!confirm('Remover este post?'))return;
+  S.posts=(S.posts||[]).filter(p=>p.id!==editingPostId);
+  save(); closeModalPost(); renderMarketing(); toast('Post removido','pink');
+}
+
+function mesAnterior(){mktMesAtual.setMonth(mktMesAtual.getMonth()-1);renderCalendario();}
+function mesSeguinte(){mktMesAtual.setMonth(mktMesAtual.getMonth()+1);renderCalendario();}
+
+function renderMarketing(){
+  if(!S.posts) S.posts=[];
+  const posts=S.posts;
+  const total=posts.length;
+  const publicados=posts.filter(p=>p.status==='Publicado').length;
+  const agendados=posts.filter(p=>statusAutoPost(p)==='Agendado').length;
+  const atrasados=posts.filter(p=>statusAutoPost(p)==='Atrasado').length;
+  const alcanceTotal=posts.reduce((s,p)=>s+(p.alcance||0),0);
+  const curtidasTotal=posts.reduce((s,p)=>s+(p.curtidas||0),0);
+
+  document.getElementById('mkt-metrics').innerHTML=`
+    <div class="metric-card purple"><div class="mc-label">Total posts</div><div class="mc-value">${total}</div></div>
+    <div class="metric-card lime"><div class="mc-label">Publicados</div><div class="mc-value green">${publicados}</div></div>
+    <div class="metric-card purple"><div class="mc-label">Agendados</div><div class="mc-value purple">${agendados}</div></div>
+    <div class="metric-card pink"><div class="mc-label">Atrasados</div><div class="mc-value red">${atrasados}</div></div>
+    <div class="metric-card lime"><div class="mc-label">Alcance total</div><div class="mc-value green">${alcanceTotal.toLocaleString('pt-BR')}</div></div>
+    <div class="metric-card amber"><div class="mc-label">Curtidas total</div><div class="mc-value amber">${curtidasTotal.toLocaleString('pt-BR')}</div></div>
+  `;
+  document.getElementById('nb-mkt').textContent=total;
+  renderCalendario();
+  renderPosts();
+}
+
+function renderCalendario(){
+  const MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const DIAS=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+  const ano=mktMesAtual.getFullYear();
+  const mes=mktMesAtual.getMonth();
+  document.getElementById('mkt-mes-label').textContent=`${MESES[mes]} ${ano}`;
+
+  const primeiroDia=new Date(ano,mes,1).getDay();
+  const diasNoMes=new Date(ano,mes+1,0).getDate();
+  const hoje=new Date(); hoje.setHours(0,0,0,0);
+
+  const postsPorDia={};
+  (S.posts||[]).forEach(p=>{
+    if(!p.data)return;
+    const d=new Date(p.data+'T00:00:00');
+    if(d.getFullYear()===ano&&d.getMonth()===mes){
+      const dia=d.getDate();
+      if(!postsPorDia[dia])postsPorDia[dia]=[];
+      postsPorDia[dia].push(p);
+    }
+  });
+
+  let html=`<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:6px;">
+    ${DIAS.map(d=>`<div style="text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--text3);padding:4px 0;">${d}</div>`).join('')}
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;">`;
+
+  for(let i=0;i<primeiroDia;i++){
+    html+=`<div style="min-height:64px;"></div>`;
+  }
+
+  for(let d=1;d<=diasNoMes;d++){
+    const dataAtual=new Date(ano,mes,d);
+    const ehHoje=dataAtual.getTime()===hoje.getTime();
+    const posts=postsPorDia[d]||[];
+    const temPost=posts.length>0;
+    html+=`<div style="min-height:64px;background:${ehHoje?'rgba(139,63,216,0.15)':'var(--black3)'};border:1px solid ${ehHoje?'var(--purple)':'var(--border)'};border-radius:var(--r);padding:6px;cursor:default;">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:${ehHoje?'var(--purple-light)':'var(--text3)'};">${d}</div>
+      ${posts.slice(0,2).map(p=>{
+        const st=statusAutoPost(p);
+        const cor=st==='Publicado'?'var(--lime)':st==='Atrasado'?'var(--pink)':'var(--purple-light)';
+        return`<div onclick="abrirPost(${p.id})" style="margin-top:3px;background:${st==='Publicado'?'rgba(170,255,0,0.1)':st==='Atrasado'?'rgba(255,27,173,0.1)':'rgba(139,63,216,0.12)'};border-radius:4px;padding:2px 5px;font-size:10px;font-family:'Barlow Condensed',sans-serif;font-weight:600;color:${cor};cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${p.titulo}">${TIPO_ICON[p.tipo]||'📄'} ${p.titulo}</div>`;
+      }).join('')}
+      ${posts.length>2?`<div style="font-size:10px;color:var(--text3);margin-top:2px;font-family:'Barlow Condensed',sans-serif;">+${posts.length-2} mais</div>`:''}
+    </div>`;
+  }
+  html+=`</div>`;
+  document.getElementById('mkt-calendario').innerHTML=html;
+}
+
+function renderPosts(){
+  if(!S.posts) S.posts=[];
+  const fstatus=document.getElementById('mkt-filtro-status').value;
+  const ftipo=document.getElementById('mkt-filtro-tipo').value;
+  const lista=[...S.posts]
+    .sort((a,b)=>a.data>b.data?1:-1)
+    .filter(p=>{
+      const st=statusAutoPost(p);
+      if(fstatus&&st!==fstatus)return false;
+      if(ftipo&&p.tipo!==ftipo)return false;
+      return true;
+    });
+  const tb=document.getElementById('mkt-tbody');
+  const empty=document.getElementById('mkt-empty');
+  if(!lista.length){tb.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  tb.innerHTML=lista.map(p=>{
+    const st=statusAutoPost(p);
+    const dataFmt=p.data?new Date(p.data+'T00:00:00').toLocaleDateString('pt-BR'):'—';
+    return`<tr style="cursor:pointer;" onclick="abrirPost(${p.id})">
+      <td style="font-family:'Barlow Condensed',sans-serif;font-weight:600;">${dataFmt}</td>
+      <td style="color:var(--text3);">${p.hora||'—'}</td>
+      <td style="font-weight:500;">${p.titulo}</td>
+      <td><span style="font-size:13px;">${TIPO_ICON[p.tipo]||''} ${p.tipo}</span></td>
+      <td><span class="badge ${STATUS_BADGE[st]||'badge-gray'}">${st}</span></td>
+      <td style="font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--lime);">${(p.alcance||0).toLocaleString('pt-BR')}</td>
+      <td style="font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--purple-light);">${(p.curtidas||0).toLocaleString('pt-BR')}</td>
+      <td style="font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--amber);">${(p.salvamentos||0).toLocaleString('pt-BR')}</td>
+      <td><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();abrirPost(${p.id})">✏️</button></td>
+    </tr>`;
+  }).join('');
+}
 // Also update uniforms summary if financeiro is visible
 function renderAllFull(){renderAll();try{renderUniformes();}catch(e){}}
 
