@@ -748,9 +748,12 @@ function atualizarSelectsDupla(){
   const catMap={};CATS.forEach(c=>catMap[c]=[]);
   S.jogadores.forEach(j=>j.cats.forEach(c=>{if(catMap[c])catMap[c].push(j);}));
   const jogs=catMap[cat]||[];
-  const opts=jogs.map(j=>`<option value="${j.nome}">${j.nome}</option>`).join('');
-  document.getElementById('fd-a1').innerHTML=opts||'<option value="">Nenhum jogador</option>';
-  document.getElementById('fd-a2').innerHTML=opts||'<option value="">Nenhum jogador</option>';
+  const emDupla=new Set((S.duplas&&S.duplas[cat]||[]).flatMap(d=>[d.a1,d.a2]));
+  const livres=jogs.filter(j=>!emDupla.has(j.nome));
+  const opts=livres.map(j=>`<option value="${j.nome}">${j.nome}</option>`).join('');
+  const empty='<option value="">Nenhum atleta disponível</option>';
+  document.getElementById('fd-a1').innerHTML=opts||empty;
+  document.getElementById('fd-a2').innerHTML=opts||empty;
 }
 function confirmarDupla(){
   const cat=document.getElementById('fd-cat').value;
