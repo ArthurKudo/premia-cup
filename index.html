@@ -62,10 +62,11 @@ body{font-family:'Barlow',sans-serif;background:var(--black);color:var(--text);m
 .card-body{padding:18px 20px;}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 label{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;}
-input[type=text],input[type=number],input[type=tel],input[type=search],select,textarea{background:var(--black3);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:'Barlow',sans-serif;font-size:13px;padding:9px 12px;transition:border-color 0.15s,background 0.15s;width:100%;}
-input:focus,select:focus{outline:none;border-color:var(--purple);background:var(--black4);}
+input[type=text],input[type=number],input[type=tel],input[type=search],input[type=date],input[type=time],select,textarea{background:var(--black3);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:'Barlow',sans-serif;font-size:13px;padding:9px 12px;transition:border-color 0.15s,background 0.15s;width:100%;color-scheme:dark;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--purple);background:var(--black4);}
 input::placeholder{color:var(--text3);}
 select option{background:var(--black3);}
+input[type=date]::-webkit-calendar-picker-indicator,input[type=time]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(0.6);cursor:pointer;}
 .cat-group{display:flex;flex-wrap:wrap;gap:8px;}
 .cat-chip{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:20px;border:1px solid var(--border2);background:var(--black3);color:var(--text2);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.03em;cursor:pointer;transition:all 0.15s;user-select:none;}
 .cat-chip input{display:none;}
@@ -540,70 +541,85 @@ tr:hover td{background:rgba(255,255,255,0.02);}
 
   <!-- CHAVEAMENTO -->
   <div class="page" id="page-chaveamento">
-    <div class="page-header"><div class="page-header-title">Chaveamento</div><div class="page-header-sub">eliminatória dupla · 3 quadras</div></div>
+    <div class="page-header"><div class="page-header-title">Chaveamento</div><div class="page-header-sub">eliminatória dupla · 2 dias</div></div>
 
     <div class="metrics" id="chv-metrics"></div>
 
-    <!-- CALCULADORA DE TEMPO -->
+    <!-- DIA 1 -->
     <div class="card">
-      <div class="card-header"><div class="card-title">⏱ Calculadora de <span class="accent">Tempo</span></div></div>
+      <div class="card-header">
+        <div class="card-title">📅 <span class="accent">Dia 1</span> — Iniciante & Estreante</div>
+      </div>
       <div class="card-body">
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px;">
-          <div style="display:flex;flex-direction:column;gap:5px;">
-            <label>Quadras disponíveis</label>
-            <input type="number" id="chv-quadras" value="3" min="1" max="10" oninput="renderChaveamento()">
-          </div>
-          <div style="display:flex;flex-direction:column;gap:5px;">
-            <label>Intervalo entre jogos (min)</label>
-            <input type="number" id="chv-intervalo" value="5" min="0" oninput="renderChaveamento()">
-          </div>
-          <div style="display:flex;flex-direction:column;gap:5px;">
-            <label>Horário de início</label>
-            <input type="time" id="chv-inicio" value="08:00" oninput="renderChaveamento()">
-          </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:14px;">
+          <div style="display:flex;flex-direction:column;gap:5px;"><label>Quadras disponíveis</label><input type="number" id="chv-quadras-d1" value="3" min="1" max="10" oninput="renderChaveamento()"></div>
+          <div style="display:flex;flex-direction:column;gap:5px;"><label>Intervalo entre jogos (min)</label><input type="number" id="chv-intervalo-d1" value="5" min="0" oninput="renderChaveamento()"></div>
+          <div style="display:flex;flex-direction:column;gap:5px;"><label>Horário de início</label><input type="time" id="chv-inicio-d1" value="08:00" oninput="renderChaveamento()"></div>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:16px;" id="chv-params-cats"></div>
-        <div id="chv-timeline"></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:14px;" id="chv-params-d1"></div>
+        <div id="chv-timeline-d1"></div>
       </div>
     </div>
 
-    <!-- CHAVEAMENTO POR CATEGORIA -->
+    <!-- DIA 2 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">📅 <span class="accent">Dia 2</span> — Bronze & Mista Iniciante</div>
+      </div>
+      <div class="card-body">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:14px;">
+          <div style="display:flex;flex-direction:column;gap:5px;"><label>Quadras disponíveis</label><input type="number" id="chv-quadras-d2" value="3" min="1" max="10" oninput="renderChaveamento()"></div>
+          <div style="display:flex;flex-direction:column;gap:5px;"><label>Intervalo entre jogos (min)</label><input type="number" id="chv-intervalo-d2" value="5" min="0" oninput="renderChaveamento()"></div>
+          <div style="display:flex;flex-direction:column;gap:5px;"><label>Horário de início</label><input type="time" id="chv-inicio-d2" value="08:00" oninput="renderChaveamento()"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:14px;" id="chv-params-d2"></div>
+        <div id="chv-timeline-d2"></div>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:flex-end;margin-bottom:18px;">
+      <button class="btn btn-lime" onclick="salvarChvParams()">💾 Salvar parâmetros</button>
+    </div>
+
+    <!-- BRACKETS -->
     <div id="chv-brackets"></div>
   </div>
 
 
   <!-- SIMULAÇÃO -->
   <div class="page" id="page-simulacao">
-    <div class="page-header"><div class="page-header-title">Simulação</div><div class="page-header-sub">teste livre de cenários de chaveamento</div></div>
-
-    <div class="card">
-      <div class="card-header"><div class="card-title">🔢 Parâmetros da <span class="accent">Simulação</span></div></div>
-      <div class="card-body">
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px;">
-          <div style="display:flex;flex-direction:column;gap:5px;">
-            <label>Quadras disponíveis</label>
-            <input type="number" id="sim-quadras" value="3" min="1" max="10" oninput="renderSimulacao()">
-          </div>
-          <div style="display:flex;flex-direction:column;gap:5px;">
-            <label>Intervalo entre jogos (min)</label>
-            <input type="number" id="sim-intervalo" value="5" min="0" oninput="renderSimulacao()">
-          </div>
-          <div style="display:flex;flex-direction:column;gap:5px;">
-            <label>Horário de início</label>
-            <input type="time" id="sim-inicio" value="08:00" oninput="renderSimulacao()">
-          </div>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;" id="sim-cat-inputs"></div>
-      </div>
-    </div>
+    <div class="page-header"><div class="page-header-title">Simulação</div><div class="page-header-sub">teste livre de cenários de chaveamento · 2 dias</div></div>
 
     <div class="metrics" id="sim-metrics"></div>
-    <div id="sim-timeline-wrap" style="display:none;">
-      <div class="card">
-        <div class="card-header"><div class="card-title">⏱ Linha do <span class="accent">Tempo</span></div></div>
-        <div class="card-body" id="sim-timeline"></div>
+
+    <!-- DIA 1 -->
+    <div class="card">
+      <div class="card-header"><div class="card-title">📅 <span class="accent">Dia 1</span> — Iniciante & Estreante</div></div>
+      <div class="card-body">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:14px;">
+          <div style="display:flex;flex-direction:column;gap:5px;"><label>Quadras disponíveis</label><input type="number" id="sim-quadras-d1" value="3" min="1" max="10" oninput="renderSimulacao()"></div>
+          <div style="display:flex;flex-direction:column;gap:5px;"><label>Intervalo entre jogos (min)</label><input type="number" id="sim-intervalo-d1" value="5" min="0" oninput="renderSimulacao()"></div>
+          <div style="display:flex;flex-direction:column;gap:5px;"><label>Horário de início</label><input type="time" id="sim-inicio-d1" value="08:00" oninput="renderSimulacao()"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:14px;" id="sim-inputs-d1"></div>
+        <div id="sim-timeline-d1"></div>
       </div>
     </div>
+
+    <!-- DIA 2 -->
+    <div class="card">
+      <div class="card-header"><div class="card-title">📅 <span class="accent">Dia 2</span> — Bronze & Mista Iniciante</div></div>
+      <div class="card-body">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:14px;">
+          <div style="display:flex;flex-direction:column;gap:5px;"><label>Quadras disponíveis</label><input type="number" id="sim-quadras-d2" value="3" min="1" max="10" oninput="renderSimulacao()"></div>
+          <div style="display:flex;flex-direction:column;gap:5px;"><label>Intervalo entre jogos (min)</label><input type="number" id="sim-intervalo-d2" value="5" min="0" oninput="renderSimulacao()"></div>
+          <div style="display:flex;flex-direction:column;gap:5px;"><label>Horário de início</label><input type="time" id="sim-inicio-d2" value="08:00" oninput="renderSimulacao()"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:14px;" id="sim-inputs-d2"></div>
+        <div id="sim-timeline-d2"></div>
+      </div>
+    </div>
+
     <div id="sim-brackets"></div>
   </div>
 
@@ -1356,339 +1372,141 @@ function getNDuplas(cat){
 
 function renderChaveamento(){
   if(!S.chvParams) S.chvParams={};
-  const quadras=parseInt(document.getElementById('chv-quadras')?.value)||3;
-  const intervalo=parseInt(document.getElementById('chv-intervalo')?.value)||5;
-  const inicioStr=document.getElementById('chv-inicio')?.value||'08:00';
 
-  // Cat params inputs
-  const pEl=document.getElementById('chv-params-cats');
-  if(pEl){
-    pEl.innerHTML=CATS.map(c=>{
-      const key=c.replace(/ /g,'_');
-      const val=S.chvParams[c]||25;
-      const nd=getNDuplas(c);
-      return`<div style="background:var(--black3);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-          <span class="badge ${catBadge[c]||'badge-gray'}" style="font-size:12px;">${c}</span>
-          <span style="font-size:11px;color:var(--text3);font-family:'Barlow Condensed',sans-serif;">${nd} dupla${nd!==1?'s':''}</span>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:4px;">
-          <label>Tempo por jogo (min)</label>
-          <input type="number" id="chv-tempo-${key}" value="${val}" min="10" max="120" style="width:100%;" oninput="renderChaveamento()">
-        </div>
-      </div>`;
-    }).join('');
-    pEl.innerHTML+=`<div style="display:flex;align-items:flex-end;"><button class="btn btn-lime btn-sm" onclick="salvarChvParams()" style="width:100%;">💾 Salvar tempos</button></div>`;
-  }
+  const DIAS=[
+    {id:'d1',label:'Dia 1',cats:['Iniciante','Estreante'],cor:'var(--purple-light)'},
+    {id:'d2',label:'Dia 2',cats:['Bronze','Mista Iniciante'],cor:'var(--lime)'},
+  ];
 
-  // Metrics
   let totalJogosGeral=0;
-  CATS.forEach(c=>{
-    const nd=getNDuplas(c);
-    if(nd>=2) totalJogosGeral+=calcTotalJogos(nd);
-  });
+  let totalMinGeral=0;
+  const allTimings=[];
 
-  // Timeline calculation — sequential with parallel from semis
-  // Each cat runs sequentially on all quadras until semis, then parallel
-  const [hIni,mIni]=inicioStr.split(':').map(Number);
-  let minAtual=hIni*60+mIni;
+  DIAS.forEach(dia=>{
+    const quadras=parseInt(document.getElementById('chv-quadras-'+dia.id)?.value)||3;
+    const intervalo=parseInt(document.getElementById('chv-intervalo-'+dia.id)?.value)||5;
+    const inicioStr=document.getElementById('chv-inicio-'+dia.id)?.value||'08:00';
+    const [hIni,mIni]=inicioStr.split(':').map(Number);
+    let minAtual=hIni*60+mIni;
 
-  const catTimings=[];
-  CATS.forEach(c=>{
-    const nd=getNDuplas(c);
-    if(nd<2){catTimings.push({cat:c,nd,skip:true});return;}
-    const tempo=getTemplo(c);
-    const jogosPorRodada=[];
-    // WB rounds
-    let teamsWB=nd;
-    while(teamsWB>1){
-      jogosPorRodada.push({fase:'Winners',jogos:Math.floor(teamsWB/2)});
-      teamsWB=Math.ceil(teamsWB/2);
+    // params inputs
+    const pEl=document.getElementById('chv-params-'+dia.id);
+    if(pEl){
+      pEl.innerHTML=dia.cats.map(c=>{
+        const key=c.replace(/ /g,'_');
+        const val=S.chvParams[c]||25;
+        const nd=getNDuplas(c);
+        return`<div style="background:var(--black3);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <span class="badge ${catBadge[c]||'badge-gray'}" style="font-size:12px;">${c}</span>
+            <span style="font-size:11px;color:var(--text3);font-family:'Barlow Condensed',sans-serif;">${nd} dupla${nd!==1?'s':''}</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <label>Tempo por jogo (min)</label>
+            <input type="number" id="chv-tempo-${key}" value="${val}" min="10" max="120" style="width:100%;" oninput="renderChaveamento()">
+          </div>
+        </div>`;
+      }).join('');
     }
-    // LB rounds (simplified: pairs of rounds)
-    const wbR=calcRoundsWB(nd);
-    let lbTeams=0;
-    for(let r=1;r<=wbR-1;r++){
-      const dropped=Math.floor(nd/Math.pow(2,r));
-      lbTeams+=dropped;
-      const jLB1=Math.floor(lbTeams/2);
-      if(jLB1>0) jogosPorRodada.push({fase:'Losers',jogos:jLB1});
-      lbTeams-=jLB1;
-      if(lbTeams>1){
-        const jLB2=Math.floor(lbTeams/2);
-        if(jLB2>0) jogosPorRodada.push({fase:'Losers',jogos:jLB2});
-        lbTeams-=jLB2;
-      }
-    }
-    jogosPorRodada.push({fase:'Final',jogos:1});
 
-    const totalJogos=jogosPorRodada.reduce((s,r)=>s+r.jogos,0);
-    const inicioMin=minAtual;
-
-    // calc duration: each round takes ceil(jogos/quadras) * (tempo+intervalo)
-    let duracaoMin=0;
-    jogosPorRodada.forEach(r=>{
-      const slots=Math.ceil(r.jogos/quadras);
-      duracaoMin+=slots*(tempo+intervalo);
-    });
-
-    const fimMin=inicioMin+duracaoMin;
-    minAtual=fimMin;
-
-    catTimings.push({cat:c,nd,totalJogos,jogosPorRodada,inicioMin,fimMin,duracaoMin,tempo});
-  });
-
-  // Total duration
-  const totalMin=minAtual-(hIni*60+mIni);
-  const fimGeral=minAtual;
-
-  // Metrics
-  document.getElementById('chv-metrics').innerHTML=`
-    <div class="metric-card purple"><div class="mc-label">Total de jogos</div><div class="mc-value">${totalJogosGeral}</div></div>
-    <div class="metric-card lime"><div class="mc-label">Duração total</div><div class="mc-value green">${Math.floor(totalMin/60)}h${(totalMin%60).toString().padStart(2,'0')}m</div></div>
-    <div class="metric-card amber"><div class="mc-label">Quadras</div><div class="mc-value amber">${quadras}</div></div>
-    <div class="metric-card pink"><div class="mc-label">Previsão fim</div><div class="mc-value">${fmtHora(fimGeral)}</div></div>
-  `;
-
-  // Timeline
-  const tlEl=document.getElementById('chv-timeline');
-  if(tlEl){
-    const barTotal=fimGeral-(hIni*60+mIni)||1;
-    tlEl.innerHTML=`
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;">Linha do tempo estimada</div>
-      <div style="display:flex;flex-direction:column;gap:8px;">
-        ${catTimings.filter(t=>!t.skip&&t.nd>=2).map((t,i)=>{
-          const colors=['var(--lime)','var(--purple-light)','var(--pink)','#EF9F27'];
-          const cor=colors[i%4];
-          const left=Math.round((t.inicioMin-(hIni*60+mIni))/barTotal*100);
-          const width=Math.max(2,Math.round(t.duracaoMin/barTotal*100));
-          return`<div style="display:flex;align-items:center;gap:10px;">
-            <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:var(--text2);width:120px;flex-shrink:0;">${t.cat}</div>
-            <div style="flex:1;height:28px;background:var(--black4);border-radius:4px;position:relative;">
-              <div style="position:absolute;left:${left}%;width:${width}%;height:100%;background:${cor};border-radius:4px;opacity:0.85;"></div>
-              <div style="position:absolute;left:${left}%;width:${width}%;height:100%;display:flex;align-items:center;justify-content:center;">
-                <span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:#000;white-space:nowrap;">${fmtHora(t.inicioMin)} – ${fmtHora(t.fimMin)} (${t.totalJogos} jogos)</span>
-              </div>
-            </div>
-          </div>`;
-        }).join('')}
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);font-family:'Barlow Condensed',sans-serif;margin-top:6px;">
-        <span>${fmtHora(hIni*60+mIni)}</span><span>${fmtHora(fimGeral)}</span>
-      </div>`;
-  }
-
-  // Bracket cards
-  const brEl=document.getElementById('chv-brackets');
-  if(brEl){
-    brEl.innerHTML=catTimings.map(t=>{
-      if(t.skip||t.nd<2) return`<div class="card"><div class="card-header"><div class="card-title"><span class="badge ${catBadge[t.cat]||'badge-gray'}" style="font-size:13px;">${t.cat}</span></div></div><div class="card-body"><div class="empty-state" style="padding:16px;"><div class="empty-icon">🤝</div><div class="empty-text">Forme ao menos 2 duplas nesta categoria</div></div></div></div>`;
-      const nd=t.nd;
+    // calc timings per cat
+    const diaTimings=[];
+    dia.cats.forEach(c=>{
+      const nd=getNDuplas(c);
+      if(nd<2){diaTimings.push({cat:c,nd,skip:true,dia:dia.id});return;}
+      const tempo=getTemplo(c);
       const wbR=calcRoundsWB(nd);
-      // Build WB rounds summary
-      let wbRounds=[]; let tw=nd;
-      for(let r=0;r<wbR;r++){
-        const jogos=Math.floor(tw/2);
-        const nomeFase=r===0?'Oitavas':r===1?'Quartas':r===2?'Semifinal':r===3?'Final WB':'Fase '+(r+1);
-        wbRounds.push({nome:nomeFase,jogos});
-        tw=Math.ceil(tw/2);
-      }
-      // LB summary
-      let lbRounds=[];
+      const jogosPorRodada=[];
+      let tw=nd;
+      for(let r=0;r<wbR;r++){jogosPorRodada.push({fase:'WB',jogos:Math.floor(tw/2)});tw=Math.ceil(tw/2);}
       let lbT=0;
       for(let r=1;r<=wbR-1;r++){
         const dropped=Math.floor(nd/Math.pow(2,r));
         lbT+=dropped;
-        const j1=Math.floor(lbT/2);
-        if(j1>0) lbRounds.push({nome:'LB Fase '+(lbRounds.length+1),jogos:j1});
-        lbT-=j1;
-        if(lbT>1){const j2=Math.floor(lbT/2);if(j2>0){lbRounds.push({nome:'LB Fase '+(lbRounds.length+1),jogos:j2});lbT-=j2;}}
+        const j1=Math.floor(lbT/2);if(j1>0)jogosPorRodada.push({fase:'LB',jogos:j1});lbT-=j1;
+        if(lbT>1){const j2=Math.floor(lbT/2);if(j2>0){jogosPorRodada.push({fase:'LB',jogos:j2});lbT-=j2;}}
       }
+      jogosPorRodada.push({fase:'Final',jogos:1});
+      const totalJogos=jogosPorRodada.reduce((s,r)=>s+r.jogos,0);
+      let duracaoMin=0;
+      jogosPorRodada.forEach(r=>{duracaoMin+=Math.ceil(r.jogos/quadras)*(tempo+intervalo);});
+      const inicioMin=minAtual;
+      const fimMin=inicioMin+duracaoMin;
+      minAtual=fimMin;
+      totalJogosGeral+=totalJogos;
 
-      const totalJogos=wbRounds.reduce((s,r)=>s+r.jogos,0)+lbRounds.reduce((s,r)=>s+r.jogos,0)+1;
-      const durMin=t.duracaoMin;
-
-      return`<div class="card">
-        <div class="card-header">
-          <div class="card-title"><span class="badge ${catBadge[t.cat]||'badge-gray'}" style="font-size:13px;">${t.cat}</span> <span style="color:var(--text3);font-weight:400;font-size:13px;">${nd} duplas · ${totalJogos} jogos · ${Math.floor(durMin/60)}h${(durMin%60).toString().padStart(2,'0')}m</span></div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;color:var(--text3);">${fmtHora(t.inicioMin)} – ${fmtHora(t.fimMin)}</div>
-        </div>
-        <div class="card-body">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-            <div>
-              <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:var(--lime);margin-bottom:10px;">Winners Bracket</div>
-              ${wbRounds.map(r=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;">
-                <span style="font-family:'Barlow Condensed',sans-serif;font-weight:600;">${r.nome}</span>
-                <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--lime);">${r.jogos} jogo${r.jogos!==1?'s':''}</span>
-              </div>`).join('')}
-            </div>
-            <div>
-              <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:var(--purple-light);margin-bottom:10px;">Losers Bracket</div>
-              ${lbRounds.map(r=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;">
-                <span style="font-family:'Barlow Condensed',sans-serif;font-weight:600;">${r.nome}</span>
-                <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--purple-light);">${r.jogos} jogo${r.jogos!==1?'s':''}</span>
-              </div>`).join('')}
-              <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:13px;">
-                <span style="font-family:'Barlow Condensed',sans-serif;font-weight:600;color:var(--pink);">Grand Final</span>
-                <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--pink);">1 jogo</span>
-              </div>
-            </div>
-          </div>
-          <div style="margin-top:14px;padding:10px 14px;background:var(--black3);border-radius:var(--r);display:flex;gap:24px;flex-wrap:wrap;">
-            <div><div style="font-size:11px;color:var(--text3);font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.06em;">Tempo por jogo</div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--text);">${t.tempo} min</div></div>
-            <div><div style="font-size:11px;color:var(--text3);font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.06em;">Total de jogos</div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--lime);">${totalJogos}</div></div>
-            <div><div style="font-size:11px;color:var(--text3);font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.06em;">Duração estimada</div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--purple-light);">${Math.floor(durMin/60)}h${(durMin%60).toString().padStart(2,'0')}m</div></div>
-            <div><div style="font-size:11px;color:var(--text3);font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.06em;">Início / Fim</div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--pink);">${fmtHora(t.inicioMin)} – ${fmtHora(t.fimMin)}</div></div>
-          </div>
-        </div>
-      </div>`;
-    }).join('');
-  }
-}
-
-function fmtHora(min){
-  const h=Math.floor(min/60)%24;
-  const m=min%60;
-  return h.toString().padStart(2,'0')+':'+m.toString().padStart(2,'0');
-}
-
-// ===== SIMULAÇÃO =====
-function renderSimulacao(){
-  const quadras=parseInt(document.getElementById('sim-quadras')?.value)||3;
-  const intervalo=parseInt(document.getElementById('sim-intervalo')?.value)||5;
-  const inicioStr=document.getElementById('sim-inicio')?.value||'08:00';
-  const [hIni,mIni]=inicioStr.split(':').map(Number);
-
-  // Build cat input cards
-  const inputEl=document.getElementById('sim-cat-inputs');
-  if(inputEl && !inputEl.dataset.built){
-    inputEl.dataset.built='1';
-    inputEl.innerHTML=CATS.map(c=>{
-      const key=c.replace(/ /g,'_');
-      return`<div style="background:var(--black3);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;">
-        <div style="margin-bottom:10px;"><span class="badge ${catBadge[c]||'badge-gray'}" style="font-size:12px;">${c}</span></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-          <div style="display:flex;flex-direction:column;gap:4px;">
-            <label>Duplas</label>
-            <input type="number" id="sim-nd-${key}" value="8" min="2" max="64" oninput="renderSimulacao()" style="width:100%;">
-          </div>
-          <div style="display:flex;flex-direction:column;gap:4px;">
-            <label>Tempo/jogo (min)</label>
-            <input type="number" id="sim-tp-${key}" value="25" min="5" max="120" oninput="renderSimulacao()" style="width:100%;">
-          </div>
-        </div>
-      </div>`;
-    }).join('');
-  }
-
-  // Collect inputs
-  const simCats=CATS.map(c=>{
-    const key=c.replace(/ /g,'_');
-    const nd=parseInt(document.getElementById('sim-nd-'+key)?.value)||2;
-    const tempo=parseInt(document.getElementById('sim-tp-'+key)?.value)||25;
-    return{cat:c,nd,tempo};
-  });
-
-  // Calc timings (same logic as chaveamento)
-  let minAtual=hIni*60+mIni;
-  const catTimings=simCats.map(({cat,nd,tempo})=>{
-    if(nd<2) return{cat,nd,skip:true,tempo};
-    const wbR=calcRoundsWB(nd);
-    const jogosPorRodada=[];
-    let tw=nd;
-    for(let r=0;r<wbR;r++){
-      const j=Math.floor(tw/2);
-      jogosPorRodada.push({fase:'WB',jogos:j});
-      tw=Math.ceil(tw/2);
-    }
-    let lbT=0;
-    for(let r=1;r<=wbR-1;r++){
-      const dropped=Math.floor(nd/Math.pow(2,r));
-      lbT+=dropped;
-      const j1=Math.floor(lbT/2);
-      if(j1>0) jogosPorRodada.push({fase:'LB',jogos:j1});
-      lbT-=j1;
-      if(lbT>1){const j2=Math.floor(lbT/2);if(j2>0){jogosPorRodada.push({fase:'LB',jogos:j2});lbT-=j2;}}
-    }
-    jogosPorRodada.push({fase:'Final',jogos:1});
-    const totalJogos=jogosPorRodada.reduce((s,r)=>s+r.jogos,0);
-    let duracaoMin=0;
-    jogosPorRodada.forEach(r=>{
-      duracaoMin+=Math.ceil(r.jogos/quadras)*(tempo+intervalo);
+      let wbRounds=[]; let tw2=nd;
+      for(let r=0;r<wbR;r++){
+        const j=Math.floor(tw2/2);
+        const nome=r===0?'Oitavas':r===1?'Quartas':r===2?'Semifinal':r===3?'Final WB':'Fase '+(r+1);
+        wbRounds.push({nome,jogos:j});tw2=Math.ceil(tw2/2);
+      }
+      let lbRounds=[]; let lbT2=0;
+      for(let r=1;r<=wbR-1;r++){
+        const dropped=Math.floor(nd/Math.pow(2,r));lbT2+=dropped;
+        const j1=Math.floor(lbT2/2);if(j1>0)lbRounds.push({nome:'LB Fase '+(lbRounds.length+1),jogos:j1});lbT2-=j1;
+        if(lbT2>1){const j2=Math.floor(lbT2/2);if(j2>0){lbRounds.push({nome:'LB Fase '+(lbRounds.length+1),jogos:j2});lbT2-=j2;}}
+      }
+      diaTimings.push({cat:c,nd,tempo,totalJogos,wbRounds,lbRounds,jogosPorRodada,inicioMin,fimMin,duracaoMin,dia:dia.id,corDia:dia.cor});
     });
-    const inicioMin=minAtual;
-    const fimMin=inicioMin+duracaoMin;
-    minAtual=fimMin;
 
-    // WB/LB rounds for display
-    let wbRounds=[]; let tw2=nd;
-    for(let r=0;r<wbR;r++){
-      const j=Math.floor(tw2/2);
-      const nome=r===0?'Oitavas':r===1?'Quartas':r===2?'Semifinal':r===3?'Final WB':'Fase '+(r+1);
-      wbRounds.push({nome,jogos:j}); tw2=Math.ceil(tw2/2);
+    const diaMin=minAtual-(hIni*60+mIni);
+    totalMinGeral+=diaMin;
+    allTimings.push({...dia, timings:diaTimings, hIni, mIni, fimMin:minAtual, diaMin, quadras, intervalo});
+
+    // timeline per dia
+    const tlEl=document.getElementById('chv-timeline-'+dia.id);
+    if(tlEl){
+      const valid=diaTimings.filter(t=>!t.skip);
+      if(!valid.length){tlEl.innerHTML='';return;}
+      const barTotal=minAtual-(hIni*60+mIni)||1;
+      const colors=['var(--lime)','var(--purple-light)','var(--pink)','#EF9F27'];
+      tlEl.innerHTML=`
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;">Linha do tempo — ${dia.label}</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          ${valid.map((t,i)=>{
+            const cor=colors[i%4];
+            const left=Math.round((t.inicioMin-(hIni*60+mIni))/barTotal*100);
+            const width=Math.max(2,Math.round(t.duracaoMin/barTotal*100));
+            return`<div style="display:flex;align-items:center;gap:10px;">
+              <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:var(--text2);width:120px;flex-shrink:0;">${t.cat}</div>
+              <div style="flex:1;height:28px;background:var(--black4);border-radius:4px;position:relative;">
+                <div style="position:absolute;left:${left}%;width:${width}%;height:100%;background:${cor};border-radius:4px;opacity:0.85;"></div>
+                <div style="position:absolute;left:${left}%;width:${width}%;height:100%;display:flex;align-items:center;justify-content:center;">
+                  <span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:#000;white-space:nowrap;">${fmtHora(t.inicioMin)} – ${fmtHora(t.fimMin)} · ${t.totalJogos} jogos</span>
+                </div>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);font-family:'Barlow Condensed',sans-serif;margin-top:6px;">
+          <span>${fmtHora(hIni*60+mIni)}</span>
+          <span style="color:${dia.cor};font-weight:700;">${fmtHora(minAtual)} · ${Math.floor(diaMin/60)}h${(diaMin%60).toString().padStart(2,'0')}m</span>
+        </div>`;
     }
-    let lbRounds=[]; let lbT2=0;
-    for(let r=1;r<=wbR-1;r++){
-      const dropped=Math.floor(nd/Math.pow(2,r));
-      lbT2+=dropped;
-      const j1=Math.floor(lbT2/2);
-      if(j1>0) lbRounds.push({nome:'LB Fase '+(lbRounds.length+1),jogos:j1});
-      lbT2-=j1;
-      if(lbT2>1){const j2=Math.floor(lbT2/2);if(j2>0){lbRounds.push({nome:'LB Fase '+(lbRounds.length+1),jogos:j2});lbT2-=j2;}}
-    }
-    return{cat,nd,tempo,totalJogos,wbRounds,lbRounds,jogosPorRodada,inicioMin,fimMin,duracaoMin};
   });
 
-  const valid=catTimings.filter(t=>!t.skip);
-  const totalJogosGeral=valid.reduce((s,t)=>s+t.totalJogos,0);
-  const totalMin=minAtual-(hIni*60+mIni);
-  const fimGeral=minAtual;
-
-  // Metrics
-  document.getElementById('sim-metrics').innerHTML=`
-    <div class="metric-card purple"><div class="mc-label">Total de jogos</div><div class="mc-value">${totalJogosGeral}</div></div>
-    <div class="metric-card lime"><div class="mc-label">Duração total</div><div class="mc-value green">${Math.floor(totalMin/60)}h${(totalMin%60).toString().padStart(2,'0')}m</div></div>
-    <div class="metric-card amber"><div class="mc-label">Quadras</div><div class="mc-value amber">${quadras}</div></div>
-    <div class="metric-card pink"><div class="mc-label">Previsão fim</div><div class="mc-value">${fmtHora(fimGeral)}</div></div>
+  // Global metrics
+  document.getElementById('chv-metrics').innerHTML=`
+    <div class="metric-card purple"><div class="mc-label">Total jogos</div><div class="mc-value">${totalJogosGeral}</div></div>
+    <div class="metric-card lime"><div class="mc-label">Dia 1 — duração</div><div class="mc-value green">${fmtDur(allTimings[0].diaMin)}</div><div class="mc-sub">Iniciante & Estreante · até ${fmtHora(allTimings[0].fimMin)}</div></div>
+    <div class="metric-card purple"><div class="mc-label">Dia 2 — duração</div><div class="mc-value purple">${fmtDur(allTimings[1].diaMin)}</div><div class="mc-sub">Bronze & Mista · até ${fmtHora(allTimings[1].fimMin)}</div></div>
+    <div class="metric-card amber"><div class="mc-label">Quadras</div><div class="mc-value amber">${allTimings[0].quadras} / ${allTimings[1].quadras}</div><div class="mc-sub">Dia 1 / Dia 2</div></div>
   `;
 
-  // Timeline
-  const tlWrap=document.getElementById('sim-timeline-wrap');
-  const tlEl=document.getElementById('sim-timeline');
-  if(valid.length && tlWrap && tlEl){
-    tlWrap.style.display='block';
-    const barTotal=fimGeral-(hIni*60+mIni)||1;
-    const colors=['var(--lime)','var(--purple-light)','var(--pink)','#EF9F27'];
-    tlEl.innerHTML=`
-      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px;">
-        ${valid.map((t,i)=>{
-          const cor=colors[i%4];
-          const left=Math.round((t.inicioMin-(hIni*60+mIni))/barTotal*100);
-          const width=Math.max(2,Math.round(t.duracaoMin/barTotal*100));
-          return`<div style="display:flex;align-items:center;gap:10px;">
-            <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:var(--text2);width:120px;flex-shrink:0;">${t.cat}</div>
-            <div style="flex:1;height:28px;background:var(--black4);border-radius:4px;position:relative;">
-              <div style="position:absolute;left:${left}%;width:${width}%;height:100%;background:${cor};border-radius:4px;opacity:0.85;"></div>
-              <div style="position:absolute;left:${left}%;width:${width}%;height:100%;display:flex;align-items:center;justify-content:center;">
-                <span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:#000;white-space:nowrap;">${fmtHora(t.inicioMin)} – ${fmtHora(t.fimMin)} · ${t.nd} duplas · ${t.totalJogos} jogos</span>
-              </div>
-            </div>
-          </div>`;
-        }).join('')}
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);font-family:'Barlow Condensed',sans-serif;">
-        <span>${fmtHora(hIni*60+mIni)}</span><span>${fmtHora(fimGeral)}</span>
-      </div>`;
-  }
-
   // Bracket cards
-  const brEl=document.getElementById('sim-brackets');
+  const brEl=document.getElementById('chv-brackets');
   if(brEl){
-    brEl.innerHTML=catTimings.map(t=>{
-      if(t.skip||t.nd<2) return`<div class="card"><div class="card-header"><div class="card-title"><span class="badge ${catBadge[t.cat]||'badge-gray'}" style="font-size:13px;">${t.cat}</span></div></div><div class="card-body"><div class="empty-state" style="padding:16px;"><div class="empty-icon">🔢</div><div class="empty-text">Mínimo de 2 duplas para gerar chaveamento</div></div></div></div>`;
-      return`<div class="card">
-        <div class="card-header">
-          <div class="card-title"><span class="badge ${catBadge[t.cat]||'badge-gray'}" style="font-size:13px;">${t.cat}</span> <span style="color:var(--text3);font-weight:400;font-size:13px;">${t.nd} duplas · ${t.totalJogos} jogos · ${Math.floor(t.duracaoMin/60)}h${(t.duracaoMin%60).toString().padStart(2,'0')}m</span></div>
+    brEl.innerHTML=allTimings.map(dia=>{
+      const validT=dia.timings.filter(t=>!t.skip&&t.nd>=2);
+      if(!validT.length) return`<div class="card"><div class="card-header"><div class="card-title">📅 <span style="color:${dia.cor};">${dia.label}</span> — ${dia.label==='Dia 1'?'Iniciante & Estreante':'Bronze & Mista Iniciante'}</div></div><div class="card-body"><div class="empty-state" style="padding:16px;"><div class="empty-icon">🤝</div><div class="empty-text">Forme duplas nas categorias deste dia</div></div></div></div>`;
+      return validT.map(t=>`<div class="card">
+        <div class="card-header" style="border-left:3px solid ${dia.cor};padding-left:17px;">
+          <div class="card-title">
+            <span style="font-size:11px;font-family:'Barlow Condensed',sans-serif;color:${dia.cor};font-weight:700;letter-spacing:.06em;text-transform:uppercase;">${dia.label}</span>
+            <span class="badge ${catBadge[t.cat]||'badge-gray'}" style="font-size:13px;">${t.cat}</span>
+            <span style="color:var(--text3);font-weight:400;font-size:13px;">${t.nd} duplas · ${t.totalJogos} jogos · ${fmtDur(t.duracaoMin)}</span>
+          </div>
           <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;color:var(--text3);">${fmtHora(t.inicioMin)} – ${fmtHora(t.fimMin)}</div>
         </div>
         <div class="card-body">
@@ -1713,14 +1531,196 @@ function renderSimulacao(){
             </div>
           </div>
           <div style="margin-top:14px;padding:10px 14px;background:var(--black3);border-radius:var(--r);display:flex;gap:24px;flex-wrap:wrap;">
-            <div><div style="font-size:11px;color:var(--text3);font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.06em;">Tempo por jogo</div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--text);">${t.tempo} min</div></div>
-            <div><div style="font-size:11px;color:var(--text3);font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.06em;">Total de jogos</div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--lime);">${t.totalJogos}</div></div>
-            <div><div style="font-size:11px;color:var(--text3);font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.06em;">Duração</div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--purple-light);">${Math.floor(t.duracaoMin/60)}h${(t.duracaoMin%60).toString().padStart(2,'0')}m</div></div>
-            <div><div style="font-size:11px;color:var(--text3);font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.06em;">Início / Fim</div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--pink);">${fmtHora(t.inicioMin)} – ${fmtHora(t.fimMin)}</div></div>
+            <div><div style="font-size:11px;color:var(--text3);font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.06em;">Tempo/jogo</div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--text);">${t.tempo} min</div></div>
+            <div><div style="font-size:11px;color:var(--text3);font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.06em;">Total jogos</div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--lime);">${t.totalJogos}</div></div>
+            <div><div style="font-size:11px;color:var(--text3);font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.06em;">Duração</div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--purple-light);">${fmtDur(t.duracaoMin)}</div></div>
+            <div><div style="font-size:11px;color:var(--text3);font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.06em;">Início / Fim</div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:${dia.cor};">${fmtHora(t.inicioMin)} – ${fmtHora(t.fimMin)}</div></div>
+          </div>
+        </div>
+      </div>`).join('');
+    }).join('');
+  }
+}
+
+function fmtDur(min){return Math.floor(min/60)+'h'+(min%60).toString().padStart(2,'0')+'m';}
+
+function fmtHora(min){
+  const h=Math.floor(min/60)%24;
+  const m=min%60;
+  return h.toString().padStart(2,'0')+':'+m.toString().padStart(2,'0');
+}
+
+// ===== SIMULAÇÃO =====
+function buildCatCard(c, dia, defaultNd=8){
+  const key=c.replace(/ /g,'_');
+  return`<div style="background:var(--black3);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;">
+    <div style="margin-bottom:10px;"><span class="badge ${catBadge[c]||'badge-gray'}" style="font-size:12px;">${c}</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <div style="display:flex;flex-direction:column;gap:4px;"><label>Duplas</label>
+        <input type="number" id="sim-nd-${key}" value="${defaultNd}" min="2" max="64" oninput="renderSimulacao()" style="width:100%;">
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;"><label>Tempo/jogo (min)</label>
+        <input type="number" id="sim-tp-${key}" value="25" min="5" max="120" oninput="renderSimulacao()" style="width:100%;">
+      </div>
+    </div>
+  </div>`;
+}
+
+function calcCatTiming(c, quadras, intervalo, minAtual){
+  const key=c.replace(/ /g,'_');
+  const nd=parseInt(document.getElementById('sim-nd-'+key)?.value)||2;
+  const tempo=parseInt(document.getElementById('sim-tp-'+key)?.value)||25;
+  if(nd<2) return{cat:c,nd,tempo,skip:true};
+  const wbR=calcRoundsWB(nd);
+  const jogosPorRodada=[];
+  let tw=nd;
+  for(let r=0;r<wbR;r++){jogosPorRodada.push({fase:'WB',jogos:Math.floor(tw/2)});tw=Math.ceil(tw/2);}
+  let lbT=0;
+  for(let r=1;r<=wbR-1;r++){
+    const d=Math.floor(nd/Math.pow(2,r));lbT+=d;
+    const j1=Math.floor(lbT/2);if(j1>0)jogosPorRodada.push({fase:'LB',jogos:j1});lbT-=j1;
+    if(lbT>1){const j2=Math.floor(lbT/2);if(j2>0){jogosPorRodada.push({fase:'LB',jogos:j2});lbT-=j2;}}
+  }
+  jogosPorRodada.push({fase:'Final',jogos:1});
+  const totalJogos=jogosPorRodada.reduce((s,r)=>s+r.jogos,0);
+  let duracaoMin=0;
+  jogosPorRodada.forEach(r=>{duracaoMin+=Math.ceil(r.jogos/quadras)*(tempo+intervalo);});
+  const inicioMin=minAtual;
+  const fimMin=inicioMin+duracaoMin;
+  let wbRounds=[],tw2=nd;
+  for(let r=0;r<wbR;r++){const j=Math.floor(tw2/2);const nome=r===0?'Oitavas':r===1?'Quartas':r===2?'Semifinal':r===3?'Final WB':'Fase '+(r+1);wbRounds.push({nome,jogos:j});tw2=Math.ceil(tw2/2);}
+  let lbRounds=[],lbT2=0;
+  for(let r=1;r<=wbR-1;r++){
+    const d=Math.floor(nd/Math.pow(2,r));lbT2+=d;
+    const j1=Math.floor(lbT2/2);if(j1>0)lbRounds.push({nome:'LB Fase '+(lbRounds.length+1),jogos:j1});lbT2-=j1;
+    if(lbT2>1){const j2=Math.floor(lbT2/2);if(j2>0){lbRounds.push({nome:'LB Fase '+(lbRounds.length+1),jogos:j2});lbT2-=j2;}}
+  }
+  return{cat:c,nd,tempo,totalJogos,wbRounds,lbRounds,inicioMin,fimMin,duracaoMin};
+}
+
+function renderTimeline(el, timings, hIni, mIni, fimMin, cor){
+  const valid=timings.filter(t=>!t.skip);
+  if(!valid.length){el.innerHTML='';return;}
+  const barTotal=fimMin-(hIni*60+mIni)||1;
+  const colors=['var(--lime)','var(--purple-light)','var(--pink)','#EF9F27'];
+  el.innerHTML=`<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:6px;">
+    ${valid.map((t,i)=>{
+      const c=colors[i%4];
+      const left=Math.round((t.inicioMin-(hIni*60+mIni))/barTotal*100);
+      const width=Math.max(2,Math.round(t.duracaoMin/barTotal*100));
+      return`<div style="display:flex;align-items:center;gap:10px;">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:var(--text2);width:120px;flex-shrink:0;">${t.cat}</div>
+        <div style="flex:1;height:28px;background:var(--black4);border-radius:4px;position:relative;">
+          <div style="position:absolute;left:${left}%;width:${width}%;height:100%;background:${c};border-radius:4px;opacity:0.85;"></div>
+          <div style="position:absolute;left:${left}%;width:${width}%;height:100%;display:flex;align-items:center;justify-content:center;">
+            <span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:#000;white-space:nowrap;">${fmtHora(t.inicioMin)} – ${fmtHora(t.fimMin)} · ${t.nd} duplas · ${t.totalJogos} jogos</span>
           </div>
         </div>
       </div>`;
-    }).join('');
+    }).join('')}
+  </div>
+  <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);font-family:'Barlow Condensed',sans-serif;">
+    <span>${fmtHora(hIni*60+mIni)}</span>
+    <span style="color:${cor};font-weight:700;">${fmtHora(fimMin)} · ${fmtDur(fimMin-(hIni*60+mIni))}</span>
+  </div>`;
+}
+
+function renderBracketCard(t, corDia){
+  if(t.skip||t.nd<2) return`<div class="card"><div class="card-header"><div class="card-title"><span class="badge ${catBadge[t.cat]||'badge-gray'}" style="font-size:13px;">${t.cat}</span></div></div><div class="card-body"><div class="empty-state" style="padding:16px;"><div class="empty-icon">🔢</div><div class="empty-text">Mínimo de 2 duplas para gerar chaveamento</div></div></div></div>`;
+  return`<div class="card">
+    <div class="card-header" style="border-left:3px solid ${corDia};padding-left:17px;">
+      <div class="card-title"><span class="badge ${catBadge[t.cat]||'badge-gray'}" style="font-size:13px;">${t.cat}</span> <span style="color:var(--text3);font-weight:400;font-size:13px;">${t.nd} duplas · ${t.totalJogos} jogos · ${fmtDur(t.duracaoMin)}</span></div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;color:var(--text3);">${fmtHora(t.inicioMin)} – ${fmtHora(t.fimMin)}</div>
+    </div>
+    <div class="card-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:var(--lime);margin-bottom:10px;">Winners Bracket</div>
+          ${t.wbRounds.map(r=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;">
+            <span style="font-family:'Barlow Condensed',sans-serif;font-weight:600;">${r.nome}</span>
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--lime);">${r.jogos} jogo${r.jogos!==1?'s':''}</span>
+          </div>`).join('')}
+        </div>
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:var(--purple-light);margin-bottom:10px;">Losers Bracket</div>
+          ${t.lbRounds.map(r=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;">
+            <span style="font-family:'Barlow Condensed',sans-serif;font-weight:600;">${r.nome}</span>
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--purple-light);">${r.jogos} jogo${r.jogos!==1?'s':''}</span>
+          </div>`).join('')}
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:13px;">
+            <span style="font-family:'Barlow Condensed',sans-serif;font-weight:600;color:var(--pink);">Grand Final</span>
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--pink);">1 jogo</span>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:14px;padding:10px 14px;background:var(--black3);border-radius:var(--r);display:flex;gap:24px;flex-wrap:wrap;">
+        <div><div style="font-size:11px;color:var(--text3);font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.06em;">Tempo/jogo</div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--text);">${t.tempo} min</div></div>
+        <div><div style="font-size:11px;color:var(--text3);font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.06em;">Total jogos</div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--lime);">${t.totalJogos}</div></div>
+        <div><div style="font-size:11px;color:var(--text3);font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.06em;">Duração</div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--purple-light);">${fmtDur(t.duracaoMin)}</div></div>
+        <div><div style="font-size:11px;color:var(--text3);font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.06em;">Início / Fim</div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:${corDia};">${fmtHora(t.inicioMin)} – ${fmtHora(t.fimMin)}</div></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderSimulacao(){
+  const DIAS_SIM=[
+    {id:'d1',label:'Dia 1',cats:['Iniciante','Estreante'],cor:'var(--purple-light)'},
+    {id:'d2',label:'Dia 2',cats:['Bronze','Mista Iniciante'],cor:'var(--lime)'},
+  ];
+
+  // Build input cards once per dia
+  DIAS_SIM.forEach(dia=>{
+    const el=document.getElementById('sim-inputs-'+dia.id);
+    if(el&&!el.dataset.built){
+      el.dataset.built='1';
+      el.innerHTML=dia.cats.map(c=>buildCatCard(c,dia.id)).join('');
+    }
+  });
+
+  let totalJogosGeral=0;
+  const diaResults=[];
+
+  DIAS_SIM.forEach(dia=>{
+    const quadras=parseInt(document.getElementById('sim-quadras-'+dia.id)?.value)||3;
+    const intervalo=parseInt(document.getElementById('sim-intervalo-'+dia.id)?.value)||5;
+    const inicioStr=document.getElementById('sim-inicio-'+dia.id)?.value||'08:00';
+    const [hIni,mIni]=inicioStr.split(':').map(Number);
+    let minAtual=hIni*60+mIni;
+
+    const timings=dia.cats.map(c=>{
+      const t=calcCatTiming(c,quadras,intervalo,minAtual);
+      if(!t.skip) minAtual=t.fimMin;
+      return t;
+    });
+
+    const valid=timings.filter(t=>!t.skip);
+    const jogos=valid.reduce((s,t)=>s+t.totalJogos,0);
+    totalJogosGeral+=jogos;
+    const fimMin=minAtual;
+    const diaMin=fimMin-(hIni*60+mIni);
+
+    // render timeline
+    const tlEl=document.getElementById('sim-timeline-'+dia.id);
+    if(tlEl) renderTimeline(tlEl,timings,hIni,mIni,fimMin,dia.cor);
+
+    diaResults.push({...dia,timings,hIni,mIni,fimMin,diaMin,jogos});
+  });
+
+  // Metrics
+  document.getElementById('sim-metrics').innerHTML=`
+    <div class="metric-card purple"><div class="mc-label">Total jogos</div><div class="mc-value">${totalJogosGeral}</div></div>
+    <div class="metric-card lime"><div class="mc-label">Dia 1 — duração</div><div class="mc-value green">${fmtDur(diaResults[0].diaMin)}</div><div class="mc-sub">até ${fmtHora(diaResults[0].fimMin)}</div></div>
+    <div class="metric-card purple"><div class="mc-label">Dia 2 — duração</div><div class="mc-value purple">${fmtDur(diaResults[1].diaMin)}</div><div class="mc-sub">até ${fmtHora(diaResults[1].fimMin)}</div></div>
+    <div class="metric-card amber"><div class="mc-label">Quadras D1 / D2</div><div class="mc-value amber">${document.getElementById('sim-quadras-d1')?.value||3} / ${document.getElementById('sim-quadras-d2')?.value||3}</div></div>
+  `;
+
+  // Bracket cards
+  const brEl=document.getElementById('sim-brackets');
+  if(brEl){
+    brEl.innerHTML=diaResults.map(dia=>
+      dia.timings.map(t=>renderBracketCard(t,dia.cor)).join('')
+    ).join('');
   }
 }
 
