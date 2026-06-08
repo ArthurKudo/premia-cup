@@ -216,6 +216,19 @@ tr:hover td{background:rgba(255,255,255,0.02);}
             <label class="cat-chip" id="chip-Estreante"><input type="checkbox" value="Estreante" onchange="updateChip(this,'Estreante')"> 🩷 Estreante</label>
           </div>
         </div>
+        <div class="form-grid" style="margin-bottom:14px;">
+          <div style="display:flex;flex-direction:column;gap:5px;"><label>Gênero</label>
+            <select id="j-gen">
+              <option value="M">Masculino</option>
+              <option value="F">Feminino</option>
+            </select>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px;"><label>Tamanho do uniforme</label>
+            <select id="j-tam">
+              <option>PP</option><option>P</option><option selected>M</option><option>G</option><option>GG</option><option>XGG</option>
+            </select>
+          </div>
+        </div>
         <div style="display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;">
           <div style="display:flex;flex-direction:column;gap:5px;"><label>Pagamento</label><select id="j-pag" style="width:130px;"><option value="Pendente">Pendente</option><option value="Pago">Pago</option></select></div>
           <div style="flex:1;"></div>
@@ -233,7 +246,7 @@ tr:hover td{background:rgba(255,255,255,0.02);}
         </div>
       </div>
       <div class="table-wrap">
-        <table><thead><tr><th>#</th><th>Nome</th><th>Contato</th><th>Categorias</th><th>Valor</th><th>Pagamento</th><th></th></tr></thead><tbody id="jog-tbody"></tbody></table>
+        <table><thead><tr><th>#</th><th>Nome</th><th>Contato</th><th>Gênero</th><th>Uniforme</th><th>Categorias</th><th>Valor</th><th>Pagamento</th><th></th></tr></thead><tbody id="jog-tbody"></tbody></table>
         <div id="jog-empty" class="empty-state" style="display:none;"><div class="empty-icon">👤</div><div class="empty-text">Nenhum jogador encontrado</div></div>
       </div>
     </div>
@@ -336,6 +349,10 @@ tr:hover td{background:rgba(255,255,255,0.02);}
       <div class="card"><div class="card-header"><div class="card-title">📉 Despesas</div></div><div class="card-body" id="fin-despesas"></div></div>
     </div>
     <div class="card">
+      <div class="card-header"><div class="card-title">👕 Resumo de <span class="accent">Uniformes</span></div></div>
+      <div class="card-body" id="fin-uniformes"></div>
+    </div>
+    <div class="card">
       <div class="card-header"><div class="card-title">🎛 Simulador de <span class="accent">Cenários</span></div></div>
       <div class="card-body">
         <div class="sim-grid">
@@ -429,6 +446,12 @@ tr:hover td{background:rgba(255,255,255,0.02);}
     <div class="form-grid" style="margin-bottom:14px;">
       <div style="display:flex;flex-direction:column;gap:5px;"><label>Nome</label><input type="text" id="e-nome"></div>
       <div style="display:flex;flex-direction:column;gap:5px;"><label>Contato</label><input type="tel" id="e-tel"></div>
+      <div style="display:flex;flex-direction:column;gap:5px;"><label>Gênero</label>
+        <select id="e-gen"><option value="M">Masculino</option><option value="F">Feminino</option></select>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:5px;"><label>Tamanho uniforme</label>
+        <select id="e-tam"><option>PP</option><option>P</option><option>M</option><option>G</option><option>GG</option><option>XGG</option></select>
+      </div>
     </div>
     <div style="margin-bottom:14px;"><label style="display:block;margin-bottom:8px;">Categorias</label>
       <div class="cat-group">
@@ -596,9 +619,10 @@ function addJogador(){
   const cats=[...document.querySelectorAll('#cat-chips input:checked')].map(c=>c.value);
   if(!nome){toast('Informe o nome do jogador','pink');return;}
   if(!cats.length){toast('Selecione ao menos uma categoria','pink');return;}
-  S.jogadores.push({id:uid(),nome,tel,cats,pag:document.getElementById('j-pag').value});
+  S.jogadores.push({id:uid(),nome,tel,gen:document.getElementById('j-gen').value,tam:document.getElementById('j-tam').value,cats,pag:document.getElementById('j-pag').value});
   save();
   document.getElementById('j-nome').value=''; document.getElementById('j-tel').value='';
+  document.getElementById('j-gen').value='M'; document.getElementById('j-tam').value='M';
   document.querySelectorAll('#cat-chips input').forEach(c=>c.checked=false);
   ['Bronze','Iniciante','Mista','Estreante'].forEach(k=>document.getElementById('chip-'+k).className='cat-chip');
   document.getElementById('preco-preview').textContent='';
@@ -623,6 +647,8 @@ function abrirEditar(id){
   editingId=id;
   document.getElementById('e-nome').value=j.nome;
   document.getElementById('e-tel').value=j.tel||'';
+  document.getElementById('e-gen').value=j.gen||'M';
+  document.getElementById('e-tam').value=j.tam||'M';
   document.getElementById('e-pag').value=j.pag;
   ['Bronze','Iniciante','Mista','Estreante'].forEach(k=>{
     const chip=document.getElementById('e-chip-'+k);
@@ -641,6 +667,8 @@ function salvarEdicao(){
   const cats=[...document.querySelectorAll('#modal-edit .cat-chip input:checked')].map(c=>c.value);
   if(!nome||!cats.length){toast('Preencha nome e categorias','pink');return;}
   j.nome=nome; j.tel=document.getElementById('e-tel').value.trim();
+  j.gen=document.getElementById('e-gen').value;
+  j.tam=document.getElementById('e-tam').value;
   j.cats=cats; j.pag=document.getElementById('e-pag').value;
   save(); closeModal(); renderJogadores(); renderMetricas(); toast('Dados atualizados!');
 }
@@ -664,6 +692,8 @@ function renderJogadores(){
     <td style="color:var(--text3);font-size:12px;">${S.jogadores.indexOf(j)+1}</td>
     <td style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:600;">${j.nome}</td>
     <td style="color:var(--text3);font-size:12px;">${j.tel||'—'}</td>
+    <td><span class="badge ${j.gen==='F'?'badge-pink':'badge-purple'}">${j.gen==='F'?'Fem':'Masc'}</span></td>
+    <td><span class="badge badge-gray">${j.tam||'—'}</span></td>
     <td><div style="display:flex;gap:4px;flex-wrap:wrap;">${j.cats.map(c=>`<span class="badge ${catBadge[c]||'badge-gray'}">${c}</span>`).join('')}</div></td>
     <td style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--lime);letter-spacing:.5px;">${fmt(preco(j.cats.length))}</td>
     <td><button onclick="togglePag(${j.id})" class="badge ${pagBadge[j.pag]}" style="border:none;cursor:pointer;">${j.pag}</button></td>
@@ -853,7 +883,46 @@ function renderFinanceiro(){
   document.getElementById('p-arb-qtd').value=p.arbQtd;
   document.getElementById('p-arb-val').value=p.arbVal;
   document.getElementById('p-premiacao').value=p.premiacao;
+  renderUniformes();
   simular();
+}
+function renderUniformes(){
+  const TAMANHOS=['PP','P','M','G','GG','XGG'];
+  const masc=S.jogadores.filter(j=>j.gen==='M'||!j.gen);
+  const fem=S.jogadores.filter(j=>j.gen==='F');
+  const contTam={};TAMANHOS.forEach(t=>contTam[t]=0);
+  S.jogadores.forEach(j=>{const t=j.tam||'M';if(contTam[t]!==undefined)contTam[t]++;});
+  const total=S.jogadores.length;
+  const el=document.getElementById('fin-uniformes');
+  if(!el)return;
+  if(!total){el.innerHTML='<div style="color:var(--text3);font-size:13px;text-align:center;padding:12px 0;">Nenhum jogador cadastrado ainda.</div>';return;}
+  el.innerHTML=`
+    <div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:18px;">
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);">Total</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--text);">${total}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);">Masculino</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--purple-light);">${masc.length}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);">Feminino</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--pink);">${fem.length}</div>
+      </div>
+    </div>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;">Por tamanho</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      ${TAMANHOS.map(t=>{
+        const n=contTam[t];
+        const pct=total?Math.round(n/total*100):0;
+        return`<div style="background:var(--black3);border:1px solid ${n>0?'var(--purple)':'var(--border)'};border-radius:var(--r);padding:12px 16px;min-width:70px;text-align:center;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:${n>0?'var(--lime)':'var(--text3)'};">${n}</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--text2);">${t}</div>
+          ${n>0?`<div style="font-size:11px;color:var(--text3);margin-top:2px;">${pct}%</div>`:''}
+        </div>`;
+      }).join('')}
+    </div>`;
 }
 function salvarParametros(){
   S.params={
@@ -972,6 +1041,8 @@ function exportarCSV(){
 }
 
 function renderAll(){renderJogadores();renderMetricas();renderPremiacao();renderPatrocinios();simular();}
+// Also update uniforms summary if financeiro is visible
+function renderAllFull(){renderAll();try{renderUniformes();}catch(e){}}
 
 // Auto-refresh a cada 30s para sincronizar entre usuários
 setInterval(()=>{if(!isSaving)loadFromCloud();},30000);
