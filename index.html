@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Premia Cup — Controle Interno</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--black:#070a08;--black2:#0d1210;--black3:#121a14;--black4:#182019;--purple:#8B3FD8;--purple2:#6B2FBE;--purple-light:#b06aff;--purple-glow:rgba(139,63,216,0.25);--lime:#AAFF00;--lime2:#88DD00;--lime-glow:rgba(170,255,0,0.2);--pink:#FF1BAD;--pink2:#CC0088;--pink-glow:rgba(255,27,173,0.2);--text:#f0f5f0;--text2:#8a9e8a;--text3:#4a5e4a;--border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.12);--r:8px;--rl:12px;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Barlow',sans-serif;background:var(--black);color:var(--text);min-height:100vh;font-size:14px;line-height:1.6;}
+.layout{display:flex;min-height:100vh;}
+.sidebar{width:230px;min-width:230px;background:var(--black2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;transition:transform 0.25s;}
+.sidebar-logo{padding:22px 20px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;}
+.logo-text{flex:1;}
+.logo-name{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;background:linear-gradient(90deg,#fff 30%,var(--lime) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;}
+.logo-sub{font-size:11px;color:var(--text3);margin-top:2px;font-family:'Barlow Condensed',sans-serif;letter-spacing:.04em;}
+.logo-sync{font-size:10px;font-family:'Barlow Condensed',sans-serif;letter-spacing:.04em;margin-top:4px;display:flex;align-items:center;gap:4px;}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--text3);display:inline-block;}
+.sync-dot.ok{background:var(--lime);}
+.sync-dot.err{background:var(--pink);}
+.sync-dot.loading{background:var(--purple-light);animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+.nav{padding:14px 10px;flex:1;overflow-y:auto;}
+.nav-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--text3);padding:0 10px;margin-bottom:4px;margin-top:16px;}
+.nav-label:first-child{margin-top:0;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--r);color:var(--text2);font-size:13px;font-family:'Barlow Condensed',sans-serif;font-weight:500;letter-spacing:.03em;cursor:pointer;transition:all 0.15s;margin-bottom:2px;position:relative;}
+.nav-item:hover{background:var(--black3);color:var(--text);}
+.nav-item.active{background:rgba(139,63,216,0.15);color:var(--purple-light);}
+.nav-item.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;background:var(--lime);border-radius:2px;}
+.nav-icon{font-size:16px;width:20px;text-align:center;}
+.nav-badge{margin-left:auto;background:var(--black4);border:1px solid var(--border);color:var(--text3);font-size:10px;padding:1px 7px;border-radius:20px;font-family:'Barlow',sans-serif;}
+.nav-item.active .nav-badge{background:rgba(170,255,0,0.1);color:var(--lime2);border-color:rgba(170,255,0,0.25);}
+.sidebar-footer{padding:12px 16px;border-top:1px solid var(--border);font-size:11px;color:var(--text3);font-family:'Barlow Condensed',sans-serif;letter-spacing:.03em;}
+.sidebar-footer span{color:var(--lime2);}
+.main{margin-left:230px;flex:1;}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(7,10,8,0.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:12px 28px;display:flex;align-items:center;justify-content:space-between;}
+.topbar-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1.5px;color:var(--text);}
+.topbar-actions{display:flex;gap:8px;}
+.page{padding:24px 28px;display:none;}
+.page.active{display:block;}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:22px;}
+.metric-card{background:var(--black2);border:1px solid var(--border);border-radius:var(--rl);padding:16px 18px;transition:border-color 0.2s;position:relative;overflow:hidden;}
+.metric-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.metric-card.purple::before{background:var(--purple);}
+.metric-card.lime::before{background:var(--lime);}
+.metric-card.pink::before{background:var(--pink);}
+.metric-card.amber::before{background:#EF9F27;}
+.mc-label{font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;}
+.mc-value{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--text);letter-spacing:.5px;line-height:1;}
+.mc-value.green{color:var(--lime2);}
+.mc-value.red{color:var(--pink);}
+.mc-value.purple{color:var(--purple-light);}
+.mc-value.amber{color:#EF9F27;}
+.mc-sub{font-size:11px;color:var(--text3);margin-top:4px;}
+.card{background:var(--black2);border:1px solid var(--border);border-radius:var(--rl);margin-bottom:18px;overflow:hidden;}
+.card-header{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.card-title{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;color:var(--text);display:flex;align-items:center;gap:8px;}
+.card-title .accent{color:var(--lime);}
+.card-body{padding:18px 20px;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+label{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;}
+input[type=text],input[type=number],input[type=tel],input[type=search],select,textarea{background:var(--black3);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:'Barlow',sans-serif;font-size:13px;padding:9px 12px;transition:border-color 0.15s,background 0.15s;width:100%;}
+input:focus,select:focus{outline:none;border-color:var(--purple);background:var(--black4);}
+input::placeholder{color:var(--text3);}
+select option{background:var(--black3);}
+.cat-group{display:flex;flex-wrap:wrap;gap:8px;}
+.cat-chip{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:20px;border:1px solid var(--border2);background:var(--black3);color:var(--text2);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.03em;cursor:pointer;transition:all 0.15s;user-select:none;}
+.cat-chip input{display:none;}
+.cat-chip:hover{border-color:var(--purple);color:var(--text);}
+.cat-chip.checked-Bronze{background:rgba(239,159,39,0.12);border-color:rgba(239,159,39,0.5);color:#EF9F27;}
+.cat-chip.checked-Iniciante{background:rgba(139,63,216,0.15);border-color:rgba(139,63,216,0.5);color:var(--purple-light);}
+.cat-chip.checked-Mista{background:rgba(170,255,0,0.1);border-color:rgba(170,255,0,0.4);color:var(--lime);}
+.cat-chip.checked-Estreante{background:rgba(255,27,173,0.1);border-color:rgba(255,27,173,0.4);color:var(--pink);}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:var(--r);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.04em;cursor:pointer;border:1px solid var(--border2);background:var(--black3);color:var(--text2);transition:all 0.15s;white-space:nowrap;}
+.btn:hover{background:var(--black4);color:var(--text);border-color:var(--purple);}
+.btn-primary{background:var(--purple);border-color:var(--purple);color:#fff;box-shadow:0 0 16px var(--purple-glow);}
+.btn-primary:hover{background:var(--purple2);border-color:var(--purple2);color:#fff;}
+.btn-lime{background:var(--lime);border-color:var(--lime);color:#050a05;box-shadow:0 0 16px var(--lime-glow);}
+.btn-lime:hover{background:var(--lime2);border-color:var(--lime2);color:#050a05;}
+.btn-sm{padding:5px 10px;font-size:12px;}
+.btn-ghost{background:transparent;border-color:transparent;}
+.btn-ghost:hover{background:var(--black3);border-color:var(--border);}
+.btn-danger:hover{background:rgba(255,27,173,0.1);border-color:rgba(255,27,173,0.4);color:var(--pink);}
+.table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{text-align:left;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;padding:10px 16px;border-bottom:1px solid var(--border);white-space:nowrap;}
+td{padding:11px 16px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(255,255,255,0.02);}
+.tr-total td{background:var(--black3);font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.03em;}
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.04em;white-space:nowrap;}
+.badge-lime{background:rgba(170,255,0,0.12);color:var(--lime);border:1px solid rgba(170,255,0,0.3);}
+.badge-purple{background:rgba(139,63,216,0.15);color:var(--purple-light);border:1px solid rgba(139,63,216,0.35);}
+.badge-pink{background:rgba(255,27,173,0.12);color:var(--pink);border:1px solid rgba(255,27,173,0.3);}
+.badge-amber{background:rgba(239,159,39,0.12);color:#EF9F27;border:1px solid rgba(239,159,39,0.3);}
+.badge-gray{background:rgba(255,255,255,0.06);color:var(--text2);border:1px solid var(--border);}
+.badge-green{background:rgba(170,255,0,0.12);color:var(--lime2);border:1px solid rgba(170,255,0,0.3);}
+.badge-red{background:rgba(255,27,173,0.12);color:var(--pink);border:1px solid rgba(255,27,173,0.3);}
+.alert{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:var(--r);font-size:13px;margin-bottom:18px;font-family:'Barlow Condensed',sans-serif;font-weight:600;letter-spacing:.02em;}
+.alert-green{background:rgba(170,255,0,0.07);border:1px solid rgba(170,255,0,0.25);color:var(--lime);}
+.alert-red{background:rgba(255,27,173,0.07);border:1px solid rgba(255,27,173,0.25);color:var(--pink);}
+.alert-amber{background:rgba(239,159,39,0.07);border:1px solid rgba(239,159,39,0.25);color:#EF9F27;}
+.progress{height:4px;background:var(--black4);border-radius:2px;margin-top:8px;}
+.progress-fill{height:4px;border-radius:2px;background:var(--lime);transition:width 0.4s;}
+.progress-fill.purple{background:var(--purple);}
+.progress-fill.pink{background:var(--pink);}
+.player-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;}
+.player-chip{display:flex;align-items:center;justify-content:space-between;background:var(--black3);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;transition:border-color 0.15s;}
+.player-chip:hover{border-color:var(--purple);}
+.player-chip-name{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;}
+.player-chip-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+.fin-row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.fin-row:last-child{border-bottom:none;}
+.fin-label{color:var(--text2);}
+.fin-value{font-weight:700;font-family:'Barlow Condensed',sans-serif;font-size:15px;letter-spacing:.04em;}
+.fin-total{background:var(--black3);margin:0 -20px -20px;padding:12px 20px;display:flex;justify-content:space-between;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;}
+.sim-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:14px;}
+.sim-field label{display:block;font-size:11px;color:var(--text3);margin-bottom:4px;font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.08em;}
+.sim-result{background:var(--black3);border-radius:var(--r);padding:14px 18px;display:flex;gap:24px;flex-wrap:wrap;border:1px solid var(--border);}
+.sim-item-label{font-size:11px;color:var(--text3);margin-bottom:3px;font-family:'Barlow Condensed',sans-serif;letter-spacing:.04em;text-transform:uppercase;}
+.sim-item-val{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--text);letter-spacing:.5px;}
+.premio-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-bottom:18px;}
+.premio-card{background:var(--black3);border-radius:var(--rl);border:1px solid var(--border);overflow:hidden;}
+.premio-header{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.premio-row{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);}
+.premio-row:last-child{border-bottom:none;}
+.premio-val{font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--lime);letter-spacing:.5px;}
+.premio-empty{font-size:12px;color:var(--text3);font-style:italic;}
+.premio-dupla{font-size:13px;font-weight:500;font-family:'Barlow Condensed',sans-serif;}
+.menu-toggle{display:none;background:none;border:1px solid var(--border2);border-radius:var(--r);padding:7px 12px;cursor:pointer;color:var(--text);font-family:'Barlow Condensed',sans-serif;font-weight:600;letter-spacing:.04em;}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:90;}
+.toast{position:fixed;bottom:24px;right:24px;z-index:999;background:var(--black4);border:1px solid var(--border2);border-radius:var(--r);padding:12px 18px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:.04em;color:var(--text);transform:translateY(80px);opacity:0;transition:all 0.3s;pointer-events:none;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.lime{border-left:3px solid var(--lime);}
+.toast.pink{border-left:3px solid var(--pink);}
+.modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);z-index:200;align-items:center;justify-content:center;}
+.modal-backdrop.open{display:flex;}
+.modal{background:var(--black2);border:1px solid var(--purple);border-radius:var(--rl);padding:24px;width:90%;max-width:480px;box-shadow:0 0 40px var(--purple-glow);animation:slideUp 0.2s ease;}
+@keyframes slideUp{from{transform:translateY(16px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;color:var(--text);}
+.empty-state{text-align:center;padding:36px 20px;color:var(--text3);}
+.empty-icon{font-size:28px;margin-bottom:8px;opacity:0.4;}
+.empty-text{font-size:13px;font-family:'Barlow Condensed',sans-serif;letter-spacing:.03em;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.page-header{display:flex;align-items:flex-end;gap:12px;margin-bottom:22px;padding-bottom:14px;border-bottom:1px solid var(--border);position:relative;}
+.page-header::after{content:'';position:absolute;bottom:-1px;left:0;width:60px;height:2px;background:var(--lime);}
+.page-header-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:var(--text);}
+.page-header-sub{font-family:'Barlow Condensed',sans-serif;font-size:13px;color:var(--text3);padding-bottom:3px;}
+.saving-bar{height:2px;background:var(--purple);position:fixed;top:0;left:0;z-index:9999;transition:width 0.3s;width:0;}
+@media(max-width:768px){.sidebar{transform:translateX(-100%);}.sidebar.open{transform:translateX(0);}.main{margin-left:0;}.menu-toggle{display:flex;align-items:center;gap:6px;}.overlay.open{display:block;}.page{padding:16px;}.topbar{padding:10px 16px;}.form-grid{grid-template-columns:1fr;}.two-col{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="saving-bar" id="saving-bar"></div>
+<div class="layout">
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-text">
+      <div class="logo-name">Premia Cup</div>
+      <div class="logo-sub">1ª Edição · Itajaí-SC</div>
+      <div class="logo-sync">
+        <span class="sync-dot" id="sync-dot"></span>
+        <span id="sync-label" style="color:var(--text3);">conectando...</span>
+      </div>
+    </div>
+  </div>
+  <nav class="nav">
+    <div class="nav-label">Gestão</div>
+    <div class="nav-item active" onclick="goTo('jogadores',this)"><span class="nav-icon">👤</span> Jogadores<span class="nav-badge" id="nb-jogadores">0</span></div>
+    <div class="nav-item" onclick="goTo('categorias',this)"><span class="nav-icon">🏅</span> Categorias</div>
+    <div class="nav-item" onclick="goTo('premiacao',this)"><span class="nav-icon">🏆</span> Premiação</div>
+    <div class="nav-label">Financeiro</div>
+    <div class="nav-item" onclick="goTo('financeiro',this)"><span class="nav-icon">📊</span> Financeiro</div>
+    <div class="nav-item" onclick="goTo('patrocinios',this)"><span class="nav-icon">🤝</span> Patrocínios<span class="nav-badge" id="nb-pat">0</span></div>
+    <div class="nav-label">Análise</div>
+    <div class="nav-item" onclick="goTo('dashboard',this)"><span class="nav-icon">📈</span> Dashboard</div>
+  </nav>
+  <div class="sidebar-footer">Dados na <span>nuvem</span> · JSONBin</div>
+</aside>
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+<div class="main">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button class="menu-toggle btn" onclick="toggleSidebar()">☰ Menu</button>
+      <div class="topbar-title" id="topbar-title">Jogadores</div>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn btn-sm" id="btn-sync" onclick="forcSync()">↻ Sincronizar</button>
+      <button class="btn btn-sm" onclick="exportarCSV()">⬇ CSV</button>
+    </div>
+  </div>
+
+  <!-- JOGADORES -->
+  <div class="page active" id="page-jogadores">
+    <div class="page-header"><div class="page-header-title">Jogadores</div><div class="page-header-sub">cadastro e controle de inscrições</div></div>
+    <div class="metrics" id="jog-metrics"></div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">✚ <span class="accent">Novo</span> Jogador</div>
+        <div id="preco-preview" style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--lime);letter-spacing:.5px;"></div>
+      </div>
+      <div class="card-body">
+        <div class="form-grid" style="margin-bottom:14px;">
+          <div style="display:flex;flex-direction:column;gap:5px;"><label>Nome completo</label><input type="text" id="j-nome" placeholder="Ex: João Silva"></div>
+          <div style="display:flex;flex-direction:column;gap:5px;"><label>Contato (tel / @instagram)</label><input type="tel" id="j-tel" placeholder="Ex: @joaosilva"></div>
+        </div>
+        <div style="margin-bottom:14px;"><label style="display:block;margin-bottom:8px;">Categorias</label>
+          <div class="cat-group" id="cat-chips">
+            <label class="cat-chip" id="chip-Bronze"><input type="checkbox" value="Bronze" onchange="updateChip(this,'Bronze')"> 🥉 Bronze</label>
+            <label class="cat-chip" id="chip-Iniciante"><input type="checkbox" value="Iniciante" onchange="updateChip(this,'Iniciante')"> 💜 Iniciante</label>
+            <label class="cat-chip" id="chip-Mista"><input type="checkbox" value="Mista Iniciante" onchange="updateChip(this,'Mista')"> 🟢 Mista Iniciante</label>
+            <label class="cat-chip" id="chip-Estreante"><input type="checkbox" value="Estreante" onchange="updateChip(this,'Estreante')"> 🩷 Estreante</label>
+          </div>
+        </div>
+        <div style="display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;">
+          <div style="display:flex;flex-direction:column;gap:5px;"><label>Pagamento</label><select id="j-pag" style="width:130px;"><option value="Pendente">Pendente</option><option value="Pago">Pago</option></select></div>
+          <div style="flex:1;"></div>
+          <button class="btn btn-lime" onclick="addJogador()">✚ Cadastrar</button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">👥 Lista de Jogadores</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <input type="search" id="busca" placeholder="Buscar..." style="width:150px;" oninput="renderJogadores()">
+          <select id="filtro-cat" onchange="renderJogadores()" style="width:140px;"><option value="">Todas categorias</option><option>Bronze</option><option>Iniciante</option><option>Mista Iniciante</option><option>Estreante</option></select>
+          <select id="filtro-pag" onchange="renderJogadores()" style="width:120px;"><option value="">Todos pag.</option><option>Pago</option><option>Pendente</option></select>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table><thead><tr><th>#</th><th>Nome</th><th>Contato</th><th>Categorias</th><th>Valor</th><th>Pagamento</th><th></th></tr></thead><tbody id="jog-tbody"></tbody></table>
+        <div id="jog-empty" class="empty-state" style="display:none;"><div class="empty-icon">👤</div><div class="empty-text">Nenhum jogador encontrado</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CATEGORIAS -->
+  <div class="page" id="page-categorias">
+    <div class="page-header"><div class="page-header-title">Categorias</div><div class="page-header-sub">jogadores por categoria</div></div>
+    <div class="metrics" id="cat-metrics"></div>
+    <div id="cat-sections"></div>
+  </div>
+
+  <!-- PREMIAÇÃO -->
+  <div class="page" id="page-premiacao">
+    <div class="page-header"><div class="page-header-title">Premiação</div><div class="page-header-sub">resultados e valores</div></div>
+    <div class="metrics">
+      <div class="metric-card pink"><div class="mc-label">Total premiação</div><div class="mc-value red">R$ 4.040</div></div>
+      <div class="metric-card purple"><div class="mc-label">Categorias</div><div class="mc-value purple">4</div></div>
+      <div class="metric-card lime"><div class="mc-label">Duplas premiadas</div><div class="mc-value green">16</div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">🏆 Registrar <span class="accent">Resultado</span></div></div>
+      <div class="card-body">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
+          <div style="display:flex;flex-direction:column;gap:5px;flex:0 0 auto;"><label>Categoria</label><select id="r-cat" style="width:160px;"><option>Bronze</option><option>Iniciante</option><option>Mista Iniciante</option><option>Estreante</option></select></div>
+          <div style="display:flex;flex-direction:column;gap:5px;flex:0 0 auto;"><label>Posição</label><select id="r-pos" style="width:120px;"><option value="0">🥇 1º lugar</option><option value="1">🥈 2º lugar</option><option value="2">🥉 3º lugar</option><option value="3">4º lugar</option></select></div>
+          <div style="display:flex;flex-direction:column;gap:5px;flex:1;min-width:160px;"><label>Nome da dupla</label><input type="text" id="r-dupla" placeholder="Ex: João & Maria"></div>
+          <button class="btn btn-primary" onclick="addResultado()">Registrar</button>
+        </div>
+      </div>
+    </div>
+    <div class="premio-grid" id="premio-grid"></div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">💰 Tabela de <span class="accent">Premiação</span></div></div>
+      <div class="table-wrap"><table><thead><tr><th>Categoria</th><th>1º</th><th>2º</th><th>3º</th><th>4º</th><th>Total</th></tr></thead>
+        <tbody>
+          <tr><td>🥉 Bronze</td><td>R$ 1.000</td><td>R$ 500</td><td>R$ 250</td><td>R$ 100</td><td style="color:var(--lime);font-weight:700;">R$ 1.850</td></tr>
+          <tr><td>💜 Iniciante</td><td>R$ 600</td><td>R$ 350</td><td>R$ 150</td><td>—</td><td style="color:var(--lime);font-weight:700;">R$ 1.100</td></tr>
+          <tr><td>🟢 Mista Iniciante</td><td>R$ 450</td><td>R$ 300</td><td>R$ 100</td><td>—</td><td style="color:var(--lime);font-weight:700;">R$ 850</td></tr>
+          <tr><td>🩷 Estreante</td><td>R$ 240</td><td>—</td><td>—</td><td>—</td><td style="color:var(--lime);font-weight:700;">R$ 240</td></tr>
+          <tr class="tr-total"><td>Total</td><td>R$ 2.290</td><td>R$ 1.150</td><td>R$ 500</td><td>R$ 100</td><td style="color:var(--lime);">R$ 4.040</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- FINANCEIRO -->
+  <div class="page" id="page-financeiro">
+    <div class="page-header"><div class="page-header-title">Financeiro</div><div class="page-header-sub">receitas, despesas e resultado</div></div>
+    <div class="metrics" id="fin-metrics"></div>
+    <div id="fin-alert"></div>
+    <div class="two-col">
+      <div class="card"><div class="card-header"><div class="card-title">📈 Receitas</div></div><div class="card-body" id="fin-receitas"></div></div>
+      <div class="card"><div class="card-header"><div class="card-title">📉 Despesas</div></div><div class="card-body" id="fin-despesas"></div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">🎛 Simulador de <span class="accent">Cenários</span></div></div>
+      <div class="card-body">
+        <div class="sim-grid">
+          <div class="sim-field"><label>Jogadores 1 cat.</label><input type="number" id="s-1" value="0" min="0" oninput="simular()"></div>
+          <div class="sim-field"><label>Jogadores 2 cat.</label><input type="number" id="s-2" value="0" min="0" oninput="simular()"></div>
+          <div class="sim-field"><label>Jogadores 3 cat.</label><input type="number" id="s-3" value="0" min="0" oninput="simular()"></div>
+          <div class="sim-field"><label>Patrocínio (R$)</label><input type="number" id="s-pat" value="800" min="0" oninput="simular()"></div>
+        </div>
+        <div class="sim-result" id="sim-result"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PATROCÍNIOS -->
+  <div class="page" id="page-patrocinios">
+    <div class="page-header"><div class="page-header-title">Patrocínios</div><div class="page-header-sub">parceiros e patrocinadores</div></div>
+    <div class="metrics" id="pat-metrics"></div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">✚ <span class="accent">Novo</span> Patrocinador</div></div>
+      <div class="card-body">
+        <div class="form-grid" style="margin-bottom:12px;">
+          <div style="display:flex;flex-direction:column;gap:5px;"><label>Empresa</label><input type="text" id="p-nome" placeholder="Ex: Lonu"></div>
+          <div style="display:flex;flex-direction:column;gap:5px;"><label>Categoria</label><select id="p-cat"><option>Master (R$ 1.500)</option><option>Ouro (R$ 800)</option><option selected>Prata (R$ 400)</option></select></div>
+          <div style="display:flex;flex-direction:column;gap:5px;"><label>Valor R$ (0 = permuta)</label><input type="number" id="p-val" placeholder="400" min="0"></div>
+          <div style="display:flex;flex-direction:column;gap:5px;"><label>Status</label><select id="p-status"><option>Confirmado</option><option>Em análise</option><option>Enviada</option><option>Fora</option></select></div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;"><button class="btn btn-lime" onclick="addSponsor()">✚ Adicionar</button></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">🤝 Patrocinadores</div></div>
+      <div class="table-wrap">
+        <table><thead><tr><th>Empresa</th><th>Categoria</th><th>Valor</th><th>Status</th><th></th></tr></thead><tbody id="pat-tbody"></tbody></table>
+        <div id="pat-empty" class="empty-state" style="display:none;"><div class="empty-icon">🤝</div><div class="empty-text">Nenhum patrocinador</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="page" id="page-dashboard">
+    <div class="page-header"><div class="page-header-title">Dashboard</div><div class="page-header-sub">cenário ideal 96 duplas vs atual</div></div>
+    <div class="metrics" id="dash-metrics"></div>
+    <div id="dash-alert"></div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">📊 Duplas por <span class="accent">Categoria</span></div></div>
+      <div class="card-body">
+        <div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:14px;font-size:12px;color:var(--text2);font-family:'Barlow Condensed',sans-serif;font-weight:600;letter-spacing:.04em;">
+          <span style="display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;border-radius:2px;background:var(--lime);display:inline-block;"></span>Ideal</span>
+          <span style="display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;border-radius:2px;background:var(--purple-light);display:inline-block;"></span>Atual</span>
+          <span style="display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;border-radius:2px;background:var(--pink);display:inline-block;"></span>Faltam</span>
+        </div>
+        <div style="position:relative;width:100%;height:220px;"><canvas id="chartDuplas" role="img" aria-label="Duplas por categoria ideal vs atual">Ideal 24 por categoria.</canvas></div>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-header"><div class="card-title">💰 Financeiro — <span class="accent">Ideal vs Atual</span></div></div>
+        <div class="card-body">
+          <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px;font-size:12px;color:var(--text2);font-family:'Barlow Condensed',sans-serif;font-weight:600;letter-spacing:.04em;">
+            <span style="display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;border-radius:2px;background:var(--lime);display:inline-block;"></span>Receita ideal</span>
+            <span style="display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;border-radius:2px;background:var(--purple-light);display:inline-block;"></span>Receita atual</span>
+            <span style="display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;border-radius:2px;background:var(--pink);display:inline-block;"></span>Despesas</span>
+          </div>
+          <div style="position:relative;width:100%;height:200px;"><canvas id="chartFin" role="img" aria-label="Financeiro ideal vs atual">Comparativo financeiro.</canvas></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">🎯 Progresso por <span class="accent">Categoria</span></div></div>
+        <div class="card-body" id="dash-progress"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">👥 Jogadores por <span class="accent">Nº de Categorias</span></div></div>
+      <div class="card-body">
+        <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px;font-size:12px;color:var(--text2);font-family:'Barlow Condensed',sans-serif;font-weight:600;letter-spacing:.04em;">
+          <span style="display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;border-radius:2px;background:var(--purple-light);display:inline-block;"></span>1 categoria</span>
+          <span style="display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;border-radius:2px;background:var(--lime);display:inline-block;"></span>2 categorias</span>
+          <span style="display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;border-radius:2px;background:var(--pink);display:inline-block;"></span>3 categorias</span>
+        </div>
+        <div style="position:relative;width:100%;height:180px;"><canvas id="chartCats" role="img" aria-label="Jogadores por número de categorias">Distribuição por categorias.</canvas></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- MODAL EDITAR -->
+<div class="modal-backdrop" id="modal-edit">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">✏️ Editar Jogador</div><button class="btn btn-sm btn-ghost" onclick="closeModal()">✕</button></div>
+    <div class="form-grid" style="margin-bottom:14px;">
+      <div style="display:flex;flex-direction:column;gap:5px;"><label>Nome</label><input type="text" id="e-nome"></div>
+      <div style="display:flex;flex-direction:column;gap:5px;"><label>Contato</label><input type="tel" id="e-tel"></div>
+    </div>
+    <div style="margin-bottom:14px;"><label style="display:block;margin-bottom:8px;">Categorias</label>
+      <div class="cat-group">
+        <label class="cat-chip" id="e-chip-Bronze"><input type="checkbox" value="Bronze" onchange="updateEditChip(this,'Bronze')"> 🥉 Bronze</label>
+        <label class="cat-chip" id="e-chip-Iniciante"><input type="checkbox" value="Iniciante" onchange="updateEditChip(this,'Iniciante')"> 💜 Iniciante</label>
+        <label class="cat-chip" id="e-chip-Mista"><input type="checkbox" value="Mista Iniciante" onchange="updateEditChip(this,'Mista')"> 🟢 Mista Iniciante</label>
+        <label class="cat-chip" id="e-chip-Estreante"><input type="checkbox" value="Estreante" onchange="updateEditChip(this,'Estreante')"> 🩷 Estreante</label>
+      </div>
+    </div>
+    <div style="display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;">
+      <div style="display:flex;flex-direction:column;gap:5px;"><label>Pagamento</label><select id="e-pag" style="width:130px;"><option>Pendente</option><option>Pago</option></select></div>
+      <div style="flex:1;"></div>
+      <div id="e-preco" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--lime);margin-bottom:1px;"></div>
+      <button class="btn btn-lime" onclick="salvarEdicao()">Salvar</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+// ===== JSONBIN CONFIG =====
+const BIN_ID = '6a27119bda38895dfe9ba20f';
+const API_KEY = '$2a$10$cEuyGQilS7FRcItHcoY75.8CBrCHAze0z9cjiB7dps9u0zGzCTzb2';
+const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+let saveTimer = null;
+let isSaving = false;
+
+async function loadFromCloud() {
+  setSyncStatus('loading','carregando...');
+  try {
+    const r = await fetch(API_URL+'/latest', {headers:{'X-Master-Key':API_KEY}});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const data = await r.json();
+    S = data.record;
+    if(!S.jogadores) S.jogadores = [];
+    if(!S.resultados) S.resultados = {};
+    if(!S.sponsors) S.sponsors = [
+      {id:1,nome:'Lonu',cat:'Ouro (R$ 800)',val:0,status:'Confirmado'},
+      {id:2,nome:'JMP',cat:'Prata (R$ 400)',val:400,status:'Confirmado'},
+      {id:3,nome:'Restaurante Dom Alberto',cat:'Prata (R$ 400)',val:400,status:'Confirmado'},
+    ];
+    setSyncStatus('ok','sincronizado');
+    renderAll();
+  } catch(e) {
+    setSyncStatus('err','erro de conexão');
+    toast('Erro ao carregar dados da nuvem','pink');
+  }
+}
+
+async function saveToCloud() {
+  if(isSaving) return;
+  isSaving = true;
+  showSavingBar();
+  try {
+    const r = await fetch(API_URL, {
+      method:'PUT',
+      headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},
+      body: JSON.stringify(S)
+    });
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    setSyncStatus('ok','salvo');
+  } catch(e) {
+    setSyncStatus('err','erro ao salvar');
+    toast('Erro ao salvar na nuvem','pink');
+  } finally {
+    isSaving = false;
+    hideSavingBar();
+  }
+}
+
+function save() {
+  clearTimeout(saveTimer);
+  setSyncStatus('loading','salvando...');
+  saveTimer = setTimeout(saveToCloud, 800);
+}
+
+function forcSync() {
+  clearTimeout(saveTimer);
+  loadFromCloud();
+}
+
+function setSyncStatus(type, label) {
+  const dot = document.getElementById('sync-dot');
+  const lbl = document.getElementById('sync-label');
+  dot.className = 'sync-dot ' + type;
+  lbl.textContent = label;
+  lbl.style.color = type==='ok'?'var(--lime2)':type==='err'?'var(--pink)':'var(--text3)';
+}
+
+function showSavingBar() {
+  const b = document.getElementById('saving-bar');
+  b.style.width='60%';
+}
+function hideSavingBar() {
+  const b = document.getElementById('saving-bar');
+  b.style.width='100%';
+  setTimeout(()=>b.style.width='0',400);
+}
+
+// ===== STATE =====
+let S = {jogadores:[],resultados:{},sponsors:[]};
+const CATS = ['Bronze','Iniciante','Mista Iniciante','Estreante'];
+const PRECOS = {1:120,2:200,3:260};
+const PREMIOS = {Bronze:[1000,500,250,100],Iniciante:[600,350,150,0],'Mista Iniciante':[450,300,100,0],Estreante:[240,0,0,0]};
+const POSICOES = ['🥇 1º lugar','🥈 2º lugar','🥉 3º lugar','4º lugar'];
+const IDEAL = 96;
+const PAT_BASE = 800;
+const DESPESAS_FIXAS = 24*33+8*300+4040;
+let editingId = null;
+let chartDuplas=null,chartFin=null,chartCats=null;
+
+function fmt(n){return 'R$ '+Math.round(n).toLocaleString('pt-BR');}
+function preco(n){return PRECOS[Math.min(n,3)]||260;}
+function uid(){return Date.now()+Math.random();}
+
+function toast(msg,type='lime'){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.className='toast show '+type;
+  setTimeout(()=>el.classList.remove('show'),2800);
+}
+
+const catBadge={Bronze:'badge-amber',Iniciante:'badge-purple','Mista Iniciante':'badge-lime',Estreante:'badge-pink'};
+const pagBadge={Pago:'badge-lime',Pendente:'badge-amber'};
+const statusBadge={Confirmado:'badge-lime','Em análise':'badge-amber',Enviada:'badge-purple',Fora:'badge-red'};
+
+function goTo(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  btn.classList.add('active');
+  const titles={jogadores:'Jogadores',categorias:'Categorias',premiacao:'Premiação',financeiro:'Financeiro',patrocinios:'Patrocínios',dashboard:'Dashboard'};
+  document.getElementById('topbar-title').textContent=titles[id]||id;
+  if(id==='financeiro')renderFinanceiro();
+  if(id==='categorias')renderCategorias();
+  if(id==='patrocinios')renderPatrocinios();
+  if(id==='dashboard')renderDashboard();
+  closeSidebar();
+}
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').classList.toggle('open');}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('open');}
+
+function updateChip(cb,key){
+  const chip=document.getElementById('chip-'+key);
+  if(cb.checked)chip.classList.add('checked-'+key);else chip.classList.remove('checked-'+key);
+  const sel=[...document.querySelectorAll('#cat-chips input:checked')];
+  const el=document.getElementById('preco-preview');
+  if(!sel.length){el.textContent='';return;}
+  el.textContent=sel.length===1?fmt(120):sel.length===2?`${fmt(200)} — 2 cats`:fmt(260)+' — 3 cats';
+}
+function updateEditChip(cb,key){
+  const chip=document.getElementById('e-chip-'+key);
+  if(cb.checked)chip.classList.add('checked-'+key);else chip.classList.remove('checked-'+key);
+  const sel=[...document.querySelectorAll('#modal-edit .cat-chip input:checked')];
+  document.getElementById('e-preco').textContent=sel.length?fmt(preco(sel.length)):'';
+}
+
+function addJogador(){
+  const nome=document.getElementById('j-nome').value.trim();
+  const tel=document.getElementById('j-tel').value.trim();
+  const cats=[...document.querySelectorAll('#cat-chips input:checked')].map(c=>c.value);
+  if(!nome){toast('Informe o nome do jogador','pink');return;}
+  if(!cats.length){toast('Selecione ao menos uma categoria','pink');return;}
+  S.jogadores.push({id:uid(),nome,tel,cats,pag:document.getElementById('j-pag').value});
+  save();
+  document.getElementById('j-nome').value=''; document.getElementById('j-tel').value='';
+  document.querySelectorAll('#cat-chips input').forEach(c=>c.checked=false);
+  ['Bronze','Iniciante','Mista','Estreante'].forEach(k=>document.getElementById('chip-'+k).className='cat-chip');
+  document.getElementById('preco-preview').textContent='';
+  renderJogadores(); renderMetricas();
+  toast(`${nome} cadastrado!`);
+}
+function remJogador(id){
+  if(!confirm('Remover jogador?'))return;
+  S.jogadores=S.jogadores.filter(j=>j.id!==id);
+  save(); renderJogadores(); renderMetricas(); toast('Jogador removido','pink');
+}
+function togglePag(id){
+  const j=S.jogadores.find(j=>j.id===id);
+  if(!j)return;
+  j.pag=j.pag==='Pago'?'Pendente':'Pago';
+  save(); renderJogadores(); renderMetricas();
+  toast(j.pag==='Pago'?`${j.nome} — Pago ✓`:`${j.nome} — Pendente`);
+}
+function abrirEditar(id){
+  const j=S.jogadores.find(j=>j.id===id);
+  if(!j)return;
+  editingId=id;
+  document.getElementById('e-nome').value=j.nome;
+  document.getElementById('e-tel').value=j.tel||'';
+  document.getElementById('e-pag').value=j.pag;
+  ['Bronze','Iniciante','Mista','Estreante'].forEach(k=>{
+    const chip=document.getElementById('e-chip-'+k);
+    const cb=chip.querySelector('input');
+    const checked=j.cats.includes(cb.value);
+    cb.checked=checked;
+    chip.className='cat-chip'+(checked?' checked-'+k:'');
+  });
+  document.getElementById('e-preco').textContent=fmt(preco(j.cats.length));
+  document.getElementById('modal-edit').classList.add('open');
+}
+function salvarEdicao(){
+  const j=S.jogadores.find(j=>j.id===editingId);
+  if(!j)return;
+  const nome=document.getElementById('e-nome').value.trim();
+  const cats=[...document.querySelectorAll('#modal-edit .cat-chip input:checked')].map(c=>c.value);
+  if(!nome||!cats.length){toast('Preencha nome e categorias','pink');return;}
+  j.nome=nome; j.tel=document.getElementById('e-tel').value.trim();
+  j.cats=cats; j.pag=document.getElementById('e-pag').value;
+  save(); closeModal(); renderJogadores(); renderMetricas(); toast('Dados atualizados!');
+}
+function closeModal(){document.getElementById('modal-edit').classList.remove('open');editingId=null;}
+
+function renderJogadores(){
+  const busca=document.getElementById('busca').value.toLowerCase();
+  const fcat=document.getElementById('filtro-cat').value;
+  const fpag=document.getElementById('filtro-pag').value;
+  const lista=S.jogadores.filter(j=>{
+    if(busca&&!j.nome.toLowerCase().includes(busca)&&!(j.tel||'').toLowerCase().includes(busca))return false;
+    if(fcat&&!j.cats.includes(fcat))return false;
+    if(fpag&&j.pag!==fpag)return false;
+    return true;
+  });
+  const tb=document.getElementById('jog-tbody');
+  const empty=document.getElementById('jog-empty');
+  if(!lista.length){tb.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  tb.innerHTML=lista.map(j=>`<tr>
+    <td style="color:var(--text3);font-size:12px;">${S.jogadores.indexOf(j)+1}</td>
+    <td style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:600;">${j.nome}</td>
+    <td style="color:var(--text3);font-size:12px;">${j.tel||'—'}</td>
+    <td><div style="display:flex;gap:4px;flex-wrap:wrap;">${j.cats.map(c=>`<span class="badge ${catBadge[c]||'badge-gray'}">${c}</span>`).join('')}</div></td>
+    <td style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--lime);letter-spacing:.5px;">${fmt(preco(j.cats.length))}</td>
+    <td><button onclick="togglePag(${j.id})" class="badge ${pagBadge[j.pag]}" style="border:none;cursor:pointer;">${j.pag}</button></td>
+    <td><div style="display:flex;gap:4px;">
+      <button class="btn btn-sm btn-ghost" onclick="abrirEditar(${j.id})">✏️</button>
+      <button class="btn btn-sm btn-ghost btn-danger" onclick="remJogador(${j.id})">🗑</button>
+    </div></td>
+  </tr>`).join('');
+}
+
+function renderMetricas(){
+  const total=S.jogadores.length;
+  const pagos=S.jogadores.filter(j=>j.pag==='Pago').length;
+  const recTotal=S.jogadores.reduce((s,j)=>s+preco(j.cats.length),0);
+  const recPago=S.jogadores.filter(j=>j.pag==='Pago').reduce((s,j)=>s+preco(j.cats.length),0);
+  document.getElementById('jog-metrics').innerHTML=`
+    <div class="metric-card purple"><div class="mc-label">Jogadores</div><div class="mc-value">${total}</div></div>
+    <div class="metric-card lime"><div class="mc-label">Pagos</div><div class="mc-value green">${pagos}</div><div class="progress"><div class="progress-fill" style="width:${total?Math.round(pagos/total*100):0}%"></div></div></div>
+    <div class="metric-card amber"><div class="mc-label">Pendentes</div><div class="mc-value amber">${total-pagos}</div></div>
+    <div class="metric-card lime"><div class="mc-label">Receita inscrições</div><div class="mc-value green">${fmt(recTotal)}</div></div>
+    <div class="metric-card purple"><div class="mc-label">Já recebido</div><div class="mc-value purple">${fmt(recPago)}</div></div>
+    <div class="metric-card pink"><div class="mc-label">A receber</div><div class="mc-value amber">${fmt(recTotal-recPago)}</div></div>`;
+  document.getElementById('nb-jogadores').textContent=total;
+}
+
+function renderCategorias(){
+  const catMap={};CATS.forEach(c=>catMap[c]=[]);
+  S.jogadores.forEach(j=>j.cats.forEach(c=>{if(catMap[c])catMap[c].push(j);}));
+  document.getElementById('cat-metrics').innerHTML=CATS.map(c=>`
+    <div class="metric-card ${c==='Bronze'?'amber':c==='Iniciante'?'purple':c==='Mista Iniciante'?'lime':'pink'}">
+      <div class="mc-label">${c}</div><div class="mc-value">${catMap[c].length}</div>
+      <div class="mc-sub">${catMap[c].filter(j=>j.pag==='Pago').length} pagos · meta 48</div>
+      <div class="progress"><div class="progress-fill ${c==='Bronze'?'pink':c==='Mista Iniciante'?'':'purple'}" style="width:${Math.min(100,Math.round(catMap[c].length/48*100))}%"></div></div>
+    </div>`).join('');
+  document.getElementById('cat-sections').innerHTML=CATS.map(c=>`
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span class="badge ${catBadge[c]||'badge-gray'}" style="font-size:13px;">${c}</span></div>
+        <span style="font-size:13px;color:var(--text3);font-family:'Barlow Condensed',sans-serif;">${catMap[c].length} jogador${catMap[c].length!==1?'es':''}</span>
+      </div>
+      <div class="card-body">
+        ${catMap[c].length?`<div class="player-list">${catMap[c].map(j=>`
+          <div class="player-chip">
+            <div><div class="player-chip-name">${j.nome}</div><div class="player-chip-sub">${j.tel||'—'} · ${j.cats.length} cat.</div></div>
+            <span class="badge ${pagBadge[j.pag]}">${j.pag}</span>
+          </div>`).join('')}</div>`
+        :`<div class="empty-state" style="padding:20px;"><div class="empty-icon">👤</div><div class="empty-text">Nenhum jogador</div></div>`}
+      </div>
+    </div>`).join('');
+}
+
+function addResultado(){
+  const cat=document.getElementById('r-cat').value;
+  const pos=parseInt(document.getElementById('r-pos').value);
+  const dupla=document.getElementById('r-dupla').value.trim();
+  if(!dupla){toast('Informe o nome da dupla','pink');return;}
+  if(!S.resultados[cat])S.resultados[cat]={};
+  S.resultados[cat][pos]=dupla;
+  save(); document.getElementById('r-dupla').value='';
+  renderPremiacao(); toast(`Resultado: ${cat} — ${POSICOES[pos]}`);
+}
+function remResultado(cat,pos){
+  if(S.resultados[cat])delete S.resultados[cat][pos];
+  save(); renderPremiacao();
+}
+function renderPremiacao(){
+  document.getElementById('premio-grid').innerHTML=CATS.map(cat=>{
+    const res=S.resultados[cat]||{};
+    const rows=[0,1,2,3].map(i=>{
+      const val=PREMIOS[cat][i];if(val===0&&i>0)return'';
+      const dupla=res[i];
+      return`<div class="premio-row">
+        <span style="font-size:18px;">${POSICOES[i].split(' ')[0]}</span>
+        <div style="flex:1;padding:0 10px;">
+          <div style="font-size:11px;color:var(--text3);font-family:'Barlow Condensed',sans-serif;letter-spacing:.04em;">${POSICOES[i].split(' ').slice(1).join(' ')}</div>
+          ${dupla?`<div class="premio-dupla">${dupla}</div>`:`<div class="premio-empty">A definir</div>`}
+        </div>
+        <div style="text-align:right;">
+          ${val>0?`<div class="premio-val">${fmt(val)}</div>`:''}
+          ${dupla?`<button class="btn btn-sm btn-ghost" onclick="remResultado('${cat}',${i})" style="font-size:10px;padding:2px 6px;margin-top:3px;">✕</button>`:''}
+        </div>
+      </div>`;
+    }).join('');
+    return`<div class="premio-card"><div class="premio-header"><span class="badge ${catBadge[cat]||'badge-gray'}" style="font-size:13px;">${cat}</span><span class="premio-val">${fmt(PREMIOS[cat].reduce((a,b)=>a+b,0))}</span></div>${rows}</div>`;
+  }).join('');
+}
+
+function calcFin(){
+  const patTotal=S.sponsors.filter(p=>p.status==='Confirmado').reduce((s,p)=>s+p.val,0);
+  const recInsc=S.jogadores.reduce((s,j)=>s+preco(j.cats.length),0);
+  const totalRec=recInsc+patTotal;
+  const nJog=S.jogadores.length;
+  const uniforme=nJog*70;
+  const gastos=DESPESAS_FIXAS+uniforme;
+  const lucro=totalRec-gastos;
+  const recPago=S.jogadores.filter(j=>j.pag==='Pago').reduce((s,j)=>s+preco(j.cats.length),0);
+  return{patTotal,recInsc,totalRec,nJog,uniforme,gastos,lucro,recPago};
+}
+function renderFinanceiro(){
+  const f=calcFin();
+  document.getElementById('fin-metrics').innerHTML=`
+    <div class="metric-card lime"><div class="mc-label">Receita total</div><div class="mc-value green">${fmt(f.totalRec)}</div></div>
+    <div class="metric-card pink"><div class="mc-label">Despesas</div><div class="mc-value red">${fmt(f.gastos)}</div></div>
+    <div class="metric-card ${f.lucro>=0?'lime':'pink'}"><div class="mc-label">Resultado</div><div class="mc-value ${f.lucro>=0?'green':'red'}">${fmt(f.lucro)}</div></div>
+    <div class="metric-card purple"><div class="mc-label">Já recebido</div><div class="mc-value purple">${fmt(f.recPago)}</div></div>
+    <div class="metric-card amber"><div class="mc-label">A receber</div><div class="mc-value amber">${fmt(f.recInsc-f.recPago)}</div></div>`;
+  document.getElementById('fin-alert').innerHTML=f.lucro>=0
+    ?`<div class="alert alert-green">✅ Torneio lucrativo — margem de ${fmt(f.lucro)}</div>`
+    :`<div class="alert alert-red">⚠️ Resultado negativo de ${fmt(Math.abs(f.lucro))} — revise inscrições ou patrocínios</div>`;
+  document.getElementById('fin-receitas').innerHTML=`
+    <div class="fin-row"><span class="fin-label">Inscrições (${f.nJog} jogadores)</span><span class="fin-value" style="color:var(--lime);">${fmt(f.recInsc)}</span></div>
+    <div class="fin-row"><span class="fin-label">Patrocínios confirmados</span><span class="fin-value" style="color:var(--lime);">${fmt(f.patTotal)}</span></div>
+    <div class="fin-total"><span>Total receitas</span><span style="color:var(--lime);">${fmt(f.totalRec)}</span></div>`;
+  document.getElementById('fin-despesas').innerHTML=`
+    <div class="fin-row"><span class="fin-label">Uniformes (${f.nJog} × R$70)</span><span class="fin-value">${fmt(f.uniforme)}</span></div>
+    <div class="fin-row"><span class="fin-label">Troféus (24 × R$33)</span><span class="fin-value">${fmt(24*33)}</span></div>
+    <div class="fin-row"><span class="fin-label">Árbitros (8 × R$300)</span><span class="fin-value">${fmt(8*300)}</span></div>
+    <div class="fin-row"><span class="fin-label">Premiação</span><span class="fin-value">${fmt(4040)}</span></div>
+    <div class="fin-total"><span>Total despesas</span><span style="color:var(--pink);">${fmt(f.gastos)}</span></div>`;
+  simular();
+}
+function simular(){
+  const n1=parseInt(document.getElementById('s-1').value)||0;
+  const n2=parseInt(document.getElementById('s-2').value)||0;
+  const n3=parseInt(document.getElementById('s-3').value)||0;
+  const pat=parseInt(document.getElementById('s-pat').value)||0;
+  const nJog=n1+n2+n3;
+  const rec=n1*120+n2*200+n3*260+pat;
+  const desp=nJog*70+DESPESAS_FIXAS;
+  const lucro=rec-desp;
+  const c=lucro>=0?'var(--lime)':'var(--pink)';
+  document.getElementById('sim-result').innerHTML=`
+    <div class="sim-item"><div class="sim-item-label">Jogadores</div><div class="sim-item-val">${nJog}</div></div>
+    <div class="sim-item"><div class="sim-item-label">Receita</div><div class="sim-item-val" style="color:var(--lime);">${fmt(rec)}</div></div>
+    <div class="sim-item"><div class="sim-item-label">Despesas</div><div class="sim-item-val" style="color:var(--pink);">${fmt(desp)}</div></div>
+    <div class="sim-item"><div class="sim-item-label">Resultado</div><div class="sim-item-val" style="color:${c};">${fmt(lucro)}</div></div>`;
+}
+
+function renderPatrocinios(){
+  const total=S.sponsors.filter(p=>p.status==='Confirmado').reduce((s,p)=>s+p.val,0);
+  const conf=S.sponsors.filter(p=>p.status==='Confirmado').length;
+  document.getElementById('pat-metrics').innerHTML=`
+    <div class="metric-card lime"><div class="mc-label">Arrecadado</div><div class="mc-value green">${fmt(total)}</div></div>
+    <div class="metric-card purple"><div class="mc-label">Patrocinadores</div><div class="mc-value">${S.sponsors.length}</div></div>
+    <div class="metric-card lime"><div class="mc-label">Confirmados</div><div class="mc-value green">${conf}</div></div>
+    <div class="metric-card amber"><div class="mc-label">Em análise</div><div class="mc-value amber">${S.sponsors.filter(p=>p.status==='Em análise'||p.status==='Enviada').length}</div></div>`;
+  const tb=document.getElementById('pat-tbody');
+  const empty=document.getElementById('pat-empty');
+  if(!S.sponsors.length){tb.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  tb.innerHTML=S.sponsors.map((p,i)=>`<tr>
+    <td style="font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:14px;">${p.nome}</td>
+    <td><span class="badge badge-gray">${p.cat}</span></td>
+    <td style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--lime);letter-spacing:.5px;">${p.val>0?fmt(p.val):'Permuta'}</td>
+    <td><span class="badge ${statusBadge[p.status]||'badge-gray'}">${p.status}</span></td>
+    <td><button class="btn btn-sm btn-ghost btn-danger" onclick="remSponsor(${i})">🗑</button></td>
+  </tr>`).join('');
+  document.getElementById('nb-pat').textContent=conf;
+}
+function addSponsor(){
+  const nome=document.getElementById('p-nome').value.trim();
+  const val=parseInt(document.getElementById('p-val').value)||0;
+  if(!nome){toast('Informe o nome da empresa','pink');return;}
+  S.sponsors.push({id:uid(),nome,cat:document.getElementById('p-cat').value,val,status:document.getElementById('p-status').value});
+  save(); document.getElementById('p-nome').value=''; document.getElementById('p-val').value='';
+  renderPatrocinios(); toast(`${nome} adicionado!`);
+}
+function remSponsor(i){
+  if(!confirm('Remover patrocinador?'))return;
+  S.sponsors.splice(i,1); save(); renderPatrocinios(); toast('Removido','pink');
+}
+
+function renderDashboard(){
+  const catMap={};CATS.forEach(c=>catMap[c]=new Set());
+  S.jogadores.forEach(j=>j.cats.forEach(c=>{if(catMap[c])catMap[c].add(j.id);}));
+  const duplas={};CATS.forEach(c=>duplas[c]=Math.floor(catMap[c].size/2));
+  const totalDuplas=Object.values(duplas).reduce((a,b)=>a+b,0);
+  const f=calcFin();
+  const recIdeal=IDEAL*120+PAT_BASE;
+  const despIdeal=IDEAL*2*70+DESPESAS_FIXAS;
+  const pct=Math.round(totalDuplas/IDEAL*100);
+  document.getElementById('dash-metrics').innerHTML=`
+    <div class="metric-card lime"><div class="mc-label">Meta duplas</div><div class="mc-value green">${IDEAL}</div><div class="mc-sub">24 por categoria</div></div>
+    <div class="metric-card purple"><div class="mc-label">Duplas atual</div><div class="mc-value purple">${totalDuplas}</div><div class="mc-sub">${pct}% do meta</div><div class="progress"><div class="progress-fill purple" style="width:${pct}%"></div></div></div>
+    <div class="metric-card pink"><div class="mc-label">Faltam</div><div class="mc-value red">${Math.max(0,IDEAL-totalDuplas)}</div></div>
+    <div class="metric-card lime"><div class="mc-label">Receita ideal</div><div class="mc-value green">${fmt(recIdeal)}</div></div>
+    <div class="metric-card ${f.lucro>=0?'lime':'pink'}"><div class="mc-label">Resultado atual</div><div class="mc-value ${f.lucro>=0?'green':'red'}">${fmt(f.lucro)}</div></div>`;
+  document.getElementById('dash-alert').innerHTML=totalDuplas<82
+    ?`<div class="alert alert-red">⚠️ Abaixo do mínimo de 82 duplas. Atual: ${totalDuplas}.</div>`
+    :`<div class="alert alert-green">✅ Acima do mínimo de 82 duplas. ${IDEAL-totalDuplas>0?`Faltam ${IDEAL-totalDuplas} para o ideal.`:'Meta atingido!'}</div>`;
+  document.getElementById('dash-progress').innerHTML=CATS.map(c=>{
+    const d=duplas[c]||0;const p=Math.min(100,Math.round(d/24*100));
+    const col=p>=100?'var(--lime)':p>=50?'var(--purple-light)':'var(--pink)';
+    return`<div style="margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;font-family:'Barlow Condensed',sans-serif;font-weight:600;">
+        <span>${c}</span><span style="color:var(--text3);">${d} / 24 · ${p}%</span>
+      </div>
+      <div style="height:6px;background:var(--black4);border-radius:3px;"><div style="height:6px;border-radius:3px;background:${col};width:${p}%;transition:width .4s;"></div></div>
+    </div>`;
+  }).join('');
+  if(chartDuplas){chartDuplas.destroy();chartDuplas=null;}
+  if(chartFin){chartFin.destroy();chartFin=null;}
+  if(chartCats){chartCats.destroy();chartCats=null;}
+  const gridC='rgba(255,255,255,0.06)';const tickC='#4a5e4a';
+  chartDuplas=new Chart(document.getElementById('chartDuplas'),{type:'bar',data:{labels:CATS,datasets:[
+    {label:'Ideal',data:CATS.map(()=>24),backgroundColor:'#AAFF00',borderRadius:4},
+    {label:'Atual',data:CATS.map(c=>duplas[c]||0),backgroundColor:'#b06aff',borderRadius:4},
+    {label:'Faltam',data:CATS.map(c=>Math.max(0,24-(duplas[c]||0))),backgroundColor:'#FF1BAD',borderRadius:4},
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:gridC},ticks:{color:tickC,font:{size:12}}},y:{grid:{color:gridC},ticks:{color:tickC,font:{size:12},stepSize:4},max:30,beginAtZero:true}}}});
+  chartFin=new Chart(document.getElementById('chartFin'),{type:'bar',data:{labels:['Receita ideal','Receita atual','Despesas'],datasets:[{data:[recIdeal,f.totalRec,f.gastos],backgroundColor:['#AAFF00','#b06aff','#FF1BAD'],borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>'R$ '+Math.round(ctx.parsed.y).toLocaleString('pt-BR')}}},scales:{x:{grid:{color:gridC},ticks:{color:tickC,font:{size:11}}},y:{grid:{color:gridC},ticks:{color:tickC,font:{size:11},callback:v=>'R$'+(v/1000).toFixed(0)+'k'},beginAtZero:true}}}});
+  const n1=S.jogadores.filter(j=>j.cats.length===1).length;
+  const n2=S.jogadores.filter(j=>j.cats.length===2).length;
+  const n3=S.jogadores.filter(j=>j.cats.length>=3).length;
+  chartCats=new Chart(document.getElementById('chartCats'),{type:'bar',data:{labels:['1 categoria','2 categorias','3 categorias'],datasets:[{data:[n1,n2,n3],backgroundColor:['#b06aff','#AAFF00','#FF1BAD'],borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:gridC},ticks:{color:tickC,font:{size:12}}},y:{grid:{color:gridC},ticks:{color:tickC,font:{size:12},stepSize:1},beginAtZero:true,min:0}}}});
+}
+
+function exportarCSV(){
+  if(!S.jogadores.length){toast('Nenhum jogador para exportar','pink');return;}
+  const header=['#','Nome','Contato','Categorias','Valor','Pagamento'];
+  const rows=S.jogadores.map((j,i)=>[i+1,j.nome,j.tel||'',j.cats.join(' | '),preco(j.cats.length),j.pag]);
+  const csv=[header,...rows].map(r=>r.map(c=>`"${c}"`).join(',')).join('\n');
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='premia-cup.csv';a.click();
+  toast('CSV exportado!');
+}
+
+function renderAll(){renderJogadores();renderMetricas();renderPremiacao();renderPatrocinios();simular();}
+
+// Auto-refresh a cada 30s para sincronizar entre usuários
+setInterval(()=>{if(!isSaving)loadFromCloud();},30000);
+
+loadFromCloud();
+</script>
+</body>
+</html>
