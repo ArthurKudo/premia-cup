@@ -241,9 +241,39 @@ tr:hover td{background:rgba(255,255,255,0.02);}
 
   <!-- CATEGORIAS -->
   <div class="page" id="page-categorias">
-    <div class="page-header"><div class="page-header-title">Categorias</div><div class="page-header-sub">jogadores por categoria</div></div>
+    <div class="page-header"><div class="page-header-title">Categorias</div><div class="page-header-sub">jogadores e duplas por categoria</div></div>
     <div class="metrics" id="cat-metrics"></div>
     <div id="cat-sections"></div>
+  </div>
+
+  <!-- MODAL FORMAR DUPLA -->
+  <div class="modal-backdrop" id="modal-dupla">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">🤝 Formar <span style="color:var(--lime);">Dupla</span></div>
+        <button class="btn btn-sm btn-ghost" onclick="closeModalDupla()">✕</button>
+      </div>
+      <div style="margin-bottom:14px;">
+        <label style="display:block;margin-bottom:6px;">Categoria</label>
+        <select id="fd-cat" onchange="atualizarSelectsDupla()" style="width:100%;">
+          <option>Bronze</option><option>Iniciante</option><option>Mista Iniciante</option><option>Estreante</option>
+        </select>
+      </div>
+      <div class="form-grid" style="margin-bottom:18px;">
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <label>Atleta 1</label>
+          <select id="fd-a1" style="width:100%;"></select>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <label>Atleta 2</label>
+          <select id="fd-a2" style="width:100%;"></select>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;">
+        <button class="btn btn-ghost" onclick="closeModalDupla()">Cancelar</button>
+        <button class="btn btn-lime" onclick="confirmarDupla()">✚ Confirmar dupla</button>
+      </div>
+    </div>
   </div>
 
   <!-- PREMIAÇÃO -->
@@ -285,6 +315,22 @@ tr:hover td{background:rgba(255,255,255,0.02);}
     <div class="page-header"><div class="page-header-title">Financeiro</div><div class="page-header-sub">receitas, despesas e resultado</div></div>
     <div class="metrics" id="fin-metrics"></div>
     <div id="fin-alert"></div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">⚙️ Parâmetros de <span class="accent">Despesa</span></div>
+        <button class="btn btn-sm btn-lime" onclick="salvarParametros()">Salvar parâmetros</button>
+      </div>
+      <div class="card-body">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;">
+          <div style="display:flex;flex-direction:column;gap:5px;"><label>Custo uniforme (por jogador)</label><input type="number" id="p-uniforme" min="0" placeholder="70"></div>
+          <div style="display:flex;flex-direction:column;gap:5px;"><label>Qtd troféus</label><input type="number" id="p-trofeu-qtd" min="0" placeholder="24"></div>
+          <div style="display:flex;flex-direction:column;gap:5px;"><label>Custo por troféu</label><input type="number" id="p-trofeu-val" min="0" placeholder="33"></div>
+          <div style="display:flex;flex-direction:column;gap:5px;"><label>Qtd árbitros</label><input type="number" id="p-arb-qtd" min="0" placeholder="8"></div>
+          <div style="display:flex;flex-direction:column;gap:5px;"><label>Custo por árbitro</label><input type="number" id="p-arb-val" min="0" placeholder="300"></div>
+          <div style="display:flex;flex-direction:column;gap:5px;"><label>Premiação total</label><input type="number" id="p-premiacao" min="0" placeholder="4040"></div>
+        </div>
+      </div>
+    </div>
     <div class="two-col">
       <div class="card"><div class="card-header"><div class="card-title">📈 Receitas</div></div><div class="card-body" id="fin-receitas"></div></div>
       <div class="card"><div class="card-header"><div class="card-title">📉 Despesas</div></div><div class="card-body" id="fin-despesas"></div></div>
@@ -420,6 +466,8 @@ async function loadFromCloud() {
     S = data.record;
     if(!S.jogadores) S.jogadores = [];
     if(!S.resultados) S.resultados = {};
+    if(!S.duplas) S.duplas = {};
+    if(!S.params) S.params = {uniforme:70,trofeuQtd:24,trofeuVal:33,arbQtd:8,arbVal:300,premiacao:4040};
     if(!S.sponsors) S.sponsors = [
       {id:1,nome:'Lonu',cat:'Ouro (R$ 800)',val:0,status:'Confirmado'},
       {id:2,nome:'JMP',cat:'Prata (R$ 400)',val:400,status:'Confirmado'},
@@ -484,16 +532,18 @@ function hideSavingBar() {
 }
 
 // ===== STATE =====
-let S = {jogadores:[],resultados:{},sponsors:[]};
+let S = {jogadores:[],resultados:{},sponsors:[],duplas:{},params:{uniforme:70,trofeuQtd:24,trofeuVal:33,arbQtd:8,arbVal:300,premiacao:4040}};
 const CATS = ['Bronze','Iniciante','Mista Iniciante','Estreante'];
 const PRECOS = {1:120,2:200,3:260};
 const PREMIOS = {Bronze:[1000,500,250,100],Iniciante:[600,350,150,0],'Mista Iniciante':[450,300,100,0],Estreante:[240,0,0,0]};
 const POSICOES = ['🥇 1º lugar','🥈 2º lugar','🥉 3º lugar','4º lugar'];
 const IDEAL = 96;
 const PAT_BASE = 800;
-const DESPESAS_FIXAS = 24*33+8*300+4040;
 let editingId = null;
 let chartDuplas=null,chartFin=null,chartCats=null;
+
+function getParams(){return Object.assign({uniforme:70,trofeuQtd:24,trofeuVal:33,arbQtd:8,arbVal:300,premiacao:4040},S.params||{});}
+function calcDespesasFixas(){const p=getParams();return p.trofeuQtd*p.trofeuVal+p.arbQtd*p.arbVal+p.premiacao;}
 
 function fmt(n){return 'R$ '+Math.round(n).toLocaleString('pt-BR');}
 function preco(n){return PRECOS[Math.min(n,3)]||260;}
@@ -642,27 +692,83 @@ function renderMetricas(){
 function renderCategorias(){
   const catMap={};CATS.forEach(c=>catMap[c]=[]);
   S.jogadores.forEach(j=>j.cats.forEach(c=>{if(catMap[c])catMap[c].push(j);}));
-  document.getElementById('cat-metrics').innerHTML=CATS.map(c=>`
-    <div class="metric-card ${c==='Bronze'?'amber':c==='Iniciante'?'purple':c==='Mista Iniciante'?'lime':'pink'}">
+  if(!S.duplas)S.duplas={};
+  document.getElementById('cat-metrics').innerHTML=CATS.map(c=>{
+    const duplasC=(S.duplas[c]||[]).length;
+    return`<div class="metric-card ${c==='Bronze'?'amber':c==='Iniciante'?'purple':c==='Mista Iniciante'?'lime':'pink'}">
       <div class="mc-label">${c}</div><div class="mc-value">${catMap[c].length}</div>
-      <div class="mc-sub">${catMap[c].filter(j=>j.pag==='Pago').length} pagos · meta 48</div>
+      <div class="mc-sub">${duplasC} dupla${duplasC!==1?'s':''} formada${duplasC!==1?'s':''}</div>
       <div class="progress"><div class="progress-fill ${c==='Bronze'?'pink':c==='Mista Iniciante'?'':'purple'}" style="width:${Math.min(100,Math.round(catMap[c].length/48*100))}%"></div></div>
-    </div>`).join('');
-  document.getElementById('cat-sections').innerHTML=CATS.map(c=>`
-    <div class="card">
+    </div>`;}).join('');
+  document.getElementById('cat-sections').innerHTML=CATS.map(c=>{
+    const duplasC=S.duplas[c]||[];
+    const jogadores=catMap[c];
+    return`<div class="card">
       <div class="card-header">
         <div class="card-title"><span class="badge ${catBadge[c]||'badge-gray'}" style="font-size:13px;">${c}</span></div>
-        <span style="font-size:13px;color:var(--text3);font-family:'Barlow Condensed',sans-serif;">${catMap[c].length} jogador${catMap[c].length!==1?'es':''}</span>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:13px;color:var(--text3);font-family:'Barlow Condensed',sans-serif;">${jogadores.length} jogador${jogadores.length!==1?'es':''}</span>
+          <button class="btn btn-sm btn-primary" onclick="abrirModalDupla('${c}')">🤝 Formar dupla</button>
+        </div>
       </div>
       <div class="card-body">
-        ${catMap[c].length?`<div class="player-list">${catMap[c].map(j=>`
-          <div class="player-chip">
-            <div><div class="player-chip-name">${j.nome}</div><div class="player-chip-sub">${j.tel||'—'} · ${j.cats.length} cat.</div></div>
-            <span class="badge ${pagBadge[j.pag]}">${j.pag}</span>
-          </div>`).join('')}</div>`
+        ${duplasC.length?`
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;">Duplas formadas (${duplasC.length})</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;margin-bottom:16px;">
+            ${duplasC.map((d,i)=>`
+              <div style="background:var(--black3);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;">
+                <div>
+                  <div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:var(--lime);">#${i+1} ${d.a1} <span style="color:var(--text3);">&</span> ${d.a2}</div>
+                </div>
+                <button class="btn btn-sm btn-ghost btn-danger" onclick="remDupla('${c}',${i})">🗑</button>
+              </div>`).join('')}
+          </div>
+          <div style="height:1px;background:var(--border);margin-bottom:14px;"></div>
+        `:''}
+        ${jogadores.length?`
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;">Atletas inscritos</div>
+          <div class="player-list">${jogadores.map(j=>`
+            <div class="player-chip">
+              <div><div class="player-chip-name">${j.nome}</div><div class="player-chip-sub">${j.tel||'—'} · ${j.cats.length} cat.</div></div>
+              <span class="badge ${pagBadge[j.pag]}">${j.pag}</span>
+            </div>`).join('')}</div>`
         :`<div class="empty-state" style="padding:20px;"><div class="empty-icon">👤</div><div class="empty-text">Nenhum jogador</div></div>`}
       </div>
-    </div>`).join('');
+    </div>`;}).join('');
+}
+
+function abrirModalDupla(cat){
+  document.getElementById('fd-cat').value=cat;
+  atualizarSelectsDupla();
+  document.getElementById('modal-dupla').classList.add('open');
+}
+function closeModalDupla(){document.getElementById('modal-dupla').classList.remove('open');}
+function atualizarSelectsDupla(){
+  const cat=document.getElementById('fd-cat').value;
+  const catMap={};CATS.forEach(c=>catMap[c]=[]);
+  S.jogadores.forEach(j=>j.cats.forEach(c=>{if(catMap[c])catMap[c].push(j);}));
+  const jogs=catMap[cat]||[];
+  const opts=jogs.map(j=>`<option value="${j.nome}">${j.nome}</option>`).join('');
+  document.getElementById('fd-a1').innerHTML=opts||'<option value="">Nenhum jogador</option>';
+  document.getElementById('fd-a2').innerHTML=opts||'<option value="">Nenhum jogador</option>';
+}
+function confirmarDupla(){
+  const cat=document.getElementById('fd-cat').value;
+  const a1=document.getElementById('fd-a1').value;
+  const a2=document.getElementById('fd-a2').value;
+  if(!a1||!a2){toast('Selecione dois atletas','pink');return;}
+  if(a1===a2){toast('Selecione atletas diferentes','pink');return;}
+  if(!S.duplas)S.duplas={};
+  if(!S.duplas[cat])S.duplas[cat]=[];
+  const jaExiste=S.duplas[cat].some(d=>(d.a1===a1&&d.a2===a2)||(d.a1===a2&&d.a2===a1));
+  if(jaExiste){toast('Essa dupla já está cadastrada','pink');return;}
+  S.duplas[cat].push({a1,a2});
+  save(); closeModalDupla(); renderCategorias();
+  toast(`Dupla ${a1} & ${a2} formada!`);
+}
+function remDupla(cat,i){
+  S.duplas[cat].splice(i,1);
+  save(); renderCategorias(); toast('Dupla removida','pink');
 }
 
 function addResultado(){
@@ -702,18 +808,22 @@ function renderPremiacao(){
 }
 
 function calcFin(){
-  const patTotal=S.sponsors.filter(p=>p.status==='Confirmado').reduce((s,p)=>s+p.val,0);
+  const p=getParams();
+  const patTotal=S.sponsors.filter(sp=>sp.status==='Confirmado').reduce((s,sp)=>s+sp.val,0);
   const recInsc=S.jogadores.reduce((s,j)=>s+preco(j.cats.length),0);
   const totalRec=recInsc+patTotal;
   const nJog=S.jogadores.length;
-  const uniforme=nJog*70;
-  const gastos=DESPESAS_FIXAS+uniforme;
+  const uniforme=nJog*p.uniforme;
+  const trofeu=p.trofeuQtd*p.trofeuVal;
+  const arbitro=p.arbQtd*p.arbVal;
+  const gastos=uniforme+trofeu+arbitro+p.premiacao;
   const lucro=totalRec-gastos;
   const recPago=S.jogadores.filter(j=>j.pag==='Pago').reduce((s,j)=>s+preco(j.cats.length),0);
-  return{patTotal,recInsc,totalRec,nJog,uniforme,gastos,lucro,recPago};
+  return{patTotal,recInsc,totalRec,nJog,uniforme,trofeu,arbitro,gastos,lucro,recPago,p};
 }
 function renderFinanceiro(){
   const f=calcFin();
+  const p=f.p;
   document.getElementById('fin-metrics').innerHTML=`
     <div class="metric-card lime"><div class="mc-label">Receita total</div><div class="mc-value green">${fmt(f.totalRec)}</div></div>
     <div class="metric-card pink"><div class="mc-label">Despesas</div><div class="mc-value red">${fmt(f.gastos)}</div></div>
@@ -728,12 +838,30 @@ function renderFinanceiro(){
     <div class="fin-row"><span class="fin-label">Patrocínios confirmados</span><span class="fin-value" style="color:var(--lime);">${fmt(f.patTotal)}</span></div>
     <div class="fin-total"><span>Total receitas</span><span style="color:var(--lime);">${fmt(f.totalRec)}</span></div>`;
   document.getElementById('fin-despesas').innerHTML=`
-    <div class="fin-row"><span class="fin-label">Uniformes (${f.nJog} × R$70)</span><span class="fin-value">${fmt(f.uniforme)}</span></div>
-    <div class="fin-row"><span class="fin-label">Troféus (24 × R$33)</span><span class="fin-value">${fmt(24*33)}</span></div>
-    <div class="fin-row"><span class="fin-label">Árbitros (8 × R$300)</span><span class="fin-value">${fmt(8*300)}</span></div>
-    <div class="fin-row"><span class="fin-label">Premiação</span><span class="fin-value">${fmt(4040)}</span></div>
+    <div class="fin-row"><span class="fin-label">Uniformes (${f.nJog} × R$${p.uniforme})</span><span class="fin-value">${fmt(f.uniforme)}</span></div>
+    <div class="fin-row"><span class="fin-label">Troféus (${p.trofeuQtd} × R$${p.trofeuVal})</span><span class="fin-value">${fmt(f.trofeu)}</span></div>
+    <div class="fin-row"><span class="fin-label">Árbitros (${p.arbQtd} × R$${p.arbVal})</span><span class="fin-value">${fmt(f.arbitro)}</span></div>
+    <div class="fin-row"><span class="fin-label">Premiação total</span><span class="fin-value">${fmt(p.premiacao)}</span></div>
     <div class="fin-total"><span>Total despesas</span><span style="color:var(--pink);">${fmt(f.gastos)}</span></div>`;
+  // populate param fields
+  document.getElementById('p-uniforme').value=p.uniforme;
+  document.getElementById('p-trofeu-qtd').value=p.trofeuQtd;
+  document.getElementById('p-trofeu-val').value=p.trofeuVal;
+  document.getElementById('p-arb-qtd').value=p.arbQtd;
+  document.getElementById('p-arb-val').value=p.arbVal;
+  document.getElementById('p-premiacao').value=p.premiacao;
   simular();
+}
+function salvarParametros(){
+  S.params={
+    uniforme:parseInt(document.getElementById('p-uniforme').value)||70,
+    trofeuQtd:parseInt(document.getElementById('p-trofeu-qtd').value)||24,
+    trofeuVal:parseInt(document.getElementById('p-trofeu-val').value)||33,
+    arbQtd:parseInt(document.getElementById('p-arb-qtd').value)||8,
+    arbVal:parseInt(document.getElementById('p-arb-val').value)||300,
+    premiacao:parseInt(document.getElementById('p-premiacao').value)||4040,
+  };
+  save(); renderFinanceiro(); toast('Parâmetros salvos!');
 }
 function simular(){
   const n1=parseInt(document.getElementById('s-1').value)||0;
@@ -742,7 +870,7 @@ function simular(){
   const pat=parseInt(document.getElementById('s-pat').value)||0;
   const nJog=n1+n2+n3;
   const rec=n1*120+n2*200+n3*260+pat;
-  const desp=nJog*70+DESPESAS_FIXAS;
+  const desp=nJog*(getParams().uniforme||70)+calcDespesasFixas();
   const lucro=rec-desp;
   const c=lucro>=0?'var(--lime)':'var(--pink)';
   document.getElementById('sim-result').innerHTML=`
@@ -793,7 +921,7 @@ function renderDashboard(){
   const totalDuplas=Object.values(duplas).reduce((a,b)=>a+b,0);
   const f=calcFin();
   const recIdeal=IDEAL*120+PAT_BASE;
-  const despIdeal=IDEAL*2*70+DESPESAS_FIXAS;
+  const despIdeal=IDEAL*2*(getParams().uniforme||70)+calcDespesasFixas();
   const pct=Math.round(totalDuplas/IDEAL*100);
   document.getElementById('dash-metrics').innerHTML=`
     <div class="metric-card lime"><div class="mc-label">Meta duplas</div><div class="mc-value green">${IDEAL}</div><div class="mc-sub">24 por categoria</div></div>
