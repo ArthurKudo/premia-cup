@@ -229,7 +229,8 @@ tr:hover td{background:rgba(255,255,255,0.02);}
           </div>
           <div style="display:flex;flex-direction:column;gap:5px;"><label>Tamanho do uniforme</label>
             <select id="j-tam">
-              <option>PP</option><option>P</option><option selected>M</option><option>G</option><option>GG</option><option>XGG</option>
+              <option value="" selected>—</option>
+              <option>PP</option><option>P</option><option>M</option><option>G</option><option>GG</option><option>XGG</option>
             </select>
           </div>
         </div>
@@ -320,7 +321,7 @@ tr:hover td{background:rgba(255,255,255,0.02);}
           <tr><td>🥉 Bronze</td><td>R$ 1.000</td><td>R$ 500</td><td>R$ 250</td><td>R$ 100</td><td style="color:var(--lime);font-weight:700;">R$ 1.850</td></tr>
           <tr><td>💜 Iniciante</td><td>R$ 600</td><td>R$ 350</td><td>R$ 150</td><td>—</td><td style="color:var(--lime);font-weight:700;">R$ 1.100</td></tr>
           <tr><td>🟢 Mista Iniciante</td><td>R$ 450</td><td>R$ 300</td><td>R$ 100</td><td>—</td><td style="color:var(--lime);font-weight:700;">R$ 850</td></tr>
-          <tr><td>⭐ Estreante</td><td>R$ 240</td><td>—</td><td>—</td><td>—</td><td style="color:var(--lime);font-weight:700;">R$ 240</td></tr>
+          <tr><td>⭐ Estreante</td><td>R$ 240</td><td>—</td><td>—</td><td>—</td><td style="color:var(--lime);font-weight:700;">R$ 240</td></div></td></tr>
           <tr class="tr-total"><td>Total</td><td>R$ 2.290</td><td>R$ 1.150</td><td>R$ 500</td><td>R$ 100</td><td style="color:var(--lime);">R$ 4.040</td></tr>
         </tbody>
       </table></div>
@@ -444,52 +445,21 @@ tr:hover td{background:rgba(255,255,255,0.02);}
   <!-- MARKETING -->
   <div class="page" id="page-marketing">
     <div class="page-header"><div class="page-header-title">Marketing</div><div class="page-header-sub">planejamento de posts · @premiacup</div></div>
-
     <div class="metrics" id="mkt-metrics"></div>
-
     <div class="card">
-      <div class="card-header">
-        <div class="card-title">✚ <span class="accent">Novo</span> Post</div>
-      </div>
+      <div class="card-header"><div class="card-title">✚ <span class="accent">Novo</span> Post</div></div>
       <div class="card-body">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
-          <div style="display:flex;flex-direction:column;gap:5px;">
-            <label>Título do post</label>
-            <input type="text" id="mkt-titulo" placeholder="Ex: Abertura de inscrições">
-          </div>
-          <div style="display:flex;flex-direction:column;gap:5px;">
-            <label>Tipo</label>
-            <select id="mkt-tipo">
-              <option>Feed — Foto</option>
-              <option>Feed — Carrossel</option>
-              <option>Feed — Vídeo</option>
-              <option>Stories</option>
-              <option>Reels</option>
-            </select>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:5px;">
-            <label>Data</label>
-            <input type="date" id="mkt-data">
-          </div>
-          <div style="display:flex;flex-direction:column;gap:5px;">
-            <label>Horário</label>
-            <input type="time" id="mkt-hora" value="18:00">
-          </div>
+          <div style="display:flex;flex-direction:column;gap:5px;"><label>Título do post</label><input type="text" id="mkt-titulo" placeholder="Ex: Abertura de inscrições"></div>
+          <div style="display:flex;flex-direction:column;gap:5px;"><label>Tipo</label><select id="mkt-tipo"><option>Feed — Foto</option><option>Feed — Carrossel</option><option>Feed — Vídeo</option><option>Stories</option><option>Reels</option></select></div>
+          <div style="display:flex;flex-direction:column;gap:5px;"><label>Data</label><input type="date" id="mkt-data"></div>
+          <div style="display:flex;flex-direction:column;gap:5px;"><label>Horário</label><input type="time" id="mkt-hora" value="18:00"></div>
         </div>
-        <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:12px;">
-          <label>Legenda</label>
-          <textarea id="mkt-legenda" rows="3" placeholder="Escreva a legenda do post aqui..." style="resize:vertical;"></textarea>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px;">
-          <label>Hashtags</label>
-          <input type="text" id="mkt-hashtags" placeholder="#premiacup #futevolei #itajai">
-        </div>
-        <div style="display:flex;justify-content:flex-end;">
-          <button class="btn btn-lime" onclick="addPost()">✚ Adicionar post</button>
-        </div>
+        <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:12px;"><label>Legenda</label><textarea id="mkt-legenda" rows="3" placeholder="Escreva a legenda do post aqui..." style="resize:vertical;"></textarea></div>
+        <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px;"><label>Hashtags</label><input type="text" id="mkt-hashtags" placeholder="#premiacup #futevolei #itajai"></div>
+        <div style="display:flex;justify-content:flex-end;"><button class="btn btn-lime" onclick="addPost()">✚ Adicionar post</button></div>
       </div>
     </div>
-
     <div class="card">
       <div class="card-header">
         <div class="card-title">📅 Calendário de <span class="accent">Posts</span></div>
@@ -499,57 +469,29 @@ tr:hover td{background:rgba(255,255,255,0.02);}
           <button class="btn btn-sm btn-ghost" onclick="mesSeguinte()">›</button>
         </div>
       </div>
-      <div class="card-body" style="padding:12px;">
-        <div id="mkt-calendario"></div>
-      </div>
+      <div class="card-body" style="padding:12px;"><div id="mkt-calendario"></div></div>
     </div>
-
     <div class="card">
       <div class="card-header">
         <div class="card-title">📋 Todos os <span class="accent">Posts</span></div>
         <div style="display:flex;gap:8px;">
-          <select id="mkt-filtro-status" onchange="renderPosts()" style="width:140px;">
-            <option value="">Todos os status</option>
-            <option>Ideia</option>
-            <option>Agendado</option>
-            <option>Publicado</option>
-            <option>Atrasado</option>
-          </select>
-          <select id="mkt-filtro-tipo" onchange="renderPosts()" style="width:140px;">
-            <option value="">Todos os tipos</option>
-            <option>Feed — Foto</option>
-            <option>Feed — Carrossel</option>
-            <option>Feed — Vídeo</option>
-            <option>Stories</option>
-            <option>Reels</option>
-          </select>
+          <select id="mkt-filtro-status" onchange="renderPosts()" style="width:140px;"><option value="">Todos os status</option><option>Ideia</option><option>Agendado</option><option>Publicado</option><option>Atrasado</option></select>
+          <select id="mkt-filtro-tipo" onchange="renderPosts()" style="width:140px;"><option value="">Todos os tipos</option><option>Feed — Foto</option><option>Feed — Carrossel</option><option>Feed — Vídeo</option><option>Stories</option><option>Reels</option></select>
         </div>
       </div>
       <div class="table-wrap">
-        <table>
-          <thead><tr><th>Data</th><th>Hora</th><th>Título</th><th>Tipo</th><th>Status</th><th>Alcance</th><th>Curtidas</th><th>Salvamentos</th><th></th></tr></thead>
-          <tbody id="mkt-tbody"></tbody>
-        </table>
-        <div id="mkt-empty" class="empty-state" style="display:none;">
-          <div class="empty-icon">📱</div>
-          <div class="empty-text">Nenhum post cadastrado ainda</div>
-        </div>
+        <table><thead><tr><th>Data</th><th>Hora</th><th>Título</th><th>Tipo</th><th>Status</th><th>Alcance</th><th>Curtidas</th><th>Salvamentos</th><th></th></tr></thead><tbody id="mkt-tbody"></tbody></table>
+        <div id="mkt-empty" class="empty-state" style="display:none;"><div class="empty-icon">📱</div><div class="empty-text">Nenhum post cadastrado ainda</div></div>
       </div>
     </div>
   </div>
 
-
   <!-- CHAVEAMENTO -->
   <div class="page" id="page-chaveamento">
     <div class="page-header"><div class="page-header-title">Chaveamento</div><div class="page-header-sub">eliminatória dupla · 2 dias</div></div>
-
     <div class="metrics" id="chv-metrics"></div>
-
-    <!-- DIA 1 -->
     <div class="card">
-      <div class="card-header">
-        <div class="card-title">📅 <span class="accent">Dia 1</span> — Iniciante & Estreante</div>
-      </div>
+      <div class="card-header"><div class="card-title">📅 <span class="accent">Dia 1</span> — Iniciante & Estreante</div></div>
       <div class="card-body">
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:14px;">
           <div style="display:flex;flex-direction:column;gap:5px;"><label>Quadras disponíveis</label><input type="number" id="chv-quadras-d1" value="3" min="1" max="10" oninput="renderChaveamento()"></div>
@@ -560,12 +502,8 @@ tr:hover td{background:rgba(255,255,255,0.02);}
         <div id="chv-timeline-d1"></div>
       </div>
     </div>
-
-    <!-- DIA 2 -->
     <div class="card">
-      <div class="card-header">
-        <div class="card-title">📅 <span class="accent">Dia 2</span> — Bronze & Mista Iniciante</div>
-      </div>
+      <div class="card-header"><div class="card-title">📅 <span class="accent">Dia 2</span> — Bronze & Mista Iniciante</div></div>
       <div class="card-body">
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:14px;">
           <div style="display:flex;flex-direction:column;gap:5px;"><label>Quadras disponíveis</label><input type="number" id="chv-quadras-d2" value="3" min="1" max="10" oninput="renderChaveamento()"></div>
@@ -576,23 +514,16 @@ tr:hover td{background:rgba(255,255,255,0.02);}
         <div id="chv-timeline-d2"></div>
       </div>
     </div>
-
     <div style="display:flex;justify-content:flex-end;margin-bottom:18px;">
       <button class="btn btn-lime" onclick="salvarChvParams()">💾 Salvar parâmetros</button>
     </div>
-
-    <!-- BRACKETS -->
     <div id="chv-brackets"></div>
   </div>
-
 
   <!-- SIMULAÇÃO -->
   <div class="page" id="page-simulacao">
     <div class="page-header"><div class="page-header-title">Simulação</div><div class="page-header-sub">teste livre de cenários de chaveamento · 2 dias</div></div>
-
     <div class="metrics" id="sim-metrics"></div>
-
-    <!-- DIA 1 -->
     <div class="card">
       <div class="card-header"><div class="card-title">📅 <span class="accent">Dia 1</span> — Iniciante & Estreante</div></div>
       <div class="card-body">
@@ -605,8 +536,6 @@ tr:hover td{background:rgba(255,255,255,0.02);}
         <div id="sim-timeline-d1"></div>
       </div>
     </div>
-
-    <!-- DIA 2 -->
     <div class="card">
       <div class="card-header"><div class="card-title">📅 <span class="accent">Dia 2</span> — Bronze & Mista Iniciante</div></div>
       <div class="card-body">
@@ -619,7 +548,6 @@ tr:hover td{background:rgba(255,255,255,0.02);}
         <div id="sim-timeline-d2"></div>
       </div>
     </div>
-
     <div id="sim-brackets"></div>
   </div>
 
@@ -637,7 +565,7 @@ tr:hover td{background:rgba(255,255,255,0.02);}
         <select id="e-gen"><option value="M">Masculino</option><option value="F">Feminino</option></select>
       </div>
       <div style="display:flex;flex-direction:column;gap:5px;"><label>Tamanho uniforme</label>
-        <select id="e-tam"><option>PP</option><option>P</option><option>M</option><option>G</option><option>GG</option><option>XGG</option></select>
+        <select id="e-tam"><option value="">—</option><option>PP</option><option>P</option><option>M</option><option>G</option><option>GG</option><option>XGG</option></select>
       </div>
     </div>
     <div style="margin-bottom:14px;"><label style="display:block;margin-bottom:8px;">Categorias</label>
@@ -656,6 +584,7 @@ tr:hover td{background:rgba(255,255,255,0.02);}
     </div>
   </div>
 </div>
+
 <!-- MODAL POST -->
 <div class="modal-backdrop" id="modal-post">
   <div class="modal" style="max-width:560px;">
@@ -665,24 +594,13 @@ tr:hover td{background:rgba(255,255,255,0.02);}
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
       <div style="display:flex;flex-direction:column;gap:5px;"><label>Título</label><input type="text" id="mp-titulo"></div>
-      <div style="display:flex;flex-direction:column;gap:5px;"><label>Tipo</label>
-        <select id="mp-tipo"><option>Feed — Foto</option><option>Feed — Carrossel</option><option>Feed — Vídeo</option><option>Stories</option><option>Reels</option></select>
-      </div>
+      <div style="display:flex;flex-direction:column;gap:5px;"><label>Tipo</label><select id="mp-tipo"><option>Feed — Foto</option><option>Feed — Carrossel</option><option>Feed — Vídeo</option><option>Stories</option><option>Reels</option></select></div>
       <div style="display:flex;flex-direction:column;gap:5px;"><label>Data</label><input type="date" id="mp-data"></div>
       <div style="display:flex;flex-direction:column;gap:5px;"><label>Horário</label><input type="time" id="mp-hora"></div>
     </div>
-    <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:12px;">
-      <label>Legenda</label>
-      <textarea id="mp-legenda" rows="3" style="resize:vertical;"></textarea>
-    </div>
-    <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px;">
-      <label>Hashtags</label>
-      <input type="text" id="mp-hashtags">
-    </div>
-    <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px;">
-      <label>Status</label>
-      <select id="mp-status"><option>Ideia</option><option>Agendado</option><option>Publicado</option></select>
-    </div>
+    <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:12px;"><label>Legenda</label><textarea id="mp-legenda" rows="3" style="resize:vertical;"></textarea></div>
+    <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px;"><label>Hashtags</label><input type="text" id="mp-hashtags"></div>
+    <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px;"><label>Status</label><select id="mp-status"><option>Ideia</option><option>Agendado</option><option>Publicado</option></select></div>
     <div style="border-top:1px solid var(--border);padding-top:14px;margin-bottom:14px;">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:var(--lime);margin-bottom:10px;">Métricas (preencher após publicar)</div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
@@ -856,7 +774,7 @@ function addJogador(){
   S.jogadores.push({id:uid(),nome,tel,gen:document.getElementById('j-gen').value,tam:document.getElementById('j-tam').value,cats,pag:document.getElementById('j-pag').value});
   save();
   document.getElementById('j-nome').value=''; document.getElementById('j-tel').value='';
-  document.getElementById('j-gen').value='M'; document.getElementById('j-tam').value='M';
+  document.getElementById('j-gen').value='M'; document.getElementById('j-tam').value='';
   document.querySelectorAll('#cat-chips input').forEach(c=>c.checked=false);
   ['Bronze','Iniciante','Mista','Estreante'].forEach(k=>document.getElementById('chip-'+k).className='cat-chip');
   document.getElementById('preco-preview').textContent='';
@@ -882,7 +800,7 @@ function abrirEditar(id){
   document.getElementById('e-nome').value=j.nome;
   document.getElementById('e-tel').value=j.tel||'';
   document.getElementById('e-gen').value=j.gen||'M';
-  document.getElementById('e-tam').value=j.tam||'M';
+  document.getElementById('e-tam').value=j.tam||'';
   document.getElementById('e-pag').value=j.pag;
   ['Bronze','Iniciante','Mista','Estreante'].forEach(k=>{
     const chip=document.getElementById('e-chip-'+k);
@@ -1110,7 +1028,6 @@ function renderFinanceiro(){
     <div class="fin-row"><span class="fin-label">Árbitros (${p.arbQtd} × R$${p.arbVal})</span><span class="fin-value">${fmt(f.arbitro)}</span></div>
     <div class="fin-row"><span class="fin-label">Premiação total</span><span class="fin-value">${fmt(p.premiacao)}</span></div>
     <div class="fin-total"><span>Total despesas</span><span style="color:var(--pink);">${fmt(f.gastos)}</span></div>`;
-  // populate param fields
   document.getElementById('p-uniforme').value=p.uniforme;
   document.getElementById('p-trofeu-qtd').value=p.trofeuQtd;
   document.getElementById('p-trofeu-val').value=p.trofeuVal;
@@ -1128,18 +1045,20 @@ function renderUniformes(){
   const el=document.getElementById('fin-uniformes');
   if(!el)return;
   if(!total){el.innerHTML='<div style="color:var(--text3);font-size:13px;text-align:center;padding:12px 0;">Nenhum jogador cadastrado ainda.</div>';return;}
-
-  // count per tamanho per genero
   const contM={};const contF={};
   TAMANHOS.forEach(t=>{contM[t]=0;contF[t]=0;});
+  // Count only jogadores with a defined tamanho
+  const semTam=S.jogadores.filter(j=>!j.tam).length;
   S.jogadores.forEach(j=>{
-    const t=j.tam||'M';
+    const t=j.tam;
+    if(!t)return; // skip if no size selected
     if(j.gen==='F'){if(contF[t]!==undefined)contF[t]++;}
     else{if(contM[t]!==undefined)contM[t]++;}
   });
   const totalM=masc.length;const totalF=fem.length;
-
+  const semTamInfo=semTam?`<div style="margin-bottom:14px;padding:10px 14px;background:rgba(239,159,39,0.07);border:1px solid rgba(239,159,39,0.3);border-radius:var(--r);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;color:#EF9F27;">⚠️ ${semTam} jogador${semTam!==1?'es':''} sem tamanho de uniforme definido</div>`:'';
   el.innerHTML=`
+    ${semTamInfo}
     <div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:20px;">
       <div style="background:var(--black3);border:1px solid var(--purple);border-radius:var(--r);padding:14px 20px;display:flex;flex-direction:column;gap:4px;">
         <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--purple-light);">Total geral</div>
@@ -1153,8 +1072,11 @@ function renderUniformes(){
         <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--pink);">Feminino</div>
         <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--pink);line-height:1;">${totalF}</div>
       </div>
+      ${semTam?`<div style="background:var(--black3);border:1px solid rgba(239,159,39,0.4);border-radius:var(--r);padding:14px 20px;display:flex;flex-direction:column;gap:4px;">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#EF9F27;">Sem tamanho</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:#EF9F27;line-height:1;">${semTam}</div>
+      </div>`:''}
     </div>
-
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;">
       <div style="background:var(--black3);border:1px solid rgba(176,106,255,0.3);border-radius:var(--rl);overflow:hidden;">
         <div style="padding:10px 16px;border-bottom:1px solid var(--border);font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:var(--purple-light);">Masculino — por tamanho</div>
@@ -1175,7 +1097,6 @@ function renderUniformes(){
           </div>
         </div>
       </div>
-
       <div style="background:var(--black3);border:1px solid rgba(255,27,173,0.3);border-radius:var(--rl);overflow:hidden;">
         <div style="padding:10px 16px;border-bottom:1px solid var(--border);font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:var(--pink);">Feminino — por tamanho</div>
         <div style="padding:8px 0;">
@@ -1305,8 +1226,8 @@ function renderDashboard(){
 
 function exportarCSV(){
   if(!S.jogadores.length){toast('Nenhum jogador para exportar','pink');return;}
-  const header=['#','Nome','Contato','Categorias','Valor','Pagamento'];
-  const rows=S.jogadores.map((j,i)=>[i+1,j.nome,j.tel||'',j.cats.join(' | '),preco(j.cats.length),j.pag]);
+  const header=['#','Nome','Contato','Categorias','Valor','Pagamento','Uniforme'];
+  const rows=S.jogadores.map((j,i)=>[i+1,j.nome,j.tel||'',j.cats.join(' | '),preco(j.cats.length),j.pag,j.tam||'—']);
   const csv=[header,...rows].map(r=>r.map(c=>`"${c}"`).join(',')).join('\n');
   const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='premia-cup.csv';a.click();
@@ -1316,20 +1237,16 @@ function exportarCSV(){
 function renderAll(){renderJogadores();renderMetricas();renderPremiacao();renderPatrocinios();simular();}
 
 // ===== CHAVEAMENTO =====
-// Double elimination logic
 function calcRoundsWB(n){ return Math.ceil(Math.log2(n)); }
 function calcJogosWB(n){
-  // winners bracket total matches
   let matches=0; let teams=n;
   while(teams>1){ matches+=Math.floor(teams/2); teams=Math.ceil(teams/2); }
   return matches;
 }
 function calcRoundsLB(n){
-  // losers bracket rounds = 2*(WB rounds - 1)
   return Math.max(1, 2*(calcRoundsWB(n)-1));
 }
 function calcJogosLB(n){
-  // losers bracket total matches
   const wbRounds=calcRoundsWB(n);
   let losers=0;
   let lbTeams=0;
@@ -1343,7 +1260,7 @@ function calcJogosLB(n){
   return losers;
 }
 function calcTotalJogos(n){
-  return calcJogosWB(n)+calcJogosLB(n)+1; // +1 grand final
+  return calcJogosWB(n)+calcJogosLB(n)+1;
 }
 
 function getChvParams(){
@@ -1387,9 +1304,7 @@ function renderChaveamento(){
     const intervalo=parseInt(document.getElementById('chv-intervalo-'+dia.id)?.value)||5;
     const inicioStr=document.getElementById('chv-inicio-'+dia.id)?.value||'08:00';
     const [hIni,mIni]=inicioStr.split(':').map(Number);
-    let minAtual=hIni*60+mIni;
 
-    // params inputs
     const pEl=document.getElementById('chv-params-'+dia.id);
     if(pEl){
       pEl.innerHTML=dia.cats.map(c=>{
@@ -1409,7 +1324,6 @@ function renderChaveamento(){
       }).join('');
     }
 
-    // Calc each cat independently using new engine
     const diaTimings=dia.cats.map(c=>{
       const nd=getNDuplas(c);
       if(nd<2) return{cat:c,nd,skip:true,dia:dia.id,corDia:dia.cor};
@@ -1420,7 +1334,6 @@ function renderChaveamento(){
     const valid=diaTimings.filter(t=>!t.skip);
     valid.forEach(t=>totalJogosGeral+=t.totalJogos);
 
-    // Overlay: cat B starts when cat A has free courts
     let diaMin=0;
     if(valid.length===2){
       const ov=calcOverlap(valid[0],valid[1],quadras,valid[0].tempo,intervalo);
@@ -1438,7 +1351,6 @@ function renderChaveamento(){
     totalMinGeral+=diaMin;
     allTimings.push({...dia, timings:diaTimings, hIni, mIni, fimMin:fimDia, diaMin, quadras, intervalo});
 
-    // timeline per dia
     const tlEl=document.getElementById('chv-timeline-'+dia.id);
     if(tlEl){
       const vt=diaTimings.filter(t=>!t.skip);
@@ -1446,7 +1358,6 @@ function renderChaveamento(){
     }
   });
 
-  // Global metrics
   document.getElementById('chv-metrics').innerHTML=`
     <div class="metric-card purple"><div class="mc-label">Total jogos</div><div class="mc-value">${totalJogosGeral}</div></div>
     <div class="metric-card lime"><div class="mc-label">Dia 1 — duração</div><div class="mc-value green">${fmtDur(allTimings[0].diaMin)}</div><div class="mc-sub">Iniciante & Estreante · até ${fmtHora(allTimings[0].fimMin)}</div></div>
@@ -1454,7 +1365,6 @@ function renderChaveamento(){
     <div class="metric-card amber"><div class="mc-label">Quadras</div><div class="mc-value amber">${allTimings[0].quadras} / ${allTimings[1].quadras}</div><div class="mc-sub">Dia 1 / Dia 2</div></div>
   `;
 
-  // Bracket cards
   const brEl=document.getElementById('chv-brackets');
   if(brEl){
     brEl.innerHTML=allTimings.map(dia=>{
@@ -1503,7 +1413,6 @@ function renderChaveamento(){
 }
 
 function fmtDur(min){return Math.floor(min/60)+'h'+(min%60).toString().padStart(2,'0')+'m';}
-
 function fmtHora(min){
   const h=Math.floor(min/60)%24;
   const m=min%60;
@@ -1527,44 +1436,32 @@ function buildCatCard(c, dia, defaultNd=8){
 }
 
 // ===== CORE BRACKET ENGINE =====
-// Builds the full WB + LB schedule for N duplas as a sequence of rounds
-// Each round has: { label, wbJogos, lbJogos } — WB and LB that can run in parallel
 function buildRounds(nd) {
   const wbR = calcRoundsWB(nd);
-  // WB rounds
   const wbByRound = [];
   let tw = nd;
   for (let r = 0; r < wbR; r++) {
     wbByRound.push(Math.floor(tw / 2));
     tw = Math.ceil(tw / 2);
   }
-  // LB phases — each WB round r (1-indexed) drops Math.floor(nd/2^r) losers
-  // LB phase pairs: first integrate new losers, then play among themselves
   const lbPhases = [];
   let lbPool = 0;
   for (let r = 1; r <= wbR - 1; r++) {
     const newLosers = Math.floor(nd / Math.pow(2, r));
     lbPool += newLosers;
-    // Phase A: play off (lbPool/2 games)
     const phA = Math.floor(lbPool / 2);
     if (phA > 0) lbPhases.push({ afterWBRound: r, jogos: phA });
     lbPool -= phA;
-    // Phase B: survivors play among themselves if >1
     if (lbPool > 1) {
       const phB = Math.floor(lbPool / 2);
       if (phB > 0) lbPhases.push({ afterWBRound: r, jogos: phB });
       lbPool -= phB;
     }
   }
-
-  // Now build time-ordered rounds merging WB and LB
-  // Each WB round r can run in parallel with any LB phase that has afterWBRound <= r-1
-  // (losers from WB round r are known only after it ends)
   const rounds = [];
   let lbIdx = 0;
   for (let r = 0; r < wbR; r++) {
     const wbJ = wbByRound[r];
-    // Collect all LB phases unlocked after WB round r-1 completed
     let lbJ = 0;
     while (lbIdx < lbPhases.length && lbPhases[lbIdx].afterWBRound <= r) {
       lbJ += lbPhases[lbIdx].jogos;
@@ -1573,18 +1470,14 @@ function buildRounds(nd) {
     const label = r === 0 ? 'Oitavas' : r === 1 ? 'Quartas' : r === 2 ? 'Semifinal' : r === 3 ? 'Final WB' : 'Fase ' + (r + 1);
     rounds.push({ label, wbJogos: wbJ, lbJogos: lbJ });
   }
-  // Remaining LB phases after last WB round
   while (lbIdx < lbPhases.length) {
     rounds.push({ label: 'LB Fase ' + (rounds.length), wbJogos: 0, lbJogos: lbPhases[lbIdx].jogos });
     lbIdx++;
   }
-  // Grand Final
   rounds.push({ label: 'Grand Final', wbJogos: 0, lbJogos: 0, grandFinal: true });
   return rounds;
 }
 
-// Given rounds for a category and available courts, compute duration in minutes
-// WB and LB share courts proportionally within each round
 function calcRoundsDuration(rounds, quadras, tempo, intervalo) {
   let total = 0;
   const slotTime = tempo + intervalo;
@@ -1597,7 +1490,6 @@ function calcRoundsDuration(rounds, quadras, tempo, intervalo) {
     }
     const jogos = r.wbJogos + r.lbJogos;
     if (jogos === 0) continue;
-    // Distribute courts proportionally
     let qWB = 0, qLB = 0;
     if (r.wbJogos > 0 && r.lbJogos > 0) {
       qWB = Math.max(1, Math.round(quadras * r.wbJogos / jogos));
@@ -1618,11 +1510,7 @@ function calcRoundsDuration(rounds, quadras, tempo, intervalo) {
   return { total, detail };
 }
 
-// Overlay two categories: cat B starts as soon as cat A has free courts
-// Returns adjusted start time for cat B and new total duration for the day
 function calcOverlap(timingA, timingB, quadras, tempo, intervalo) {
-  // Find the first round of A where it uses fewer than 'quadras' courts
-  // Cat B starts at the beginning of that round
   const slotTime = tempo + intervalo;
   let timeA = 0;
   let bStartOffset = null;
@@ -1634,8 +1522,7 @@ function calcOverlap(timingA, timingB, quadras, tempo, intervalo) {
     }
     timeA += r.minutos;
   }
-  if (bStartOffset === null) bStartOffset = timeA; // no overlap possible
-  // Cat B duration independently
+  if (bStartOffset === null) bStartOffset = timeA;
   const bDur = timingB.duracaoMin;
   const bEnd = bStartOffset + bDur;
   const totalDay = Math.max(timeA, bEnd);
@@ -1650,7 +1537,6 @@ function calcCatTiming(c, quadras, intervalo, minAtual, nd_override, tempo_overr
   const rounds = buildRounds(nd);
   const { total: duracaoMin, detail: roundDetail } = calcRoundsDuration(rounds, quadras, tempo, intervalo);
   const totalJogos = rounds.reduce((s, r) => s + r.wbJogos + r.lbJogos + (r.grandFinal ? 1 : 0), 0);
-  // For display: separate WB and LB rounds
   const wbRounds = rounds.filter(r => r.wbJogos > 0 || r.grandFinal).map(r => ({ nome: r.label, jogos: r.wbJogos + (r.grandFinal ? 1 : 0) }));
   const lbRounds = rounds.filter(r => r.lbJogos > 0).map((r, i) => ({ nome: 'LB Fase ' + (i + 1), jogos: r.lbJogos }));
   const inicioMin = minAtual;
@@ -1729,7 +1615,6 @@ function renderSimulacao(){
     {id:'d2',label:'Dia 2',cats:['Bronze','Mista Iniciante'],cor:'var(--lime)'},
   ];
 
-  // Build input cards once per dia
   DIAS_SIM.forEach(dia=>{
     const el=document.getElementById('sim-inputs-'+dia.id);
     if(el&&!el.dataset.built){
@@ -1747,19 +1632,16 @@ function renderSimulacao(){
     const inicioStr=document.getElementById('sim-inicio-'+dia.id)?.value||'08:00';
     const [hIni,mIni]=inicioStr.split(':').map(Number);
 
-    // Calc each cat independently first
     const timings=dia.cats.map(c=>calcCatTiming(c,quadras,intervalo,0));
     const valid=timings.filter(t=>!t.skip);
     const jogos=valid.reduce((s,t)=>s+t.totalJogos,0);
     totalJogosGeral+=jogos;
 
-    // Overlay: cat B starts as soon as cat A has free courts
     let diaMin=0, bStartOffset=0;
     if(valid.length===2){
       const ov=calcOverlap(valid[0],valid[1],quadras,valid[0].tempo,intervalo);
       bStartOffset=ov.bStartOffset;
       diaMin=ov.totalDay;
-      // Assign absolute times
       valid[0].inicioMin=hIni*60+mIni;
       valid[0].fimMin=valid[0].inicioMin+valid[0].duracaoMin;
       valid[1].inicioMin=hIni*60+mIni+bStartOffset;
@@ -1777,7 +1659,6 @@ function renderSimulacao(){
     diaResults.push({...dia,timings,hIni,mIni,fimMin,diaMin,jogos});
   });
 
-  // Metrics
   document.getElementById('sim-metrics').innerHTML=`
     <div class="metric-card purple"><div class="mc-label">Total jogos</div><div class="mc-value">${totalJogosGeral}</div></div>
     <div class="metric-card lime"><div class="mc-label">Dia 1 — duração</div><div class="mc-value green">${fmtDur(diaResults[0].diaMin)}</div><div class="mc-sub">até ${fmtHora(diaResults[0].fimMin)}</div></div>
@@ -1785,7 +1666,6 @@ function renderSimulacao(){
     <div class="metric-card amber"><div class="mc-label">Quadras D1 / D2</div><div class="mc-value amber">${document.getElementById('sim-quadras-d1')?.value||3} / ${document.getElementById('sim-quadras-d2')?.value||3}</div></div>
   `;
 
-  // Bracket cards
   const brEl=document.getElementById('sim-brackets');
   if(brEl){
     brEl.innerHTML=diaResults.map(dia=>
@@ -1932,7 +1812,6 @@ function renderCalendario(){
     const dataAtual=new Date(ano,mes,d);
     const ehHoje=dataAtual.getTime()===hoje.getTime();
     const posts=postsPorDia[d]||[];
-    const temPost=posts.length>0;
     html+=`<div style="min-height:64px;background:${ehHoje?'rgba(139,63,216,0.15)':'var(--black3)'};border:1px solid ${ehHoje?'var(--purple)':'var(--border)'};border-radius:var(--r);padding:6px;cursor:default;">
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:${ehHoje?'var(--purple-light)':'var(--text3)'};">${d}</div>
       ${posts.slice(0,2).map(p=>{
@@ -1979,10 +1858,10 @@ function renderPosts(){
     </tr>`;
   }).join('');
 }
-// Also update uniforms summary if financeiro is visible
+
 function renderAllFull(){renderAll();try{renderUniformes();}catch(e){}}
 
-// Auto-refresh a cada 30s para sincronizar entre usuários
+// Auto-refresh a cada 30s
 setInterval(()=>{if(!isSaving)loadFromCloud();},30000);
 
 loadFromCloud();
