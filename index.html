@@ -4,10 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Premia Cup — Controle Interno</title>
+<link rel="icon" type="image/jpeg" href="favicon.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:ital,wght@0,400;0,500;0,600;0,700;1,700&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-:root{--black:#070a08;--black2:#0d1210;--black3:#121a14;--black4:#182019;--purple:#8B3FD8;--purple2:#6B2FBE;--purple-light:#b06aff;--purple-glow:rgba(139,63,216,0.25);--lime:#AAFF00;--lime2:#88DD00;--lime-glow:rgba(170,255,0,0.2);--pink:#FF1BAD;--pink2:#CC0088;--pink-glow:rgba(255,27,173,0.2);--text:#f0f5f0;--text2:#8a9e8a;--text3:#4a5e4a;--border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.12);--r:8px;--rl:12px;}
+:root{--black:#070a08;--black2:#0d1210;--black3:#121a14;--black4:#182019;--purple:#8B3FD8;--purple2:#6B2FBE;--purple-light:#b06aff;--purple-glow:rgba(139,63,216,0.25);--lime:#AAFF00;--lime2:#88DD00;--lime-glow:rgba(170,255,0,0.2);--pink:#FF1BAD;--pink2:#CC0088;--pink-glow:rgba(255,27,173,0.2);--text:#f0f5f0;--text2:#8a9e8a;--text3:#6e8f6e;--border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.18);--r:8px;--rl:12px;}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
 body{font-family:'Barlow',sans-serif;background:var(--black);color:var(--text);min-height:100vh;font-size:14px;line-height:1.6;}
@@ -28,6 +29,7 @@ body{font-family:'Barlow',sans-serif;background:var(--black);color:var(--text);m
 .nav-label:first-child{margin-top:0;}
 .nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--r);color:var(--text2);font-size:13px;font-family:'Barlow Condensed',sans-serif;font-weight:500;letter-spacing:.03em;cursor:pointer;transition:all 0.15s;margin-bottom:2px;position:relative;}
 .nav-item:hover{background:var(--black3);color:var(--text);}
+:focus-visible{outline:2px solid var(--lime);outline-offset:2px;}
 .nav-item.active{background:rgba(139,63,216,0.15);color:var(--purple-light);}
 .nav-item.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;background:var(--lime);border-radius:2px;}
 .nav-icon{font-size:16px;width:20px;text-align:center;}
@@ -186,18 +188,18 @@ tr:hover td{background:rgba(255,255,255,0.02);}
   </div>
   <nav class="nav">
     <div class="nav-label">Gestão</div>
-    <div class="nav-item active" onclick="goTo('jogadores',this)"><span class="nav-icon">👤</span> Jogadores<span class="nav-badge" id="nb-jogadores">0</span></div>
-    <div class="nav-item" onclick="goTo('categorias',this)"><span class="nav-icon">🏅</span> Categorias</div>
-    <div class="nav-item" onclick="goTo('premiacao',this)"><span class="nav-icon">🏆</span> Premiação</div>
+    <div class="nav-item active" tabindex="0" role="button" onkeydown="navKey(event)" onclick="goTo('jogadores',this)"><span class="nav-icon">👤</span> Jogadores<span class="nav-badge" id="nb-jogadores">0</span></div>
+    <div class="nav-item" tabindex="0" role="button" onkeydown="navKey(event)" onclick="goTo('categorias',this)"><span class="nav-icon">🏅</span> Categorias</div>
+    <div class="nav-item" tabindex="0" role="button" onkeydown="navKey(event)" onclick="goTo('premiacao',this)"><span class="nav-icon">🏆</span> Premiação</div>
     <div class="nav-label">Financeiro</div>
-    <div class="nav-item" onclick="goTo('financeiro',this)"><span class="nav-icon">📊</span> Financeiro</div>
-    <div class="nav-item" onclick="goTo('patrocinios',this)"><span class="nav-icon">🤝</span> Patrocínios<span class="nav-badge" id="nb-pat">0</span></div>
+    <div class="nav-item" tabindex="0" role="button" onkeydown="navKey(event)" onclick="goTo('financeiro',this)"><span class="nav-icon">📊</span> Financeiro</div>
+    <div class="nav-item" tabindex="0" role="button" onkeydown="navKey(event)" onclick="goTo('patrocinios',this)"><span class="nav-icon">🤝</span> Patrocínios<span class="nav-badge" id="nb-pat">0</span></div>
     <div class="nav-label">Análise</div>
-    <div class="nav-item" onclick="goTo('dashboard',this)"><span class="nav-icon">📈</span> Dashboard</div>
-    <div class="nav-item" onclick="goTo('marketing',this)"><span class="nav-icon">📱</span> Marketing<span class="nav-badge" id="nb-mkt">0</span></div>
-    <div class="nav-item" onclick="goTo('story',this)"><span class="nav-icon">📸</span> Story Dupla</div>
-    <div class="nav-item" onclick="goTo('chaveamento',this)"><span class="nav-icon">🏟</span> Chaveamento</div>
-    <div class="nav-item" onclick="goTo('simulacao',this)"><span class="nav-icon">🔢</span> Simulação</div>
+    <div class="nav-item" tabindex="0" role="button" onkeydown="navKey(event)" onclick="goTo('dashboard',this)"><span class="nav-icon">📈</span> Dashboard</div>
+    <div class="nav-item" tabindex="0" role="button" onkeydown="navKey(event)" onclick="goTo('marketing',this)"><span class="nav-icon">📱</span> Marketing<span class="nav-badge" id="nb-mkt">0</span></div>
+    <div class="nav-item" tabindex="0" role="button" onkeydown="navKey(event)" onclick="goTo('story',this)"><span class="nav-icon">📸</span> Story Dupla</div>
+    <div class="nav-item" tabindex="0" role="button" onkeydown="navKey(event)" onclick="goTo('chaveamento',this)"><span class="nav-icon">🏟</span> Chaveamento</div>
+    <div class="nav-item" tabindex="0" role="button" onkeydown="navKey(event)" onclick="goTo('simulacao',this)"><span class="nav-icon">🔢</span> Simulação</div>
   </nav>
   <div class="sidebar-footer">Dados na <span>nuvem</span> · JSONBin</div>
 </aside>
@@ -314,9 +316,9 @@ tr:hover td{background:rgba(255,255,255,0.02);}
   <div class="page" id="page-premiacao">
     <div class="page-header"><div class="page-header-title">Premiação</div><div class="page-header-sub">resultados e valores</div></div>
     <div class="metrics">
-      <div class="metric-card pink"><div class="mc-label">Total premiação</div><div class="mc-value red">R$ 4.040</div></div>
-      <div class="metric-card purple"><div class="mc-label">Categorias</div><div class="mc-value purple">4</div></div>
-      <div class="metric-card lime"><div class="mc-label">Duplas premiadas</div><div class="mc-value green">16</div></div>
+      <div class="metric-card pink"><div class="mc-label">Total premiação</div><div class="mc-value red" id="prem-total"></div></div>
+      <div class="metric-card purple"><div class="mc-label">Categorias</div><div class="mc-value purple" id="prem-cats"></div></div>
+      <div class="metric-card lime"><div class="mc-label">Duplas premiadas</div><div class="mc-value green" id="prem-duplas"></div></div>
     </div>
     <div class="card">
       <div class="card-header"><div class="card-title">🏆 Registrar <span class="accent">Resultado</span></div></div>
@@ -337,7 +339,7 @@ tr:hover td{background:rgba(255,255,255,0.02);}
           <tr><td>🥉 Bronze</td><td>R$ 1.000</td><td>R$ 500</td><td>R$ 250</td><td>R$ 100</td><td style="color:var(--lime);font-weight:700;">R$ 1.850</td></tr>
           <tr><td>💜 Iniciante</td><td>R$ 600</td><td>R$ 350</td><td>R$ 150</td><td>—</td><td style="color:var(--lime);font-weight:700;">R$ 1.100</td></tr>
           <tr><td>🟢 Mista Iniciante</td><td>R$ 450</td><td>R$ 300</td><td>R$ 100</td><td>—</td><td style="color:var(--lime);font-weight:700;">R$ 850</td></tr>
-          <tr><td>⭐ Estreante</td><td>R$ 240</td><td>—</td><td>—</td><td>—</td><td style="color:var(--lime);font-weight:700;">R$ 240</td></div></td></tr>
+          <tr><td>⭐ Estreante</td><td>R$ 240</td><td>—</td><td>—</td><td>—</td><td style="color:var(--lime);font-weight:700;">R$ 240</td></tr>
           <tr class="tr-total"><td>Total</td><td>R$ 2.290</td><td>R$ 1.150</td><td>R$ 500</td><td>R$ 100</td><td style="color:var(--lime);">R$ 4.040</td></tr>
         </tbody>
       </table></div>
@@ -672,6 +674,21 @@ tr:hover td{background:rgba(255,255,255,0.02);}
   </div>
 </div>
 
+<!-- MODAL CONFIRMAR -->
+<div class="modal-backdrop" id="modal-confirm">
+  <div class="modal" style="max-width:380px;">
+    <div class="modal-header">
+      <div class="modal-title" style="color:var(--pink);">⚠️ Confirmar remoção</div>
+      <button class="btn btn-sm btn-ghost" onclick="closeModalConfirm()">✕</button>
+    </div>
+    <div id="mc-msg" style="font-size:14px;color:var(--text2);margin-bottom:20px;line-height:1.5;"></div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;">
+      <button class="btn btn-ghost" onclick="closeModalConfirm()">Cancelar</button>
+      <button class="btn" id="mc-btn-ok" onclick="mcConfirmado()" style="background:var(--pink);border-color:var(--pink);color:#fff;">Remover</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
@@ -803,6 +820,7 @@ function goTo(id,btn){
   if(id==='simulacao')renderSimulacao();
   closeSidebar();
 }
+function navKey(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();e.currentTarget.click();}}
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').classList.toggle('open');}
 function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('open');}
 
@@ -838,9 +856,10 @@ function addJogador(){
   toast(`${nome} cadastrado!`);
 }
 function remJogador(id){
-  if(!confirm('Remover jogador?'))return;
-  S.jogadores=S.jogadores.filter(j=>j.id!==id);
-  save(); renderJogadores(); renderMetricas(); toast('Jogador removido','pink');
+  confirmarAcao('Remover este jogador da lista?',()=>{
+    S.jogadores=S.jogadores.filter(j=>j.id!==id);
+    save(); renderJogadores(); renderMetricas(); toast('Jogador removido','pink');
+  });
 }
 function togglePag(id){
   const j=S.jogadores.find(j=>j.id===id);
@@ -881,6 +900,15 @@ function salvarEdicao(){
   save(); closeModal(); renderJogadores(); renderMetricas(); toast('Dados atualizados!');
 }
 function closeModal(){document.getElementById('modal-edit').classList.remove('open');editingId=null;}
+
+let mcCallback=null;
+function confirmarAcao(msg,cb){
+  document.getElementById('mc-msg').textContent=msg;
+  mcCallback=cb;
+  document.getElementById('modal-confirm').classList.add('open');
+}
+function closeModalConfirm(){document.getElementById('modal-confirm').classList.remove('open');mcCallback=null;}
+function mcConfirmado(){const cb=mcCallback;closeModalConfirm();if(cb)cb();}
 
 function renderJogadores(){
   const busca=document.getElementById('busca').value.toLowerCase();
@@ -1027,6 +1055,12 @@ function remResultado(cat,pos){
   save(); renderPremiacao();
 }
 function renderPremiacao(){
+  const totalPremiacao=CATS.reduce((s,cat)=>s+PREMIOS[cat].reduce((a,b)=>a+b,0),0);
+  const slots=CATS.reduce((s,cat)=>s+PREMIOS[cat].filter((v,i)=>v>0||i===0).length,0);
+  const preenchidas=CATS.reduce((s,cat)=>s+Object.keys(S.resultados[cat]||{}).length,0);
+  document.getElementById('prem-total').textContent=fmt(totalPremiacao);
+  document.getElementById('prem-cats').textContent=CATS.length;
+  document.getElementById('prem-duplas').textContent=preenchidas+' / '+slots;
   document.getElementById('premio-grid').innerHTML=CATS.map(cat=>{
     const res=S.resultados[cat]||{};
     const rows=[0,1,2,3].map(i=>{
@@ -1236,8 +1270,9 @@ function addSponsor(){
   renderPatrocinios(); toast(`${nome} adicionado!`);
 }
 function remSponsor(i){
-  if(!confirm('Remover patrocinador?'))return;
-  S.sponsors.splice(i,1); save(); renderPatrocinios(); toast('Removido','pink');
+  confirmarAcao('Remover este patrocinador?',()=>{
+    S.sponsors.splice(i,1); save(); renderPatrocinios(); toast('Removido','pink');
+  });
 }
 
 function renderDashboard(){
@@ -1806,9 +1841,10 @@ function salvarPost(){
   save(); closeModalPost(); renderMarketing(); toast('Post salvo!');
 }
 function remPostModal(){
-  if(!confirm('Remover este post?'))return;
-  S.posts=(S.posts||[]).filter(p=>p.id!==editingPostId);
-  save(); closeModalPost(); renderMarketing(); toast('Post removido','pink');
+  confirmarAcao('Remover este post?',()=>{
+    S.posts=(S.posts||[]).filter(p=>p.id!==editingPostId);
+    save(); closeModalPost(); renderMarketing(); toast('Post removido','pink');
+  });
 }
 
 function mesAnterior(){mktMesAtual.setMonth(mktMesAtual.getMonth()-1);renderCalendario();}
@@ -1877,7 +1913,7 @@ function renderCalendario(){
       ${posts.slice(0,2).map(p=>{
         const st=statusAutoPost(p);
         const cor=st==='Publicado'?'var(--lime)':st==='Atrasado'?'var(--pink)':'var(--purple-light)';
-        return`<div onclick="abrirPost(${p.id})" style="margin-top:3px;background:${st==='Publicado'?'rgba(170,255,0,0.1)':st==='Atrasado'?'rgba(255,27,173,0.1)':'rgba(139,63,216,0.12)'};border-radius:4px;padding:2px 5px;font-size:10px;font-family:'Barlow Condensed',sans-serif;font-weight:600;color:${cor};cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${p.titulo}">${TIPO_ICON[p.tipo]||'📄'} ${p.titulo}</div>`;
+        return`<div tabindex="0" role="button" onkeydown="navKey(event)" onclick="abrirPost(${p.id})" style="margin-top:3px;background:${st==='Publicado'?'rgba(170,255,0,0.1)':st==='Atrasado'?'rgba(255,27,173,0.1)':'rgba(139,63,216,0.12)'};border-radius:4px;padding:2px 5px;font-size:10px;font-family:'Barlow Condensed',sans-serif;font-weight:600;color:${cor};cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${p.titulo}">${TIPO_ICON[p.tipo]||'📄'} ${p.titulo}</div>`;
       }).join('')}
       ${posts.length>2?`<div style="font-size:10px;color:var(--text3);margin-top:2px;font-family:'Barlow Condensed',sans-serif;">+${posts.length-2} mais</div>`:''}
     </div>`;
@@ -1905,7 +1941,7 @@ function renderPosts(){
   tb.innerHTML=lista.map(p=>{
     const st=statusAutoPost(p);
     const dataFmt=p.data?new Date(p.data+'T00:00:00').toLocaleDateString('pt-BR'):'—';
-    return`<tr style="cursor:pointer;" onclick="abrirPost(${p.id})">
+    return`<tr tabindex="0" role="button" onkeydown="navKey(event)" style="cursor:pointer;" onclick="abrirPost(${p.id})">
       <td style="font-family:'Barlow Condensed',sans-serif;font-weight:600;">${dataFmt}</td>
       <td style="color:var(--text3);">${p.hora||'—'}</td>
       <td style="font-weight:500;">${p.titulo}</td>
@@ -2016,7 +2052,8 @@ function stCellHTML(f,wide){
   const bg=f.alpha
     ?'<div style="position:absolute;inset:0;background:'+ST_BACKDROP+';"></div>'
     :'<img src="'+f.src+'" aria-hidden="true" style="filter:blur(14px) brightness(0.45);transform:scale(1.15);">';
-  const main='<img src="'+f.src+'" style="transform:translate('+(f.fx*100)+'%,'+(f.fy*100)+'%) scale('+f.zoom+');">';
+  const cw=wide?ST_PX.w:ST_PX.w/2,r=stDestRect(f.iw,f.ih,cw,ST_PX.h,f.zoom,f.fx,f.fy);
+  const main='<img src="'+f.src+'" style="left:'+(r.dx/cw*100)+'%;top:'+(r.dy/ST_PX.h*100)+'%;width:'+(r.dw/cw*100)+'%;height:'+(r.dh/ST_PX.h*100)+'%;right:auto;bottom:auto;transform:none;object-fit:fill;">';
   return '<div class="st-cell" style="width:'+(wide?'100%':'50%')+';">'+bg+main+'</div>';
 }
 
