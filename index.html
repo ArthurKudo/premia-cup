@@ -89,6 +89,8 @@ input[type=date]::-webkit-calendar-picker-indicator,input[type=time]::-webkit-ca
 .cat-chip.checked-Iniciante{background:rgba(139,63,216,0.15);border-color:rgba(139,63,216,0.5);color:var(--purple-light);}
 .cat-chip.checked-Mista{background:rgba(170,255,0,0.1);border-color:rgba(170,255,0,0.4);color:var(--lime);}
 .cat-chip.checked-Estreante{background:rgba(255,27,173,0.1);border-color:rgba(255,27,173,0.4);color:var(--pink);}
+.form-actions{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;}
+.form-actions .spacer{flex:1;}
 .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:var(--r);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.04em;cursor:pointer;border:1px solid var(--border2);background:var(--black3);color:var(--text2);transition:all 0.15s;white-space:nowrap;}
 .btn:hover{background:var(--black4);color:var(--text);border-color:var(--purple);}
 .btn-primary{background:var(--purple);border-color:var(--purple);color:#fff;box-shadow:0 0 16px var(--purple-glow);}
@@ -153,7 +155,7 @@ tr:hover td{background:rgba(255,255,255,0.02);}
 .toast.pink{border-left:3px solid var(--pink);}
 .modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);z-index:200;align-items:center;justify-content:center;}
 .modal-backdrop.open{display:flex;}
-.modal{background:var(--black2);border:1px solid var(--purple);border-radius:var(--rl);padding:24px;width:90%;max-width:480px;box-shadow:0 0 40px var(--purple-glow);animation:slideUp 0.2s ease;}
+.modal{background:var(--black2);border:1px solid var(--purple);border-radius:var(--rl);padding:24px;width:90%;max-width:480px;max-height:90vh;overflow-y:auto;box-shadow:0 0 40px var(--purple-glow);animation:slideUp 0.2s ease;}
 @keyframes slideUp{from{transform:translateY(16px);opacity:0;}to{transform:translateY(0);opacity:1;}}
 .modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
 .modal-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;color:var(--text);}
@@ -166,7 +168,7 @@ tr:hover td{background:rgba(255,255,255,0.02);}
 .page-header-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:var(--text);}
 .page-header-sub{font-family:'Barlow Condensed',sans-serif;font-size:13px;color:var(--text3);padding-bottom:3px;}
 .saving-bar{height:2px;background:var(--purple);position:fixed;top:0;left:0;z-index:9999;transition:width 0.3s;width:0;}
-*{-webkit-tap-highlight-color:transparent;}
+*{-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
 @media(max-width:768px){
 .sidebar{transform:translateX(-100%);}
 .sidebar.open{transform:translateX(0);}
@@ -175,14 +177,24 @@ tr:hover td{background:rgba(255,255,255,0.02);}
 .overlay.open{display:block;}
 .page{padding:16px calc(16px + env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left));}
 .topbar{padding:calc(10px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) 10px calc(16px + env(safe-area-inset-left));}
-.form-grid{grid-template-columns:1fr;}
+.card-header{padding:14px 16px;}
+.card-body{padding:16px;}
+.form-grid{grid-template-columns:1fr;gap:14px;}
 .two-col{grid-template-columns:1fr;}
-input[type=text],input[type=number],input[type=tel],input[type=search],input[type=date],input[type=time],select,textarea{font-size:16px;}
+input[type=text],input[type=number],input[type=tel],input[type=search],input[type=date],input[type=time],select,textarea{font-size:16px;min-height:46px;}
 select,input[type=search]{width:100% !important;}
-.btn{padding:10px 16px;}
-.btn-sm{padding:8px 12px;font-size:13px;}
-.nav-item{padding:12px 12px;}
-.cat-chip{padding:9px 14px;}
+.btn{padding:12px 18px;min-height:46px;font-size:14px;}
+.btn-sm{padding:9px 14px;font-size:13px;min-height:40px;}
+.nav-item{padding:14px 12px;font-size:14px;}
+.cat-group{gap:10px;}
+.cat-chip{padding:12px 10px;font-size:14px;flex:1 1 calc(50% - 5px);justify-content:center;min-height:46px;}
+.form-actions{flex-direction:column;align-items:stretch;gap:12px;}
+.form-actions .spacer{display:none;}
+.form-actions select{width:100% !important;}
+.btn-cadastrar{width:100%;justify-content:center;font-size:15px;padding:14px 18px;min-height:50px;}
+table{font-size:13px;}
+th,td{padding:10px 12px;}
+.modal{padding:18px;max-height:85vh;}
 }
 
 /* ===== Story Dupla Confirmada ===== */
@@ -281,10 +293,10 @@ select,input[type=search]{width:100% !important;}
             </select>
           </div>
         </div>
-        <div style="display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;">
+        <div class="form-actions">
           <div style="display:flex;flex-direction:column;gap:5px;"><label>Pagamento</label><select id="j-pag" style="width:130px;"><option value="Pendente">Pendente</option><option value="Pago">Pago</option></select></div>
-          <div style="flex:1;"></div>
-          <button class="btn btn-lime" onclick="addJogador()">✚ Cadastrar</button>
+          <div class="spacer"></div>
+          <button class="btn btn-lime btn-cadastrar" onclick="addJogador()">✚ Cadastrar</button>
         </div>
       </div>
     </div>
@@ -663,11 +675,11 @@ select,input[type=search]{width:100% !important;}
         <label class="cat-chip" id="e-chip-Estreante"><input type="checkbox" value="Estreante" onchange="updateEditChip(this,'Estreante')"> ⭐ Estreante</label>
       </div>
     </div>
-    <div style="display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;">
+    <div class="form-actions">
       <div style="display:flex;flex-direction:column;gap:5px;"><label>Pagamento</label><select id="e-pag" style="width:130px;"><option>Pendente</option><option>Pago</option></select></div>
-      <div style="flex:1;"></div>
+      <div class="spacer"></div>
       <div id="e-preco" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--lime);margin-bottom:1px;"></div>
-      <button class="btn btn-lime" onclick="salvarEdicao()">Salvar</button>
+      <button class="btn btn-lime btn-cadastrar" onclick="salvarEdicao()">Salvar</button>
     </div>
   </div>
 </div>
