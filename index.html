@@ -1956,23 +1956,36 @@ async function stTemAlpha(src){
   return false;
 }
 
+function stEhSolo(n){return !stFotos[n===1?2:1].src;}
+function stFotoFit(n){
+  const f=stFotos[n],bruto=stZoomCorpo(f.iw,f.ih,stHalfW(n),ST_PX.h);
+  f.zoom=stEhSolo(n)?bruto:Math.max(0.5,bruto);
+  f.fx=0;f.fy=0;
+}
 function stUpload(n,input){
   const f=input.files&&input.files[0];if(!f)return;
   const r=new FileReader();
   r.onload=async ev=>{
     const src=ev.target.result;
     const[alpha,img]=await Promise.all([stTemAlpha(src),stLoadImg(src)]);
-    const zoom=Math.max(0.5,stZoomCorpo(img.width,img.height,stHalfW(n),ST_PX.h));
-    stFotos[n]={src,iw:img.width,ih:img.height,zoom,fx:0,fy:0,alpha};
+    stFotos[n]={src,iw:img.width,ih:img.height,zoom:1,fx:0,fy:0,alpha};
+    stFotoFit(n);
+    const outro=n===1?2:1;
+    if(stFotos[outro].src)stFotoFit(outro);
     stRenderCtrls();stRenderPreview();
   };
   r.readAsDataURL(f);input.value='';
 }
-function stRemover(n){stFotos[n]=stNovaFoto();stRenderCtrls();stRenderPreview();}
+function stRemover(n){
+  stFotos[n]=stNovaFoto();
+  const outro=n===1?2:1;
+  if(stFotos[outro].src)stFotoFit(outro);
+  stRenderCtrls();stRenderPreview();
+}
 function stSet(n,k,v){stFotos[n][k]=parseFloat(v);stRenderPreview();}
 function stAtalho(n,tipo){
   const f=stFotos[n];if(!f.src)return;
-  if(tipo==='corpo'){f.zoom=Math.max(0.5,stZoomCorpo(f.iw,f.ih,stHalfW(n),ST_PX.h));f.fx=0;f.fy=0;}
+  if(tipo==='corpo'){stFotoFit(n);}
   else{f.zoom=1;f.fx=0;f.fy=-0.18;}
   stRenderCtrls();stRenderPreview();
 }
@@ -1991,7 +2004,7 @@ function stRenderCtrls(){
       h+='<div style="display:flex;gap:8px;margin-bottom:4px;">';
       h+='<button class="btn btn-sm btn-lime" style="flex:1;justify-content:center;" onclick="stAtalho('+n+',\'corpo\')">Corpo inteiro</button>';
       h+='<button class="btn btn-sm btn-primary" style="flex:1;justify-content:center;" onclick="stAtalho('+n+',\'busto\')">Preencher (busto)</button></div>';
-      h+='<div class="st-range"><span>Zoom</span><input type="range" min="0.5" max="2.5" step="0.01" value="'+f.zoom+'" oninput="stSet('+n+',\'zoom\',this.value)"></div>';
+      h+='<div class="st-range"><span>Zoom</span><input type="range" min="'+Math.min(0.5,f.zoom).toFixed(2)+'" max="2.5" step="0.01" value="'+f.zoom+'" oninput="stSet('+n+',\'zoom\',this.value)"></div>';
       h+='<div class="st-range"><span>Posição ↔</span><input type="range" min="-0.5" max="0.5" step="0.01" value="'+f.fx+'" oninput="stSet('+n+',\'fx\',this.value)"></div>';
       h+='<div class="st-range"><span>Posição ↕</span><input type="range" min="-0.5" max="0.5" step="0.01" value="'+f.fy+'" oninput="stSet('+n+',\'fy\',this.value)"></div>';
     }
