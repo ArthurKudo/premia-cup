@@ -362,6 +362,7 @@ tr:hover td{background:rgba(255,255,255,0.02);}
           <div style="display:flex;flex-direction:column;gap:5px;"><label>Qtd árbitros</label><input type="number" id="p-arb-qtd" min="0" placeholder="8"></div>
           <div style="display:flex;flex-direction:column;gap:5px;"><label>Custo por árbitro</label><input type="number" id="p-arb-val" min="0" placeholder="300"></div>
           <div style="display:flex;flex-direction:column;gap:5px;"><label>Premiação total</label><input type="number" id="p-premiacao" min="0" placeholder="4040"></div>
+          <div style="display:flex;flex-direction:column;gap:5px;"><label>Tráfego pago (Meta/Google Ads)</label><input type="number" id="p-trafego" min="0" placeholder="0"></div>
         </div>
       </div>
     </div>
@@ -769,8 +770,8 @@ const PAT_BASE = 800;
 let editingId = null;
 let chartDuplas=null,chartFin=null,chartCats=null;
 
-function getParams(){return Object.assign({uniforme:70,trofeuQtd:24,trofeuVal:33,arbQtd:8,arbVal:300,premiacao:4040},S.params||{});}
-function calcDespesasFixas(){const p=getParams();return p.trofeuQtd*p.trofeuVal+p.arbQtd*p.arbVal+p.premiacao;}
+function getParams(){return Object.assign({uniforme:70,trofeuQtd:24,trofeuVal:33,arbQtd:8,arbVal:300,premiacao:4040,trafegoPago:0},S.params||{});}
+function calcDespesasFixas(){const p=getParams();return p.trofeuQtd*p.trofeuVal+p.arbQtd*p.arbVal+p.premiacao+p.trafegoPago;}
 
 function fmt(n){return 'R$ '+Math.round(n).toLocaleString('pt-BR');}
 function preco(n){return PRECOS[Math.min(n,3)]||260;}
@@ -1056,10 +1057,11 @@ function calcFin(){
   const uniforme=nJog*p.uniforme;
   const trofeu=p.trofeuQtd*p.trofeuVal;
   const arbitro=p.arbQtd*p.arbVal;
-  const gastos=uniforme+trofeu+arbitro+p.premiacao;
+  const trafego=p.trafegoPago;
+  const gastos=uniforme+trofeu+arbitro+p.premiacao+trafego;
   const lucro=totalRec-gastos;
   const recPago=S.jogadores.filter(j=>j.pag==='Pago').reduce((s,j)=>s+preco(j.cats.length),0);
-  return{patTotal,recInsc,totalRec,nJog,uniforme,trofeu,arbitro,gastos,lucro,recPago,p};
+  return{patTotal,recInsc,totalRec,nJog,uniforme,trofeu,arbitro,trafego,gastos,lucro,recPago,p};
 }
 function renderFinanceiro(){
   const f=calcFin();
@@ -1082,6 +1084,7 @@ function renderFinanceiro(){
     <div class="fin-row"><span class="fin-label">Troféus (${p.trofeuQtd} × R$${p.trofeuVal})</span><span class="fin-value">${fmt(f.trofeu)}</span></div>
     <div class="fin-row"><span class="fin-label">Árbitros (${p.arbQtd} × R$${p.arbVal})</span><span class="fin-value">${fmt(f.arbitro)}</span></div>
     <div class="fin-row"><span class="fin-label">Premiação total</span><span class="fin-value">${fmt(p.premiacao)}</span></div>
+    <div class="fin-row"><span class="fin-label">Tráfego pago (Ads)</span><span class="fin-value">${fmt(f.trafego)}</span></div>
     <div class="fin-total"><span>Total despesas</span><span style="color:var(--pink);">${fmt(f.gastos)}</span></div>`;
   document.getElementById('p-uniforme').value=p.uniforme;
   document.getElementById('p-trofeu-qtd').value=p.trofeuQtd;
@@ -1089,6 +1092,7 @@ function renderFinanceiro(){
   document.getElementById('p-arb-qtd').value=p.arbQtd;
   document.getElementById('p-arb-val').value=p.arbVal;
   document.getElementById('p-premiacao').value=p.premiacao;
+  document.getElementById('p-trafego').value=p.trafegoPago;
   renderUniformes();
   simular();
 }
@@ -1181,6 +1185,7 @@ function salvarParametros(){
     arbQtd:parseInt(document.getElementById('p-arb-qtd').value)||8,
     arbVal:parseInt(document.getElementById('p-arb-val').value)||300,
     premiacao:parseInt(document.getElementById('p-premiacao').value)||4040,
+    trafegoPago:parseInt(document.getElementById('p-trafego').value)||0,
   };
   save(); renderFinanceiro(); toast('Parâmetros salvos!');
 }
