@@ -1,0 +1,12 @@
+{
+  "name": "Premia Cup — Controle Interno",
+  "short_name": "Premia Cup",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#070a08",
+  "theme_color": "#070a08",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
