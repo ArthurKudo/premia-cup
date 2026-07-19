@@ -293,13 +293,13 @@ th,td{padding:10px 12px;}
           <div style="display:flex;flex-direction:column;gap:5px;"><label>Tamanho da camiseta</label>
             <select id="j-tam">
               <option value="" selected>—</option>
-              <option>PP</option><option>P</option><option>M</option><option>G</option><option>GG</option><option>XGG</option>
+              <option>PP</option><option>P</option><option>M</option><option>G</option><option>GG</option><option>XG</option><option>XG1</option><option>XG2</option><option>XG3</option>
             </select>
           </div>
           <div style="display:flex;flex-direction:column;gap:5px;"><label>Tamanho do short</label>
             <select id="j-tam-short">
               <option value="" selected>—</option>
-              <option>PP</option><option>P</option><option>M</option><option>G</option><option>GG</option><option>XGG</option>
+              <option>P</option><option>M</option><option>G</option><option>GG</option><option>XG</option>
             </select>
           </div>
         </div>
@@ -713,10 +713,10 @@ th,td{padding:10px 12px;}
         <select id="e-gen"><option value="M">Masculino</option><option value="F">Feminino</option></select>
       </div>
       <div style="display:flex;flex-direction:column;gap:5px;"><label>Tamanho camiseta</label>
-        <select id="e-tam"><option value="">—</option><option>PP</option><option>P</option><option>M</option><option>G</option><option>GG</option><option>XGG</option></select>
+        <select id="e-tam"><option value="">—</option><option>PP</option><option>P</option><option>M</option><option>G</option><option>GG</option><option>XG</option><option>XG1</option><option>XG2</option><option>XG3</option></select>
       </div>
       <div style="display:flex;flex-direction:column;gap:5px;"><label>Tamanho short</label>
-        <select id="e-tam-short"><option value="">—</option><option>PP</option><option>P</option><option>M</option><option>G</option><option>GG</option><option>XGG</option></select>
+        <select id="e-tam-short"><option value="">—</option><option>P</option><option>M</option><option>G</option><option>GG</option><option>XG</option></select>
       </div>
     </div>
     <div style="margin-bottom:14px;"><label style="display:block;margin-bottom:8px;">Categorias</label>
@@ -1229,7 +1229,8 @@ function renderFinanceiro(){
   simular();
 }
 function renderUniformes(){
-  const TAMANHOS=['PP','P','M','G','GG','XGG'];
+  const TAM_CAMISETA=['PP','P','M','G','GG','XG','XG1','XG2','XG3'];
+  const TAM_SHORT=['P','M','G','GG','XG'];
   const masc=S.jogadores.filter(j=>j.gen==='M'||!j.gen);
   const fem=S.jogadores.filter(j=>j.gen==='F');
   const total=S.jogadores.length;
@@ -1237,7 +1238,8 @@ function renderUniformes(){
   if(!el)return;
   if(!total){el.innerHTML='<div style="color:var(--text3);font-size:13px;text-align:center;padding:12px 0;">Nenhum jogador cadastrado ainda.</div>';return;}
   const contM={};const contF={};const contMS={};const contFS={};
-  TAMANHOS.forEach(t=>{contM[t]=0;contF[t]=0;contMS[t]=0;contFS[t]=0;});
+  TAM_CAMISETA.forEach(t=>{contM[t]=0;contF[t]=0;});
+  TAM_SHORT.forEach(t=>{contMS[t]=0;contFS[t]=0;});
   // Count only jogadores with a defined tamanho
   const semTam=S.jogadores.filter(j=>!j.tam||!j.tamShort).length;
   S.jogadores.forEach(j=>{
@@ -1252,11 +1254,11 @@ function renderUniformes(){
   });
   const totalM=masc.length;const totalF=fem.length;
   const semTamInfo=semTam?`<div style="margin-bottom:14px;padding:10px 14px;background:rgba(239,159,39,0.07);border:1px solid rgba(239,159,39,0.3);border-radius:var(--r);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;color:#EF9F27;">⚠️ ${semTam} jogador${semTam!==1?'es':''} sem tamanho de camiseta ou short definido</div>`:'';
-  const tabela=(titulo,cont,totalG,cor)=>`
+  const tabela=(titulo,cont,totalG,cor,tamanhos)=>`
       <div style="background:var(--black3);border:1px solid ${cor==='pink'?'rgba(255,27,173,0.3)':'rgba(176,106,255,0.3)'};border-radius:var(--rl);overflow:hidden;">
         <div style="padding:10px 16px;border-bottom:1px solid var(--border);font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:${cor==='pink'?'var(--pink)':'var(--purple-light)'};">${titulo}</div>
         <div style="padding:8px 0;">
-          ${TAMANHOS.map(t=>{
+          ${tamanhos.map(t=>{
             const n=cont[t];
             const pct=totalG?Math.round(n/totalG*100):0;
             return`<div style="display:flex;align-items:center;gap:12px;padding:8px 16px;border-bottom:1px solid var(--border);">
@@ -1293,10 +1295,10 @@ function renderUniformes(){
       </div>`:''}
     </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;">
-      ${tabela('Camiseta — Masculino',contM,totalM,'purple')}
-      ${tabela('Camiseta — Feminino',contF,totalF,'pink')}
-      ${tabela('Short — Masculino',contMS,totalM,'purple')}
-      ${tabela('Short — Feminino',contFS,totalF,'pink')}
+      ${tabela('Camiseta — Masculino',contM,totalM,'purple',TAM_CAMISETA)}
+      ${tabela('Camiseta — Feminino',contF,totalF,'pink',TAM_CAMISETA)}
+      ${tabela('Short — Masculino',contMS,totalM,'purple',TAM_SHORT)}
+      ${tabela('Short — Feminino',contFS,totalF,'pink',TAM_SHORT)}
     </div>`;
 }
 function salvarParametros(){
