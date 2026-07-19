@@ -286,8 +286,14 @@ th,td{padding:10px 12px;}
               <option value="F">Feminino</option>
             </select>
           </div>
-          <div style="display:flex;flex-direction:column;gap:5px;"><label>Tamanho do uniforme</label>
+          <div style="display:flex;flex-direction:column;gap:5px;"><label>Tamanho da camiseta</label>
             <select id="j-tam">
+              <option value="" selected>—</option>
+              <option>PP</option><option>P</option><option>M</option><option>G</option><option>GG</option><option>XGG</option>
+            </select>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px;"><label>Tamanho do short</label>
+            <select id="j-tam-short">
               <option value="" selected>—</option>
               <option>PP</option><option>P</option><option>M</option><option>G</option><option>GG</option><option>XGG</option>
             </select>
@@ -310,7 +316,7 @@ th,td{padding:10px 12px;}
         </div>
       </div>
       <div class="table-wrap">
-        <table><thead><tr><th>#</th><th>Nome</th><th>Contato</th><th>Gênero</th><th>Uniforme</th><th>Categorias</th><th>Valor</th><th>Pagamento</th><th></th></tr></thead><tbody id="jog-tbody"></tbody></table>
+        <table><thead><tr><th>#</th><th>Nome</th><th>Contato</th><th>Gênero</th><th>Camiseta</th><th>Short</th><th>Categorias</th><th>Valor</th><th>Pagamento</th><th></th></tr></thead><tbody id="jog-tbody"></tbody></table>
         <div id="jog-empty" class="empty-state" style="display:none;"><div class="empty-icon">👤</div><div class="empty-text">Nenhum jogador encontrado</div></div>
       </div>
     </div>
@@ -663,8 +669,11 @@ th,td{padding:10px 12px;}
       <div style="display:flex;flex-direction:column;gap:5px;"><label>Gênero</label>
         <select id="e-gen"><option value="M">Masculino</option><option value="F">Feminino</option></select>
       </div>
-      <div style="display:flex;flex-direction:column;gap:5px;"><label>Tamanho uniforme</label>
+      <div style="display:flex;flex-direction:column;gap:5px;"><label>Tamanho camiseta</label>
         <select id="e-tam"><option value="">—</option><option>PP</option><option>P</option><option>M</option><option>G</option><option>GG</option><option>XGG</option></select>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:5px;"><label>Tamanho short</label>
+        <select id="e-tam-short"><option value="">—</option><option>PP</option><option>P</option><option>M</option><option>G</option><option>GG</option><option>XGG</option></select>
       </div>
     </div>
     <div style="margin-bottom:14px;"><label style="display:block;margin-bottom:8px;">Categorias</label>
@@ -886,10 +895,10 @@ function addJogador(){
   const cats=[...document.querySelectorAll('#cat-chips input:checked')].map(c=>c.value);
   if(!nome){toast('Informe o nome do jogador','pink');return;}
   if(!cats.length){toast('Selecione ao menos uma categoria','pink');return;}
-  S.jogadores.push({id:uid(),nome,tel,gen:document.getElementById('j-gen').value,tam:document.getElementById('j-tam').value,cats,pag:document.getElementById('j-pag').value});
+  S.jogadores.push({id:uid(),nome,tel,gen:document.getElementById('j-gen').value,tam:document.getElementById('j-tam').value,tamShort:document.getElementById('j-tam-short').value,cats,pag:document.getElementById('j-pag').value});
   save();
   document.getElementById('j-nome').value=''; document.getElementById('j-tel').value='';
-  document.getElementById('j-gen').value='M'; document.getElementById('j-tam').value='';
+  document.getElementById('j-gen').value='M'; document.getElementById('j-tam').value=''; document.getElementById('j-tam-short').value='';
   document.querySelectorAll('#cat-chips input').forEach(c=>c.checked=false);
   ['Bronze','Iniciante','Mista','Estreante'].forEach(k=>document.getElementById('chip-'+k).className='cat-chip');
   document.getElementById('preco-preview').textContent='';
@@ -917,6 +926,7 @@ function abrirEditar(id){
   document.getElementById('e-tel').value=j.tel||'';
   document.getElementById('e-gen').value=j.gen||'M';
   document.getElementById('e-tam').value=j.tam||'';
+  document.getElementById('e-tam-short').value=j.tamShort||'';
   document.getElementById('e-pag').value=j.pag;
   ['Bronze','Iniciante','Mista','Estreante'].forEach(k=>{
     const chip=document.getElementById('e-chip-'+k);
@@ -937,6 +947,7 @@ function salvarEdicao(){
   j.nome=nome; j.tel=document.getElementById('e-tel').value.trim();
   j.gen=document.getElementById('e-gen').value;
   j.tam=document.getElementById('e-tam').value;
+  j.tamShort=document.getElementById('e-tam-short').value;
   j.cats=cats; j.pag=document.getElementById('e-pag').value;
   save(); closeModal(); renderJogadores(); renderMetricas(); toast('Dados atualizados!');
 }
@@ -971,6 +982,7 @@ function renderJogadores(){
     <td style="color:var(--text3);font-size:12px;">${j.tel||'—'}</td>
     <td><span class="badge ${j.gen==='F'?'badge-pink':'badge-purple'}">${j.gen==='F'?'Fem':'Masc'}</span></td>
     <td><span class="badge badge-gray">${j.tam||'—'}</span></td>
+    <td><span class="badge badge-gray">${j.tamShort||'—'}</span></td>
     <td><div style="display:flex;gap:4px;flex-wrap:wrap;">${j.cats.map(c=>`<span class="badge ${catBadge[c]||'badge-gray'}">${c}</span>`).join('')}</div></td>
     <td style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--lime);letter-spacing:.5px;">${fmt(preco(j.cats.length))}</td>
     <td><button onclick="togglePag(${j.id})" class="badge ${pagBadge[j.pag]}" style="border:none;cursor:pointer;">${j.pag}</button></td>
@@ -1179,18 +1191,42 @@ function renderUniformes(){
   const el=document.getElementById('fin-uniformes');
   if(!el)return;
   if(!total){el.innerHTML='<div style="color:var(--text3);font-size:13px;text-align:center;padding:12px 0;">Nenhum jogador cadastrado ainda.</div>';return;}
-  const contM={};const contF={};
-  TAMANHOS.forEach(t=>{contM[t]=0;contF[t]=0;});
+  const contM={};const contF={};const contMS={};const contFS={};
+  TAMANHOS.forEach(t=>{contM[t]=0;contF[t]=0;contMS[t]=0;contFS[t]=0;});
   // Count only jogadores with a defined tamanho
-  const semTam=S.jogadores.filter(j=>!j.tam).length;
+  const semTam=S.jogadores.filter(j=>!j.tam||!j.tamShort).length;
   S.jogadores.forEach(j=>{
-    const t=j.tam;
-    if(!t)return; // skip if no size selected
-    if(j.gen==='F'){if(contF[t]!==undefined)contF[t]++;}
-    else{if(contM[t]!==undefined)contM[t]++;}
+    const t=j.tam;const ts=j.tamShort;
+    if(j.gen==='F'){
+      if(t&&contF[t]!==undefined)contF[t]++;
+      if(ts&&contFS[ts]!==undefined)contFS[ts]++;
+    }else{
+      if(t&&contM[t]!==undefined)contM[t]++;
+      if(ts&&contMS[ts]!==undefined)contMS[ts]++;
+    }
   });
   const totalM=masc.length;const totalF=fem.length;
-  const semTamInfo=semTam?`<div style="margin-bottom:14px;padding:10px 14px;background:rgba(239,159,39,0.07);border:1px solid rgba(239,159,39,0.3);border-radius:var(--r);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;color:#EF9F27;">⚠️ ${semTam} jogador${semTam!==1?'es':''} sem tamanho de uniforme definido</div>`:'';
+  const semTamInfo=semTam?`<div style="margin-bottom:14px;padding:10px 14px;background:rgba(239,159,39,0.07);border:1px solid rgba(239,159,39,0.3);border-radius:var(--r);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;color:#EF9F27;">⚠️ ${semTam} jogador${semTam!==1?'es':''} sem tamanho de camiseta ou short definido</div>`:'';
+  const tabela=(titulo,cont,totalG,cor)=>`
+      <div style="background:var(--black3);border:1px solid ${cor==='pink'?'rgba(255,27,173,0.3)':'rgba(176,106,255,0.3)'};border-radius:var(--rl);overflow:hidden;">
+        <div style="padding:10px 16px;border-bottom:1px solid var(--border);font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:${cor==='pink'?'var(--pink)':'var(--purple-light)'};">${titulo}</div>
+        <div style="padding:8px 0;">
+          ${TAMANHOS.map(t=>{
+            const n=cont[t];
+            const pct=totalG?Math.round(n/totalG*100):0;
+            return`<div style="display:flex;align-items:center;gap:12px;padding:8px 16px;border-bottom:1px solid var(--border);">
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--text);width:36px;">${t}</div>
+              <div style="flex:1;height:6px;background:var(--black4);border-radius:3px;">
+                <div style="height:6px;border-radius:3px;background:${cor==='pink'?'var(--pink)':'var(--purple-light)'};width:${pct}%;transition:width .4s;"></div>
+              </div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:${n>0?(cor==='pink'?'var(--pink)':'var(--purple-light)'):'var(--text3)'};min-width:28px;text-align:right;">${n}</div>
+            </div>`;
+          }).join('')}
+          <div style="display:flex;justify-content:space-between;padding:10px 16px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);">
+            <span>Total</span><span style="color:${cor==='pink'?'var(--pink)':'var(--purple-light)'};font-size:14px;">${totalG}</span>
+          </div>
+        </div>
+      </div>`;
   el.innerHTML=`
     ${semTamInfo}
     <div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:20px;">
@@ -1212,44 +1248,10 @@ function renderUniformes(){
       </div>`:''}
     </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;">
-      <div style="background:var(--black3);border:1px solid rgba(176,106,255,0.3);border-radius:var(--rl);overflow:hidden;">
-        <div style="padding:10px 16px;border-bottom:1px solid var(--border);font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:var(--purple-light);">Masculino — por tamanho</div>
-        <div style="padding:8px 0;">
-          ${TAMANHOS.map(t=>{
-            const n=contM[t];
-            const pct=totalM?Math.round(n/totalM*100):0;
-            return`<div style="display:flex;align-items:center;gap:12px;padding:8px 16px;border-bottom:1px solid var(--border);">
-              <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--text);width:36px;">${t}</div>
-              <div style="flex:1;height:6px;background:var(--black4);border-radius:3px;">
-                <div style="height:6px;border-radius:3px;background:var(--purple-light);width:${pct}%;transition:width .4s;"></div>
-              </div>
-              <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:${n>0?'var(--purple-light)':'var(--text3)'};min-width:28px;text-align:right;">${n}</div>
-            </div>`;
-          }).join('')}
-          <div style="display:flex;justify-content:space-between;padding:10px 16px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);">
-            <span>Total masculino</span><span style="color:var(--purple-light);font-size:14px;">${totalM}</span>
-          </div>
-        </div>
-      </div>
-      <div style="background:var(--black3);border:1px solid rgba(255,27,173,0.3);border-radius:var(--rl);overflow:hidden;">
-        <div style="padding:10px 16px;border-bottom:1px solid var(--border);font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:var(--pink);">Feminino — por tamanho</div>
-        <div style="padding:8px 0;">
-          ${TAMANHOS.map(t=>{
-            const n=contF[t];
-            const pct=totalF?Math.round(n/totalF*100):0;
-            return`<div style="display:flex;align-items:center;gap:12px;padding:8px 16px;border-bottom:1px solid var(--border);">
-              <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--text);width:36px;">${t}</div>
-              <div style="flex:1;height:6px;background:var(--black4);border-radius:3px;">
-                <div style="height:6px;border-radius:3px;background:var(--pink);width:${pct}%;transition:width .4s;"></div>
-              </div>
-              <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:${n>0?'var(--pink)':'var(--text3)'};min-width:28px;text-align:right;">${n}</div>
-            </div>`;
-          }).join('')}
-          <div style="display:flex;justify-content:space-between;padding:10px 16px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);">
-            <span>Total feminino</span><span style="color:var(--pink);font-size:14px;">${totalF}</span>
-          </div>
-        </div>
-      </div>
+      ${tabela('Camiseta — Masculino',contM,totalM,'purple')}
+      ${tabela('Camiseta — Feminino',contF,totalF,'pink')}
+      ${tabela('Short — Masculino',contMS,totalM,'purple')}
+      ${tabela('Short — Feminino',contFS,totalF,'pink')}
     </div>`;
 }
 function salvarParametros(){
@@ -1362,8 +1364,8 @@ function renderDashboard(){
 
 function exportarCSV(){
   if(!S.jogadores.length){toast('Nenhum jogador para exportar','pink');return;}
-  const header=['#','Nome','Contato','Categorias','Valor','Pagamento','Uniforme'];
-  const rows=S.jogadores.map((j,i)=>[i+1,j.nome,j.tel||'',j.cats.join(' | '),preco(j.cats.length),j.pag,j.tam||'—']);
+  const header=['#','Nome','Contato','Categorias','Valor','Pagamento','Camiseta','Short'];
+  const rows=S.jogadores.map((j,i)=>[i+1,j.nome,j.tel||'',j.cats.join(' | '),preco(j.cats.length),j.pag,j.tam||'—',j.tamShort||'—']);
   const csv=[header,...rows].map(r=>r.map(c=>`"${c}"`).join(',')).join('\n');
   const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='premia-cup.csv';a.click();
