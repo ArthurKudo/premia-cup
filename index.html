@@ -321,6 +321,7 @@ th,td{padding:10px 12px;}
           <input type="search" id="busca" placeholder="Buscar..." style="width:150px;" oninput="renderJogadores()">
           <select id="filtro-cat" onchange="renderJogadores()" style="width:140px;"><option value="">Todas categorias</option><option>Bronze</option><option>Iniciante</option><option>Mista Iniciante</option><option>Estreante</option></select>
           <select id="filtro-pag" onchange="renderJogadores()" style="width:120px;"><option value="">Todos pag.</option><option>Pago</option><option>Pendente</option></select>
+          <select id="filtro-unif" onchange="renderJogadores()" style="width:150px;"><option value="">Uniforme (todos)</option><option value="pendente">Sem preencher</option><option value="completo">Completo</option></select>
         </div>
       </div>
       <div class="table-wrap">
@@ -1031,10 +1032,13 @@ function renderJogadores(){
   const busca=document.getElementById('busca').value.toLowerCase();
   const fcat=document.getElementById('filtro-cat').value;
   const fpag=document.getElementById('filtro-pag').value;
+  const funif=document.getElementById('filtro-unif').value;
   const lista=S.jogadores.filter(j=>{
     if(busca&&!j.nome.toLowerCase().includes(busca)&&!(j.tel||'').toLowerCase().includes(busca))return false;
     if(fcat&&!j.cats.includes(fcat))return false;
     if(fpag&&j.pag!==fpag)return false;
+    if(funif==='pendente'&&j.tam&&j.tamShort)return false;
+    if(funif==='completo'&&(!j.tam||!j.tamShort))return false;
     return true;
   });
   const tb=document.getElementById('jog-tbody');
