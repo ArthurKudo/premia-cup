@@ -247,7 +247,7 @@ th,td{padding:10px 12px;}
     <div class="nav-item" tabindex="0" role="button" onkeydown="navKey(event)" onclick="goTo('chaveamento',this)"><span class="nav-icon">🏟</span> Chaveamento</div>
     <div class="nav-item" tabindex="0" role="button" onkeydown="navKey(event)" onclick="goTo('simulacao',this)"><span class="nav-icon">🔢</span> Simulação</div>
   </nav>
-  <div class="sidebar-footer">Dados na <span>nuvem</span> · JSONBin</div>
+  <div class="sidebar-footer">Dados na <span>nuvem</span> · Firebase</div>
 </aside>
 <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
 <div class="main">
@@ -787,21 +787,30 @@ th,td{padding:10px 12px;}
 <div class="toast" id="toast"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
 <script>
-// ===== JSONBIN CONFIG =====
-const BIN_ID = '6a27119bda38895dfe9ba20f';
-const API_KEY = '$2a$10$cEuyGQilS7FRcItHcoY75.8CBrCHAze0z9cjiB7dps9u0zGzCTzb2';
-const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+// ===== FIREBASE CONFIG =====
+const firebaseConfig = {
+  apiKey: "AIzaSyDsTDwMJ8tHSc5_jx5FGuuJCCnZSMwQj3Q",
+  authDomain: "premiacup-7d121.firebaseapp.com",
+  projectId: "premiacup-7d121",
+  storageBucket: "premiacup-7d121.firebasestorage.app",
+  messagingSenderId: "570028154978",
+  appId: "1:570028154978:web:3dffd43ef818c4e186713b"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const STATE_DOC = db.collection('premiacup').doc('state');
 let saveTimer = null;
 let isSaving = false;
 
 async function loadFromCloud() {
   setSyncStatus('loading','carregando...');
   try {
-    const r = await fetch(API_URL+'/latest', {headers:{'X-Master-Key':API_KEY}});
-    if(!r.ok) throw new Error('HTTP '+r.status);
-    const data = await r.json();
-    S = data.record;
+    const snap = await STATE_DOC.get();
+    if(!snap.exists) throw new Error('Documento não encontrado');
+    S = snap.data();
     if(!S.jogadores) S.jogadores = [];
     if(!S.resultados) S.resultados = {};
     if(!S.duplas) S.duplas = {};
@@ -827,12 +836,7 @@ async function saveToCloud() {
   isSaving = true;
   showSavingBar();
   try {
-    const r = await fetch(API_URL, {
-      method:'PUT',
-      headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},
-      body: JSON.stringify(S)
-    });
-    if(!r.ok) throw new Error('HTTP '+r.status);
+    await STATE_DOC.set(S);
     setSyncStatus('ok','salvo');
   } catch(e) {
     setSyncStatus('err','erro ao salvar');
