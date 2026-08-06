@@ -275,6 +275,7 @@ th,td{padding:10px 12px;}
         <div class="form-grid" style="margin-bottom:14px;">
           <div style="display:flex;flex-direction:column;gap:5px;"><label>Nome completo</label><input type="text" id="j-nome" placeholder="Ex: João Silva"></div>
           <div style="display:flex;flex-direction:column;gap:5px;"><label>Contato (tel / @instagram)</label><input type="text" id="j-tel" autocapitalize="none" autocorrect="off" placeholder="Ex: @joaosilva ou (11) 99999-9999"></div>
+          <div style="display:flex;flex-direction:column;gap:5px;"><label>CPF</label><input type="text" id="j-cpf" autocapitalize="none" autocorrect="off" placeholder="000.000.000-00"></div>
         </div>
         <div style="margin-bottom:14px;"><label style="display:block;margin-bottom:8px;">Categorias</label>
           <div class="cat-group" id="cat-chips">
@@ -319,10 +320,11 @@ th,td{padding:10px 12px;}
           <select id="filtro-cat" onchange="renderJogadores()" style="width:140px;"><option value="">Todas categorias</option><option>Bronze</option><option>Iniciante</option><option>Mista Iniciante</option><option>Estreante</option></select>
           <select id="filtro-pag" onchange="renderJogadores()" style="width:120px;"><option value="">Todos pag.</option><option>Pago</option><option>Pendente</option></select>
           <select id="filtro-unif" onchange="renderJogadores()" style="width:150px;"><option value="">Uniforme (todos)</option><option value="pendente">Sem preencher</option><option value="completo">Completo</option></select>
+          <select id="filtro-cpf" onchange="renderJogadores()" style="width:130px;"><option value="">CPF (todos)</option><option value="pendente">Sem CPF</option><option value="completo">Com CPF</option></select>
         </div>
       </div>
       <div class="table-wrap">
-        <table><thead><tr><th>#</th><th>Nome</th><th>Contato</th><th>Gênero</th><th>Camiseta</th><th>Short</th><th>Categorias</th><th>Valor</th><th>Pagamento</th><th></th></tr></thead><tbody id="jog-tbody"></tbody></table>
+        <table><thead><tr><th>#</th><th>Nome</th><th>Contato</th><th>CPF</th><th>Gênero</th><th>Camiseta</th><th>Short</th><th>Categorias</th><th>Valor</th><th>Pagamento</th><th></th></tr></thead><tbody id="jog-tbody"></tbody></table>
         <div id="jog-empty" class="empty-state" style="display:none;"><div class="empty-icon">👤</div><div class="empty-text">Nenhum jogador encontrado</div></div>
       </div>
     </div>
@@ -418,6 +420,7 @@ th,td{padding:10px 12px;}
           <div style="display:flex;flex-direction:column;gap:5px;"><label>Custo por árbitro</label><input type="number" id="p-arb-val" min="0" placeholder="300"></div>
           <div style="display:flex;flex-direction:column;gap:5px;"><label>Premiação total</label><input type="number" id="p-premiacao" min="0" placeholder="4040"></div>
           <div style="display:flex;flex-direction:column;gap:5px;"><label>Tráfego pago (Meta/Google Ads)</label><input type="number" id="p-trafego" min="0" placeholder="0"></div>
+          <div style="display:flex;flex-direction:column;gap:5px;"><label>Custo de limpeza</label><input type="number" id="p-limpeza" min="0" placeholder="0"></div>
         </div>
       </div>
     </div>
@@ -711,6 +714,7 @@ th,td{padding:10px 12px;}
     <div class="form-grid" style="margin-bottom:14px;">
       <div style="display:flex;flex-direction:column;gap:5px;"><label>Nome</label><input type="text" id="e-nome"></div>
       <div style="display:flex;flex-direction:column;gap:5px;"><label>Contato</label><input type="text" id="e-tel" autocapitalize="none" autocorrect="off"></div>
+      <div style="display:flex;flex-direction:column;gap:5px;"><label>CPF</label><input type="text" id="e-cpf" autocapitalize="none" autocorrect="off" placeholder="000.000.000-00"></div>
       <div style="display:flex;flex-direction:column;gap:5px;"><label>Gênero</label>
         <select id="e-gen"><option value="M">Masculino</option><option value="F">Feminino</option></select>
       </div>
@@ -817,7 +821,7 @@ async function loadFromCloud() {
     if(!S.posts) S.posts = [];
     if(!S.chvParams) S.chvParams = {};
     if(!S.nameAliases) S.nameAliases = {};
-    if(!S.params) S.params = {uniforme:70,trofeuQtd:24,trofeuVal:33,arbQtd:8,arbVal:300,premiacao:4040};
+    if(!S.params) S.params = {uniforme:70,trofeuQtd:24,trofeuVal:33,arbQtd:8,arbVal:300,premiacao:4040,limpeza:0};
     if(!S.sponsors) S.sponsors = [
       {id:1,nome:'Lonu',cat:'Ouro (R$ 800)',val:0,status:'Confirmado'},
       {id:2,nome:'JMP',cat:'Prata (R$ 400)',val:400,status:'Confirmado'},
@@ -877,7 +881,7 @@ function hideSavingBar() {
 }
 
 // ===== STATE =====
-let S = {jogadores:[],resultados:{},sponsors:[],duplas:{},params:{uniforme:70,trofeuQtd:24,trofeuVal:33,arbQtd:8,arbVal:300,premiacao:4040}};
+let S = {jogadores:[],resultados:{},sponsors:[],duplas:{},params:{uniforme:70,trofeuQtd:24,trofeuVal:33,arbQtd:8,arbVal:300,premiacao:4040,limpeza:0}};
 const CATS = ['Bronze','Iniciante','Mista Iniciante','Estreante'];
 const PRECOS = {1:120,2:200,3:260};
 const PREMIOS = {Bronze:[1000,500,250,100],Iniciante:[600,350,150,0],'Mista Iniciante':[450,300,100,0],Estreante:[240,0,0,0]};
@@ -887,8 +891,8 @@ const PAT_BASE = 800;
 let editingId = null;
 let chartDuplas=null,chartFin=null,chartCats=null;
 
-function getParams(){return Object.assign({uniforme:70,trofeuQtd:24,trofeuVal:33,arbQtd:8,arbVal:300,premiacao:4040,trafegoPago:0},S.params||{});}
-function calcDespesasFixas(){const p=getParams();return p.trofeuQtd*p.trofeuVal+p.arbQtd*p.arbVal+p.premiacao+p.trafegoPago;}
+function getParams(){return Object.assign({uniforme:70,trofeuQtd:24,trofeuVal:33,arbQtd:8,arbVal:300,premiacao:4040,trafegoPago:0,limpeza:0},S.params||{});}
+function calcDespesasFixas(){const p=getParams();return p.trofeuQtd*p.trofeuVal+p.arbQtd*p.arbVal+p.premiacao+p.trafegoPago+p.limpeza;}
 
 function fmt(n){return 'R$ '+Math.round(n).toLocaleString('pt-BR');}
 function preco(n){return PRECOS[Math.min(n,3)]||260;}
@@ -943,12 +947,13 @@ function updateEditChip(cb,key){
 function addJogador(){
   const nome=document.getElementById('j-nome').value.trim();
   const tel=document.getElementById('j-tel').value.trim();
+  const cpf=document.getElementById('j-cpf').value.trim();
   const cats=[...document.querySelectorAll('#cat-chips input:checked')].map(c=>c.value);
   if(!nome){toast('Informe o nome do jogador','pink');return;}
   if(!cats.length){toast('Selecione ao menos uma categoria','pink');return;}
-  S.jogadores.push({id:uid(),nome,tel,gen:document.getElementById('j-gen').value,tam:document.getElementById('j-tam').value,tamShort:document.getElementById('j-tam-short').value,cats,pag:document.getElementById('j-pag').value});
+  S.jogadores.push({id:uid(),nome,tel,cpf,gen:document.getElementById('j-gen').value,tam:document.getElementById('j-tam').value,tamShort:document.getElementById('j-tam-short').value,cats,pag:document.getElementById('j-pag').value});
   save();
-  document.getElementById('j-nome').value=''; document.getElementById('j-tel').value='';
+  document.getElementById('j-nome').value=''; document.getElementById('j-tel').value=''; document.getElementById('j-cpf').value='';
   document.getElementById('j-gen').value='M'; document.getElementById('j-tam').value=''; document.getElementById('j-tam-short').value='';
   document.querySelectorAll('#cat-chips input').forEach(c=>c.checked=false);
   ['Bronze','Iniciante','Mista','Estreante'].forEach(k=>document.getElementById('chip-'+k).className='cat-chip');
@@ -975,6 +980,7 @@ function abrirEditar(id){
   editingId=id;
   document.getElementById('e-nome').value=j.nome;
   document.getElementById('e-tel').value=j.tel||'';
+  document.getElementById('e-cpf').value=j.cpf||'';
   document.getElementById('e-gen').value=j.gen||'M';
   document.getElementById('e-tam').value=j.tam||'';
   document.getElementById('e-tam-short').value=j.tamShort||'';
@@ -996,6 +1002,7 @@ function salvarEdicao(){
   const cats=[...document.querySelectorAll('#modal-edit .cat-chip input:checked')].map(c=>c.value);
   if(!nome||!cats.length){toast('Preencha nome e categorias','pink');return;}
   j.nome=nome; j.tel=document.getElementById('e-tel').value.trim();
+  j.cpf=document.getElementById('e-cpf').value.trim();
   j.gen=document.getElementById('e-gen').value;
   j.tam=document.getElementById('e-tam').value;
   j.tamShort=document.getElementById('e-tam-short').value;
@@ -1018,12 +1025,15 @@ function renderJogadores(){
   const fcat=document.getElementById('filtro-cat').value;
   const fpag=document.getElementById('filtro-pag').value;
   const funif=document.getElementById('filtro-unif').value;
+  const fcpf=document.getElementById('filtro-cpf').value;
   const lista=S.jogadores.filter(j=>{
     if(busca&&!j.nome.toLowerCase().includes(busca)&&!(j.tel||'').toLowerCase().includes(busca))return false;
     if(fcat&&!j.cats.includes(fcat))return false;
     if(fpag&&j.pag!==fpag)return false;
     if(funif==='pendente'&&j.tam&&j.tamShort)return false;
     if(funif==='completo'&&(!j.tam||!j.tamShort))return false;
+    if(fcpf==='pendente'&&j.cpf)return false;
+    if(fcpf==='completo'&&!j.cpf)return false;
     return true;
   });
   const tb=document.getElementById('jog-tbody');
@@ -1034,6 +1044,7 @@ function renderJogadores(){
     <td style="color:var(--text3);font-size:12px;">${S.jogadores.indexOf(j)+1}</td>
     <td style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:600;">${j.nome}</td>
     <td style="color:var(--text3);font-size:12px;">${j.tel||'—'}</td>
+    <td style="color:var(--text3);font-size:12px;">${j.cpf||'—'}</td>
     <td><span class="badge ${j.gen==='F'?'badge-pink':'badge-purple'}">${j.gen==='F'?'Fem':'Masc'}</span></td>
     <td><span class="badge badge-gray">${j.tam||'—'}</span></td>
     <td><span class="badge badge-gray">${j.tamShort||'—'}</span></td>
@@ -1199,10 +1210,11 @@ function calcFin(){
   const trofeu=p.trofeuQtd*p.trofeuVal;
   const arbitro=p.arbQtd*p.arbVal;
   const trafego=p.trafegoPago;
-  const gastos=uniforme+trofeu+arbitro+p.premiacao+trafego;
+  const limpeza=p.limpeza;
+  const gastos=uniforme+trofeu+arbitro+p.premiacao+trafego+limpeza;
   const lucro=totalRec-gastos;
   const recPago=S.jogadores.filter(j=>j.pag==='Pago').reduce((s,j)=>s+preco(j.cats.length),0);
-  return{patTotal,recInsc,totalRec,nJog,uniforme,trofeu,arbitro,trafego,gastos,lucro,recPago,p};
+  return{patTotal,recInsc,totalRec,nJog,uniforme,trofeu,arbitro,trafego,limpeza,gastos,lucro,recPago,p};
 }
 function renderFinanceiro(){
   const f=calcFin();
@@ -1226,6 +1238,7 @@ function renderFinanceiro(){
     <div class="fin-row"><span class="fin-label">Árbitros (${p.arbQtd} × R$${p.arbVal})</span><span class="fin-value">${fmt(f.arbitro)}</span></div>
     <div class="fin-row"><span class="fin-label">Premiação total</span><span class="fin-value">${fmt(p.premiacao)}</span></div>
     <div class="fin-row"><span class="fin-label">Tráfego pago (Ads)</span><span class="fin-value">${fmt(f.trafego)}</span></div>
+    <div class="fin-row"><span class="fin-label">Limpeza</span><span class="fin-value">${fmt(f.limpeza)}</span></div>
     <div class="fin-total"><span>Total despesas</span><span style="color:var(--pink);">${fmt(f.gastos)}</span></div>`;
   document.getElementById('p-uniforme').value=p.uniforme;
   document.getElementById('p-trofeu-qtd').value=p.trofeuQtd;
@@ -1234,6 +1247,7 @@ function renderFinanceiro(){
   document.getElementById('p-arb-val').value=p.arbVal;
   document.getElementById('p-premiacao').value=p.premiacao;
   document.getElementById('p-trafego').value=p.trafegoPago;
+  document.getElementById('p-limpeza').value=p.limpeza;
   renderUniformes();
   simular();
 }
@@ -1319,6 +1333,7 @@ function salvarParametros(){
     arbVal:parseInt(document.getElementById('p-arb-val').value)||300,
     premiacao:parseInt(document.getElementById('p-premiacao').value)||4040,
     trafegoPago:parseInt(document.getElementById('p-trafego').value)||0,
+    limpeza:parseInt(document.getElementById('p-limpeza').value)||0,
   };
   save(); renderFinanceiro(); toast('Parâmetros salvos!');
 }
@@ -1420,8 +1435,8 @@ function renderDashboard(){
 
 function exportarCSV(){
   if(!S.jogadores.length){toast('Nenhum jogador para exportar','pink');return;}
-  const header=['#','Nome','Contato','Categorias','Valor','Pagamento','Camiseta','Short'];
-  const rows=S.jogadores.map((j,i)=>[i+1,j.nome,j.tel||'',j.cats.join(' | '),preco(j.cats.length),j.pag,j.tam||'—',j.tamShort||'—']);
+  const header=['#','Nome','Contato','CPF','Categorias','Valor','Pagamento','Camiseta','Short'];
+  const rows=S.jogadores.map((j,i)=>[i+1,j.nome,j.tel||'',j.cpf||'',j.cats.join(' | '),preco(j.cats.length),j.pag,j.tam||'—',j.tamShort||'—']);
   const csv=[header,...rows].map(r=>r.map(c=>`"${c}"`).join(',')).join('\n');
   const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='premia-cup.csv';a.click();
