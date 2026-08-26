@@ -240,6 +240,7 @@ th,td{padding:10px 12px;}
     <div class="nav-label">Financeiro</div>
     <div class="nav-item" tabindex="0" role="button" onkeydown="navKey(event)" onclick="goTo('financeiro',this)"><span class="nav-icon">📊</span> Financeiro</div>
     <div class="nav-item" tabindex="0" role="button" onkeydown="navKey(event)" onclick="goTo('patrocinios',this)"><span class="nav-icon">🤝</span> Patrocínios<span class="nav-badge" id="nb-pat">0</span></div>
+    <div class="nav-item" tabindex="0" role="button" onkeydown="navKey(event)" onclick="goTo('uniformes',this)"><span class="nav-icon">👕</span> Uniformes</div>
     <div class="nav-label">Análise</div>
     <div class="nav-item" tabindex="0" role="button" onkeydown="navKey(event)" onclick="goTo('dashboard',this)"><span class="nav-icon">📈</span> Dashboard</div>
     <div class="nav-item" tabindex="0" role="button" onkeydown="navKey(event)" onclick="goTo('marketing',this)"><span class="nav-icon">📱</span> Marketing<span class="nav-badge" id="nb-mkt">0</span></div>
@@ -413,7 +414,7 @@ th,td{padding:10px 12px;}
       </div>
       <div class="card-body">
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;">
-          <div style="display:flex;flex-direction:column;gap:5px;"><label>Custo uniforme (por jogador)</label><input type="number" id="p-uniforme" min="0" placeholder="70"></div>
+          <div style="display:flex;flex-direction:column;gap:5px;"><label>Custo uniforme por jogador (só simulador)</label><input type="number" id="p-uniforme" min="0" placeholder="70"></div>
           <div style="display:flex;flex-direction:column;gap:5px;"><label>Qtd troféus</label><input type="number" id="p-trofeu-qtd" min="0" placeholder="24"></div>
           <div style="display:flex;flex-direction:column;gap:5px;"><label>Custo por troféu</label><input type="number" id="p-trofeu-val" min="0" placeholder="33"></div>
           <div style="display:flex;flex-direction:column;gap:5px;"><label>Qtd árbitros</label><input type="number" id="p-arb-qtd" min="0" placeholder="8"></div>
@@ -429,10 +430,6 @@ th,td{padding:10px 12px;}
       <div class="card"><div class="card-header"><div class="card-title">📉 Despesas</div></div><div class="card-body" id="fin-despesas"></div></div>
     </div>
     <div class="card">
-      <div class="card-header"><div class="card-title">👕 Resumo de <span class="accent">Uniformes</span></div></div>
-      <div class="card-body" id="fin-uniformes"></div>
-    </div>
-    <div class="card">
       <div class="card-header"><div class="card-title">🎛 Simulador de <span class="accent">Cenários</span></div></div>
       <div class="card-body">
         <div class="sim-grid">
@@ -443,6 +440,22 @@ th,td{padding:10px 12px;}
         </div>
         <div class="sim-result" id="sim-result"></div>
       </div>
+    </div>
+  </div>
+
+  <!-- UNIFORMES -->
+  <div class="page" id="page-uniformes">
+    <div class="page-header"><div class="page-header-title">Uniformes</div><div class="page-header-sub">pedido fechado × cadastros dos atletas</div></div>
+    <div class="metrics" id="unif-metrics"></div>
+    <div id="unif-alert"></div>
+    <div id="unif-tabelas"></div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">📦 Pedido <span class="accent">BigWolf</span> — orçamento fechado</div></div>
+      <div class="card-body" id="unif-orcamento"></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">👕 Distribuição de <span class="accent">tamanhos</span></div></div>
+      <div class="card-body" id="fin-uniformes"></div>
     </div>
   </div>
 
@@ -888,6 +901,23 @@ const PREMIOS = {Bronze:[1000,500,250,100],Iniciante:[600,350,150,0],'Mista Inic
 const POSICOES = ['🥇 1º lugar','🥈 2º lugar','🥉 3º lugar','4º lugar'];
 const IDEAL = 96;
 const PAT_BASE = 800;
+
+// ===== PEDIDO DE UNIFORMES (orçamento fechado BigWolf — não varia com inscrições) =====
+const UNIFORME_TOTAL = 12810;
+const UNIFORME_PEDIDO = {
+  camMasc:  {PP:1,P:10,M:80,G:45,GG:5,XG:1,XG1:1,XG2:0,XG3:0},
+  camFem:   {PP:1,P:17,M:13,G:4,GG:0,XG:0,XG1:0,XG2:0,XG3:0},
+  shortMasc:{P:11,M:81,G:45,GG:4,XG:2},
+  shortFem: {P:17,M:14,G:4,GG:0,XG:0},
+};
+const UNIFORME_ORCAMENTO_ITENS = [
+  {nome:'Camiseta MC Raglan — atletas masc.',qtd:143,valor:5720},
+  {nome:'Calção MC sem bolso — atletas masc.',qtd:143,valor:4290},
+  {nome:'Baby Look Raglan — atletas fem.',qtd:35,valor:1050},
+  {nome:'Shorts base curvada — atletas fem.',qtd:35,valor:1400},
+  {nome:'Camiseta + calção — staff masc.',qtd:6,valor:210},
+  {nome:'Baby look + short — staff fem.',qtd:4,valor:140},
+];
 let editingId = null;
 let chartDuplas=null,chartFin=null,chartCats=null;
 
@@ -913,11 +943,12 @@ function goTo(id,btn){
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
   btn.classList.add('active');
-  const titles={jogadores:'Jogadores',conferencia:'Conferência',categorias:'Categorias',premiacao:'Premiação',financeiro:'Financeiro',patrocinios:'Patrocínios',dashboard:'Dashboard',marketing:'Marketing',story:'Story Dupla',chaveamento:'Chaveamento',simulacao:'Simulação'};
+  const titles={jogadores:'Jogadores',conferencia:'Conferência',categorias:'Categorias',premiacao:'Premiação',financeiro:'Financeiro',patrocinios:'Patrocínios',uniformes:'Uniformes',dashboard:'Dashboard',marketing:'Marketing',story:'Story Dupla',chaveamento:'Chaveamento',simulacao:'Simulação'};
   document.getElementById('topbar-title').textContent=titles[id]||id;
   if(id==='financeiro')renderFinanceiro();
   if(id==='categorias')renderCategorias();
   if(id==='patrocinios')renderPatrocinios();
+  if(id==='uniformes'){renderUniformes();renderUniformeControle();}
   if(id==='dashboard')renderDashboard();
   if(id==='marketing')renderMarketing();
   if(id==='chaveamento')renderChaveamento();
@@ -1206,7 +1237,7 @@ function calcFin(){
   const recInsc=S.jogadores.reduce((s,j)=>s+preco(j.cats.length),0);
   const totalRec=recInsc+patTotal;
   const nJog=S.jogadores.length;
-  const uniforme=nJog*p.uniforme;
+  const uniforme=UNIFORME_TOTAL;
   const trofeu=p.trofeuQtd*p.trofeuVal;
   const arbitro=p.arbQtd*p.arbVal;
   const trafego=p.trafegoPago;
@@ -1233,7 +1264,7 @@ function renderFinanceiro(){
     <div class="fin-row"><span class="fin-label">Patrocínios confirmados</span><span class="fin-value" style="color:var(--lime);">${fmt(f.patTotal)}</span></div>
     <div class="fin-total"><span>Total receitas</span><span style="color:var(--lime);">${fmt(f.totalRec)}</span></div>`;
   document.getElementById('fin-despesas').innerHTML=`
-    <div class="fin-row"><span class="fin-label">Uniformes (${f.nJog} × R$${p.uniforme})</span><span class="fin-value">${fmt(f.uniforme)}</span></div>
+    <div class="fin-row"><span class="fin-label">Uniformes (pedido fechado BigWolf)</span><span class="fin-value">${fmt(f.uniforme)}</span></div>
     <div class="fin-row"><span class="fin-label">Troféus (${p.trofeuQtd} × R$${p.trofeuVal})</span><span class="fin-value">${fmt(f.trofeu)}</span></div>
     <div class="fin-row"><span class="fin-label">Árbitros (${p.arbQtd} × R$${p.arbVal})</span><span class="fin-value">${fmt(f.arbitro)}</span></div>
     <div class="fin-row"><span class="fin-label">Premiação total</span><span class="fin-value">${fmt(p.premiacao)}</span></div>
@@ -1248,7 +1279,6 @@ function renderFinanceiro(){
   document.getElementById('p-premiacao').value=p.premiacao;
   document.getElementById('p-trafego').value=p.trafegoPago;
   document.getElementById('p-limpeza').value=p.limpeza;
-  renderUniformes();
   simular();
 }
 function renderUniformes(){
@@ -1324,6 +1354,94 @@ function renderUniformes(){
       ${tabela('Short — Feminino',contFS,totalF,'pink',TAM_SHORT)}
     </div>`;
 }
+
+function renderUniformeControle(){
+  const TAM_CAMISETA=['PP','P','M','G','GG','XG','XG1','XG2','XG3'];
+  const TAM_SHORT=['P','M','G','GG','XG'];
+  const solCamM={},solCamF={},solShM={},solShF={};
+  TAM_CAMISETA.forEach(t=>{solCamM[t]=0;solCamF[t]=0;});
+  TAM_SHORT.forEach(t=>{solShM[t]=0;solShF[t]=0;});
+  S.jogadores.forEach(j=>{
+    const isF=j.gen==='F';
+    if(j.tam){ if(isF){ if(solCamF[j.tam]!==undefined)solCamF[j.tam]++; } else { if(solCamM[j.tam]!==undefined)solCamM[j.tam]++; } }
+    if(j.tamShort){ if(isF){ if(solShF[j.tamShort]!==undefined)solShF[j.tamShort]++; } else { if(solShM[j.tamShort]!==undefined)solShM[j.tamShort]++; } }
+  });
+  const semTam=S.jogadores.filter(j=>!j.tam).length;
+  const semShort=S.jogadores.filter(j=>!j.tamShort).length;
+  const comTam=S.jogadores.length-semTam;
+
+  const pedidoTotal=Object.values(UNIFORME_PEDIDO).reduce((s,m)=>s+Object.values(m).reduce((a,b)=>a+b,0),0);
+  let solicitadoTotal=0, semFolga=0, faltando=0;
+  const garments=[
+    {ped:UNIFORME_PEDIDO.camMasc, sol:solCamM, tamanhos:TAM_CAMISETA},
+    {ped:UNIFORME_PEDIDO.camFem,  sol:solCamF, tamanhos:TAM_CAMISETA},
+    {ped:UNIFORME_PEDIDO.shortMasc,sol:solShM, tamanhos:TAM_SHORT},
+    {ped:UNIFORME_PEDIDO.shortFem, sol:solShF, tamanhos:TAM_SHORT},
+  ];
+  garments.forEach(g=>g.tamanhos.forEach(t=>{
+    const ped=g.ped[t]||0, sol=g.sol[t]||0;
+    solicitadoTotal+=sol;
+    if(ped>0&&ped-sol===0)semFolga++;
+    if(ped-sol<0)faltando++;
+  }));
+
+  document.getElementById('unif-metrics').innerHTML=`
+    <div class="metric-card lime"><div class="mc-label">Pedido total (atletas)</div><div class="mc-value">${pedidoTotal}</div></div>
+    <div class="metric-card purple"><div class="mc-label">Cadastrados com tamanho</div><div class="mc-value purple">${comTam} / ${S.jogadores.length}</div></div>
+    <div class="metric-card ${faltando?'pink':'amber'}"><div class="mc-label">Tamanhos sem folga</div><div class="mc-value ${faltando?'red':'amber'}">${semFolga}</div></div>`;
+
+  const alertEl=document.getElementById('unif-alert');
+  if(faltando){
+    alertEl.innerHTML=`<div class="alert alert-red">⚠️ Faltam peças em ${faltando} tamanho${faltando!==1?'s':''} — o pedido já não cobre o que foi solicitado. Veja as tabelas abaixo.</div>`;
+  }else{
+    const pend=Math.max(semTam,semShort);
+    alertEl.innerHTML=`<div class="alert alert-green">✅ O pedido cobre toda a demanda atual.</div>
+      ${pend?`<div class="alert alert-amber">⚠️ ${pend} atleta${pend!==1?'s ainda não escolheram':' ainda não escolheu'} tamanho, e ${semFolga} tamanho${semFolga!==1?'s já estão':' já está'} sem folga (saldo zero) — cobre essas fichas antes de fechar reposição.</div>`:''}`;
+  }
+
+  const saldoBadge=(ped,sol)=>{
+    const s=ped-sol;
+    const cls=s<0?'badge-pink':(s===0?'badge-amber':'badge-lime');
+    const label=s>0?'+'+s:String(s);
+    return`<span class="badge ${cls}">${label}</span>`;
+  };
+  const tabelaControle=(titulo,corDot,g)=>{
+    let tPed=0,tSol=0;
+    const linhas=g.tamanhos.filter(t=>(g.ped[t]||0)>0||(g.sol[t]||0)>0).map(t=>{
+      const ped=g.ped[t]||0, sol=g.sol[t]||0;
+      tPed+=ped; tSol+=sol;
+      return`<tr><td>${t}</td><td style="text-align:right;">${ped}</td><td style="text-align:right;">${sol}</td><td style="text-align:right;">${saldoBadge(ped,sol)}</td></tr>`;
+    }).join('');
+    return`<div class="card" style="margin-bottom:12px;">
+      <div class="card-header"><div class="card-title"><span style="width:9px;height:9px;border-radius:50%;background:${corDot};display:inline-block;"></span> ${titulo}</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:var(--text3);">Pedido <b style="color:var(--text2);">${tPed}</b> · Solicitado <b style="color:var(--text2);">${tSol}</b> · Saldo ${saldoBadge(tPed,tSol)}</div></div>
+      <div class="card-body" style="padding:0;">
+        <div class="table-wrap"><table>
+          <thead><tr><th>Tamanho</th><th style="text-align:right;">Pedido</th><th style="text-align:right;">Solicitado</th><th style="text-align:right;">Saldo</th></tr></thead>
+          <tbody>${linhas}</tbody>
+        </table></div>
+      </div>
+    </div>`;
+  };
+  document.getElementById('unif-tabelas').innerHTML=`
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:0 16px;">
+      ${tabelaControle('Camiseta MC Raglan (masc.)','var(--purple-light)',{ped:UNIFORME_PEDIDO.camMasc,sol:solCamM,tamanhos:TAM_CAMISETA})}
+      ${tabelaControle('Baby Look Raglan (fem.)','var(--pink)',{ped:UNIFORME_PEDIDO.camFem,sol:solCamF,tamanhos:TAM_CAMISETA})}
+      ${tabelaControle('Calção sem bolso (masc.)','var(--purple-light)',{ped:UNIFORME_PEDIDO.shortMasc,sol:solShM,tamanhos:TAM_SHORT})}
+      ${tabelaControle('Shorts base curvada (fem.)','var(--pink)',{ped:UNIFORME_PEDIDO.shortFem,sol:solShF,tamanhos:TAM_SHORT})}
+    </div>`;
+
+  document.getElementById('unif-orcamento').innerHTML=`
+    <div class="table-wrap"><table>
+      <thead><tr><th>Item</th><th style="text-align:right;">Qtd.</th><th style="text-align:right;">Valor</th></tr></thead>
+      <tbody>
+        ${UNIFORME_ORCAMENTO_ITENS.map(i=>`<tr><td>${i.nome}</td><td style="text-align:right;">${i.qtd}</td><td style="text-align:right;">${fmt(i.valor)}</td></tr>`).join('')}
+        <tr><td style="font-weight:700;color:var(--text3);font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;font-size:11px;letter-spacing:.06em;">Total</td><td></td><td style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--lime2);">${fmt(UNIFORME_TOTAL)}</td></tr>
+      </tbody>
+    </table></div>
+    <div style="margin-top:12px;font-size:12px;color:var(--text3);">Valor fechado com a BigWolf — não varia com o número de inscritos. Validade do orçamento: 15 dias. Pagamento: 50% na confirmação + 50% e frete na entrega.</div>`;
+}
+
 function salvarParametros(){
   S.params={
     uniforme:parseInt(document.getElementById('p-uniforme').value)||70,
@@ -1637,7 +1755,7 @@ function removeNameAlias(i){
 }
 function renderConferencia(){renderAliasList();}
 
-function renderAll(){renderJogadores();renderMetricas();renderPremiacao();renderPatrocinios();simular();}
+function renderAll(){renderJogadores();renderMetricas();renderPremiacao();renderPatrocinios();renderUniformes();renderUniformeControle();simular();}
 
 // ===== CHAVEAMENTO =====
 function calcRoundsWB(n){ return Math.ceil(Math.log2(n)); }
