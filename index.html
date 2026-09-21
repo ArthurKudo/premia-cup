@@ -445,12 +445,26 @@ th,td{padding:10px 12px;}
 
   <!-- UNIFORMES -->
   <div class="page" id="page-uniformes">
-    <div class="page-header"><div class="page-header-title">Uniformes</div><div class="page-header-sub">pedido fechado × cadastros dos atletas</div></div>
+    <div class="page-header">
+      <div class="page-header-title">Uniformes</div>
+      <div class="page-header-sub">pedido BigWolf × cadastros dos atletas — quantidades editáveis</div>
+    </div>
     <div class="metrics" id="unif-metrics"></div>
     <div id="unif-alert"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin:4px 0 14px;">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:var(--text3);">Edite as quantidades pedidas direto nas tabelas abaixo (colunas em destaque).</div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-sm btn-lime" onclick="salvarUniformePedido()">💾 Salvar pedido</button>
+        <button class="btn btn-sm" onclick="exportarPlanilhaUniformes()">⬇ Planilha BigWolf</button>
+      </div>
+    </div>
     <div id="unif-tabelas"></div>
     <div class="card">
-      <div class="card-header"><div class="card-title">📦 Pedido <span class="accent">BigWolf</span> — orçamento fechado</div></div>
+      <div class="card-header"><div class="card-title">🧑‍💼 Uniformes de <span class="accent">staff</span></div></div>
+      <div class="card-body" id="unif-staff"></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">📦 Pedido <span class="accent">BigWolf</span> — orçamento</div></div>
       <div class="card-body" id="unif-orcamento"></div>
     </div>
     <div class="card">
@@ -804,6 +818,7 @@ th,td{padding:10px 12px;}
 <div class="toast" id="toast"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
 <script>
@@ -835,6 +850,7 @@ async function loadFromCloud() {
     if(!S.chvParams) S.chvParams = {};
     if(!S.nameAliases) S.nameAliases = {};
     if(!S.params) S.params = {uniforme:70,trofeuQtd:24,trofeuVal:33,arbQtd:8,arbVal:300,premiacao:4040,limpeza:0};
+    if(!S.uniformePedido) S.uniformePedido = JSON.parse(JSON.stringify(UNIFORME_PEDIDO_PADRAO));
     if(!S.sponsors) S.sponsors = [
       {id:1,nome:'Lonu',cat:'Ouro (R$ 800)',val:0,status:'Confirmado'},
       {id:2,nome:'JMP',cat:'Prata (R$ 400)',val:400,status:'Confirmado'},
@@ -893,31 +909,44 @@ function hideSavingBar() {
   setTimeout(()=>b.style.width='0',400);
 }
 
+// ===== PEDIDO DE UNIFORMES (BigWolf) — quantidades editáveis pela aba Uniformes =====
+const TAM_CAMISETA = ['PP','P','M','G','GG','XG','XG1','XG2','XG3'];
+const TAM_SHORT = ['P','M','G','GG','XG'];
+const UNIFORME_GRUPOS = [
+  {chave:'camMasc',      nome:'Camiseta MC Raglan — atletas masc.',  tamanhos:TAM_CAMISETA, preco:40, atleta:true},
+  {chave:'shortMasc',    nome:'Calção MC sem bolso — atletas masc.', tamanhos:TAM_SHORT,    preco:30, atleta:true},
+  {chave:'camFem',       nome:'Baby Look Raglan — atletas fem.',     tamanhos:TAM_CAMISETA, preco:30, atleta:true},
+  {chave:'shortFem',     nome:'Shorts base curvada — atletas fem.',  tamanhos:TAM_SHORT,    preco:40, atleta:true},
+  {chave:'camMascStaff', nome:'Camiseta MC Raglan — staff masc.',    tamanhos:TAM_CAMISETA, preco:40, atleta:false},
+  {chave:'shortMascStaff',nome:'Calção MC sem bolso — staff masc.',  tamanhos:TAM_SHORT,    preco:30, atleta:false},
+  {chave:'camFemStaff',  nome:'Baby Look Raglan — staff fem.',       tamanhos:TAM_CAMISETA, preco:30, atleta:false},
+  {chave:'shortFemStaff',nome:'Shorts base curvada — staff fem.',    tamanhos:TAM_SHORT,    preco:40, atleta:false},
+];
+const UNIFORME_PEDIDO_PADRAO = {
+  camMasc:  {PP:1,P:10,M:80,G:45,GG:5,XG:1,XG1:1,XG2:0,XG3:0},
+  camFem:   {PP:1,P:17,M:13,G:4,GG:0,XG:0,XG1:0,XG2:0,XG3:0},
+  shortMasc:{P:11,M:81,G:45,GG:4,XG:2},
+  shortFem: {P:17,M:14,G:4,GG:0,XG:0},
+  camMascStaff:  {M:1,G:1,GG:1},
+  shortMascStaff:{M:1,G:1,GG:1},
+  camFemStaff:   {P:1,M:1},
+  shortFemStaff: {P:1,M:1},
+};
+function getUniformePedido(){ return S.uniformePedido || UNIFORME_PEDIDO_PADRAO; }
+function qtdGrupo(grupo){ return Object.values(grupo||{}).reduce((a,b)=>a+(b||0),0); }
+function calcUniformeTotal(){
+  const p=getUniformePedido();
+  return UNIFORME_GRUPOS.reduce((total,g)=>total+qtdGrupo(p[g.chave])*g.preco,0);
+}
+
 // ===== STATE =====
-let S = {jogadores:[],resultados:{},sponsors:[],duplas:{},params:{uniforme:70,trofeuQtd:24,trofeuVal:33,arbQtd:8,arbVal:300,premiacao:4040,limpeza:0}};
+let S = {jogadores:[],resultados:{},sponsors:[],duplas:{},params:{uniforme:70,trofeuQtd:24,trofeuVal:33,arbQtd:8,arbVal:300,premiacao:4040,limpeza:0},uniformePedido:JSON.parse(JSON.stringify(UNIFORME_PEDIDO_PADRAO))};
 const CATS = ['Bronze','Iniciante','Mista Iniciante','Estreante'];
 const PRECOS = {1:120,2:200,3:260};
 const PREMIOS = {Bronze:[1000,500,250,100],Iniciante:[600,350,150,0],'Mista Iniciante':[450,300,100,0],Estreante:[240,0,0,0]};
 const POSICOES = ['🥇 1º lugar','🥈 2º lugar','🥉 3º lugar','4º lugar'];
 const IDEAL = 96;
 const PAT_BASE = 800;
-
-// ===== PEDIDO DE UNIFORMES (orçamento fechado BigWolf — não varia com inscrições) =====
-const UNIFORME_TOTAL = 12810;
-const UNIFORME_PEDIDO = {
-  camMasc:  {PP:1,P:10,M:80,G:45,GG:5,XG:1,XG1:1,XG2:0,XG3:0},
-  camFem:   {PP:1,P:17,M:13,G:4,GG:0,XG:0,XG1:0,XG2:0,XG3:0},
-  shortMasc:{P:11,M:81,G:45,GG:4,XG:2},
-  shortFem: {P:17,M:14,G:4,GG:0,XG:0},
-};
-const UNIFORME_ORCAMENTO_ITENS = [
-  {nome:'Camiseta MC Raglan — atletas masc.',qtd:143,valor:5720},
-  {nome:'Calção MC sem bolso — atletas masc.',qtd:143,valor:4290},
-  {nome:'Baby Look Raglan — atletas fem.',qtd:35,valor:1050},
-  {nome:'Shorts base curvada — atletas fem.',qtd:35,valor:1400},
-  {nome:'Camiseta + calção — staff masc.',qtd:6,valor:210},
-  {nome:'Baby look + short — staff fem.',qtd:4,valor:140},
-];
 let editingId = null;
 let chartDuplas=null,chartFin=null,chartCats=null;
 
@@ -1237,7 +1266,7 @@ function calcFin(){
   const recInsc=S.jogadores.reduce((s,j)=>s+preco(j.cats.length),0);
   const totalRec=recInsc+patTotal;
   const nJog=S.jogadores.length;
-  const uniforme=UNIFORME_TOTAL;
+  const uniforme=calcUniformeTotal();
   const trofeu=p.trofeuQtd*p.trofeuVal;
   const arbitro=p.arbQtd*p.arbVal;
   const trafego=p.trafegoPago;
@@ -1264,7 +1293,7 @@ function renderFinanceiro(){
     <div class="fin-row"><span class="fin-label">Patrocínios confirmados</span><span class="fin-value" style="color:var(--lime);">${fmt(f.patTotal)}</span></div>
     <div class="fin-total"><span>Total receitas</span><span style="color:var(--lime);">${fmt(f.totalRec)}</span></div>`;
   document.getElementById('fin-despesas').innerHTML=`
-    <div class="fin-row"><span class="fin-label">Uniformes (pedido fechado BigWolf)</span><span class="fin-value">${fmt(f.uniforme)}</span></div>
+    <div class="fin-row"><span class="fin-label">Uniformes (pedido BigWolf)</span><span class="fin-value">${fmt(f.uniforme)}</span></div>
     <div class="fin-row"><span class="fin-label">Troféus (${p.trofeuQtd} × R$${p.trofeuVal})</span><span class="fin-value">${fmt(f.trofeu)}</span></div>
     <div class="fin-row"><span class="fin-label">Árbitros (${p.arbQtd} × R$${p.arbVal})</span><span class="fin-value">${fmt(f.arbitro)}</span></div>
     <div class="fin-row"><span class="fin-label">Premiação total</span><span class="fin-value">${fmt(p.premiacao)}</span></div>
@@ -1356,8 +1385,7 @@ function renderUniformes(){
 }
 
 function renderUniformeControle(){
-  const TAM_CAMISETA=['PP','P','M','G','GG','XG','XG1','XG2','XG3'];
-  const TAM_SHORT=['P','M','G','GG','XG'];
+  const p=getUniformePedido();
   const solCamM={},solCamF={},solShM={},solShF={};
   TAM_CAMISETA.forEach(t=>{solCamM[t]=0;solCamF[t]=0;});
   TAM_SHORT.forEach(t=>{solShM[t]=0;solShF[t]=0;});
@@ -1370,29 +1398,28 @@ function renderUniformeControle(){
   const semShort=S.jogadores.filter(j=>!j.tamShort).length;
   const comTam=S.jogadores.length-semTam;
 
-  const pedidoTotal=Object.values(UNIFORME_PEDIDO).reduce((s,m)=>s+Object.values(m).reduce((a,b)=>a+b,0),0);
-  let solicitadoTotal=0, semFolga=0, faltando=0;
-  const garments=[
-    {ped:UNIFORME_PEDIDO.camMasc, sol:solCamM, tamanhos:TAM_CAMISETA},
-    {ped:UNIFORME_PEDIDO.camFem,  sol:solCamF, tamanhos:TAM_CAMISETA},
-    {ped:UNIFORME_PEDIDO.shortMasc,sol:solShM, tamanhos:TAM_SHORT},
-    {ped:UNIFORME_PEDIDO.shortFem, sol:solShF, tamanhos:TAM_SHORT},
+  const atletaGrupos=[
+    {chave:'camMasc',  titulo:'Camiseta MC Raglan (masc.)', cor:'var(--purple-light)', sol:solCamM, tamanhos:TAM_CAMISETA},
+    {chave:'camFem',   titulo:'Baby Look Raglan (fem.)',     cor:'var(--pink)',         sol:solCamF, tamanhos:TAM_CAMISETA},
+    {chave:'shortMasc',titulo:'Calção sem bolso (masc.)',    cor:'var(--purple-light)', sol:solShM,  tamanhos:TAM_SHORT},
+    {chave:'shortFem', titulo:'Shorts base curvada (fem.)',  cor:'var(--pink)',         sol:solShF,  tamanhos:TAM_SHORT},
   ];
-  garments.forEach(g=>g.tamanhos.forEach(t=>{
-    const ped=g.ped[t]||0, sol=g.sol[t]||0;
-    solicitadoTotal+=sol;
+  const pedidoTotalAtletas=atletaGrupos.reduce((s,g)=>s+qtdGrupo(p[g.chave]),0);
+  let semFolga=0, faltando=0;
+  atletaGrupos.forEach(g=>g.tamanhos.forEach(t=>{
+    const ped=(p[g.chave]||{})[t]||0, sol=g.sol[t]||0;
     if(ped>0&&ped-sol===0)semFolga++;
     if(ped-sol<0)faltando++;
   }));
 
   document.getElementById('unif-metrics').innerHTML=`
-    <div class="metric-card lime"><div class="mc-label">Pedido total (atletas)</div><div class="mc-value">${pedidoTotal}</div></div>
+    <div class="metric-card lime"><div class="mc-label">Pedido total (atletas)</div><div class="mc-value">${pedidoTotalAtletas}</div></div>
     <div class="metric-card purple"><div class="mc-label">Cadastrados com tamanho</div><div class="mc-value purple">${comTam} / ${S.jogadores.length}</div></div>
     <div class="metric-card ${faltando?'pink':'amber'}"><div class="mc-label">Tamanhos sem folga</div><div class="mc-value ${faltando?'red':'amber'}">${semFolga}</div></div>`;
 
   const alertEl=document.getElementById('unif-alert');
   if(faltando){
-    alertEl.innerHTML=`<div class="alert alert-red">⚠️ Faltam peças em ${faltando} tamanho${faltando!==1?'s':''} — o pedido já não cobre o que foi solicitado. Veja as tabelas abaixo.</div>`;
+    alertEl.innerHTML=`<div class="alert alert-red">⚠️ Faltam peças em ${faltando} tamanho${faltando!==1?'s':''} — o pedido já não cobre o que foi solicitado. Ajuste as quantidades abaixo.</div>`;
   }else{
     const pend=Math.max(semTam,semShort);
     alertEl.innerHTML=`<div class="alert alert-green">✅ O pedido cobre toda a demanda atual.</div>
@@ -1405,15 +1432,16 @@ function renderUniformeControle(){
     const label=s>0?'+'+s:String(s);
     return`<span class="badge ${cls}">${label}</span>`;
   };
-  const tabelaControle=(titulo,corDot,g)=>{
+  const pedInput=(chave,t,ped)=>`<input type="number" min="0" value="${ped}" class="unif-ped-input" data-grp="${chave}" data-size="${t}" style="width:60px;text-align:right;padding:4px 8px;font-size:13px;">`;
+  const tabelaControle=(g)=>{
     let tPed=0,tSol=0;
-    const linhas=g.tamanhos.filter(t=>(g.ped[t]||0)>0||(g.sol[t]||0)>0).map(t=>{
-      const ped=g.ped[t]||0, sol=g.sol[t]||0;
+    const linhas=g.tamanhos.map(t=>{
+      const ped=(p[g.chave]||{})[t]||0, sol=g.sol[t]||0;
       tPed+=ped; tSol+=sol;
-      return`<tr><td>${t}</td><td style="text-align:right;">${ped}</td><td style="text-align:right;">${sol}</td><td style="text-align:right;">${saldoBadge(ped,sol)}</td></tr>`;
+      return`<tr><td>${t}</td><td style="text-align:right;">${pedInput(g.chave,t,ped)}</td><td style="text-align:right;">${sol}</td><td style="text-align:right;">${saldoBadge(ped,sol)}</td></tr>`;
     }).join('');
     return`<div class="card" style="margin-bottom:12px;">
-      <div class="card-header"><div class="card-title"><span style="width:9px;height:9px;border-radius:50%;background:${corDot};display:inline-block;"></span> ${titulo}</div>
+      <div class="card-header"><div class="card-title"><span style="width:9px;height:9px;border-radius:50%;background:${g.cor};display:inline-block;"></span> ${g.titulo}</div>
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:var(--text3);">Pedido <b style="color:var(--text2);">${tPed}</b> · Solicitado <b style="color:var(--text2);">${tSol}</b> · Saldo ${saldoBadge(tPed,tSol)}</div></div>
       <div class="card-body" style="padding:0;">
         <div class="table-wrap"><table>
@@ -1425,21 +1453,83 @@ function renderUniformeControle(){
   };
   document.getElementById('unif-tabelas').innerHTML=`
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:0 16px;">
-      ${tabelaControle('Camiseta MC Raglan (masc.)','var(--purple-light)',{ped:UNIFORME_PEDIDO.camMasc,sol:solCamM,tamanhos:TAM_CAMISETA})}
-      ${tabelaControle('Baby Look Raglan (fem.)','var(--pink)',{ped:UNIFORME_PEDIDO.camFem,sol:solCamF,tamanhos:TAM_CAMISETA})}
-      ${tabelaControle('Calção sem bolso (masc.)','var(--purple-light)',{ped:UNIFORME_PEDIDO.shortMasc,sol:solShM,tamanhos:TAM_SHORT})}
-      ${tabelaControle('Shorts base curvada (fem.)','var(--pink)',{ped:UNIFORME_PEDIDO.shortFem,sol:solShF,tamanhos:TAM_SHORT})}
+      ${atletaGrupos.map(tabelaControle).join('')}
     </div>`;
 
+  const staffGrupos=UNIFORME_GRUPOS.filter(g=>!g.atleta);
+  document.getElementById('unif-staff').innerHTML=`
+    <div class="table-wrap"><table>
+      <thead><tr><th>Item</th><th style="text-align:right;">Tamanhos (qtd. editável)</th><th style="text-align:right;">Qtd.</th></tr></thead>
+      <tbody>
+        ${staffGrupos.map(g=>{
+          const qtd=qtdGrupo(p[g.chave]);
+          const inputs=g.tamanhos.map(t=>{
+            const v=(p[g.chave]||{})[t]||0;
+            return`<span style="display:inline-flex;align-items:center;gap:4px;margin-right:10px;"><span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--text3);">${t}</span>${pedInput(g.chave,t,v)}</span>`;
+          }).join('');
+          return`<tr><td>${g.nome}</td><td>${inputs}</td><td style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:16px;">${qtd}</td></tr>`;
+        }).join('')}
+      </tbody>
+    </table></div>`;
+
+  const total=calcUniformeTotal();
   document.getElementById('unif-orcamento').innerHTML=`
     <div class="table-wrap"><table>
-      <thead><tr><th>Item</th><th style="text-align:right;">Qtd.</th><th style="text-align:right;">Valor</th></tr></thead>
+      <thead><tr><th>Item</th><th style="text-align:right;">Qtd.</th><th style="text-align:right;">Valor unit.</th><th style="text-align:right;">Valor total</th></tr></thead>
       <tbody>
-        ${UNIFORME_ORCAMENTO_ITENS.map(i=>`<tr><td>${i.nome}</td><td style="text-align:right;">${i.qtd}</td><td style="text-align:right;">${fmt(i.valor)}</td></tr>`).join('')}
-        <tr><td style="font-weight:700;color:var(--text3);font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;font-size:11px;letter-spacing:.06em;">Total</td><td></td><td style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--lime2);">${fmt(UNIFORME_TOTAL)}</td></tr>
+        ${UNIFORME_GRUPOS.map(g=>{
+          const qtd=qtdGrupo(p[g.chave]);
+          return`<tr><td>${g.nome}</td><td style="text-align:right;">${qtd}</td><td style="text-align:right;">${fmt(g.preco)}</td><td style="text-align:right;">${fmt(qtd*g.preco)}</td></tr>`;
+        }).join('')}
+        <tr><td style="font-weight:700;color:var(--text3);font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;font-size:11px;letter-spacing:.06em;">Total</td><td></td><td></td><td style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--lime2);">${fmt(total)}</td></tr>
       </tbody>
     </table></div>
-    <div style="margin-top:12px;font-size:12px;color:var(--text3);">Valor fechado com a BigWolf — não varia com o número de inscritos. Validade do orçamento: 15 dias. Pagamento: 50% na confirmação + 50% e frete na entrega.</div>`;
+    <div style="margin-top:12px;font-size:12px;color:var(--text3);">Baseado no pedido acordado com a BigWolf — valores unitários fixos, quantidades editáveis acima. Validade do orçamento original: 15 dias. Pagamento: 50% na confirmação + 50% e frete na entrega.</div>`;
+}
+
+function salvarUniformePedido(){
+  const novo={};
+  UNIFORME_GRUPOS.forEach(g=>{ novo[g.chave]={}; g.tamanhos.forEach(t=>novo[g.chave][t]=0); });
+  document.querySelectorAll('.unif-ped-input').forEach(inp=>{
+    const grp=inp.dataset.grp, t=inp.dataset.size;
+    if(novo[grp])novo[grp][t]=parseInt(inp.value)||0;
+  });
+  S.uniformePedido=novo;
+  save();
+  renderUniformeControle();
+  if(document.getElementById('page-financeiro')?.classList.contains('active'))renderFinanceiro();
+  toast('Pedido de uniformes atualizado!');
+}
+
+function exportarPlanilhaUniformes(){
+  if(typeof XLSX==='undefined'){toast('Biblioteca de planilha não carregou','pink');return;}
+  const p=getUniformePedido();
+  const cols=['PP','P','M','G','GG','XG','XG1','XG2','XG3'];
+  const header=['MODELO','COR','DESCRIÇÃO DO PRODUTO','PP','P','M','G','GG','XGG','G1','G2','G3','QUANT','VALOR UNI','VALOR TOTAL'];
+  const linhas=[header];
+  let qtdGeral=0, valorGeral=0;
+  UNIFORME_GRUPOS.forEach(g=>{
+    const g_=p[g.chave]||{};
+    const qtd=qtdGrupo(g_);
+    const valor=qtd*g.preco;
+    qtdGeral+=qtd; valorGeral+=valor;
+    const row=['WOLF TECH','',g.nome];
+    cols.forEach(t=>row.push(g_[t]||0));
+    row.push(qtd,g.preco,valor);
+    linhas.push(row);
+  });
+  linhas.push([]);
+  const totalRow=new Array(header.length).fill('');
+  totalRow[header.length-3]=qtdGeral;
+  totalRow[header.length-1]=valorGeral;
+  linhas.push(totalRow);
+
+  const ws=XLSX.utils.aoa_to_sheet(linhas);
+  ws['!cols']=[{wch:12},{wch:6},{wch:34},{wch:5},{wch:5},{wch:5},{wch:5},{wch:5},{wch:6},{wch:5},{wch:5},{wch:5},{wch:8},{wch:11},{wch:13}];
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Pedido Uniformes');
+  XLSX.writeFile(wb,'premia-cup-pedido-uniformes.xlsx');
+  toast('Planilha exportada!');
 }
 
 function salvarParametros(){
