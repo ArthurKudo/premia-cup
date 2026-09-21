@@ -1384,6 +1384,101 @@ function renderUniformes(){
     </div>`;
 }
 
+const UNIF_ATLETA_GRUPOS_DEF=[
+  {chave:'camMasc',  titulo:'Camiseta MC Raglan (masc.)', cor:'var(--purple-light)', tamanhos:TAM_CAMISETA, tipo:'camiseta'},
+  {chave:'camFem',   titulo:'Baby Look Raglan (fem.)',     cor:'var(--pink)',         tamanhos:TAM_CAMISETA, tipo:'camiseta'},
+  {chave:'shortMasc',titulo:'Calção sem bolso (masc.)',    cor:'var(--purple-light)', tamanhos:TAM_SHORT,    tipo:'short'},
+  {chave:'shortFem', titulo:'Shorts base curvada (fem.)',  cor:'var(--pink)',         tamanhos:TAM_SHORT,    tipo:'short'},
+];
+let UNIF_SOL_CACHE=null;
+
+function lerPedidoDosInputs(){
+  const pedido={};
+  UNIFORME_GRUPOS.forEach(g=>{ pedido[g.chave]={}; g.tamanhos.forEach(t=>pedido[g.chave][t]=0); });
+  document.querySelectorAll('.unif-ped-input').forEach(inp=>{
+    const grp=inp.dataset.grp, t=inp.dataset.size;
+    if(pedido[grp])pedido[grp][t]=parseInt(inp.value)||0;
+  });
+  return pedido;
+}
+
+function calcUniformeStats(pedido){
+  const sol=UNIF_SOL_CACHE;
+  let semFolga=0, faltando=0;
+  const linhas={};
+  UNIF_ATLETA_GRUPOS_DEF.forEach(g=>{
+    linhas[g.chave]={};
+    let tPed=0,tSol=0;
+    g.tamanhos.forEach(t=>{
+      const ped=(pedido[g.chave]||{})[t]||0, s=(sol[g.chave]||{})[t]||0;
+      tPed+=ped; tSol+=s;
+      linhas[g.chave][t]={ped,sol:s};
+      if(ped>0&&ped-s===0)semFolga++;
+      if(ped-s<0)faltando++;
+    });
+    linhas[g.chave]._total={ped:tPed,sol:tSol};
+  });
+  const camisetaTotal=qtdGrupo(pedido.camMasc)+qtdGrupo(pedido.camFem);
+  const shortTotal=qtdGrupo(pedido.shortMasc)+qtdGrupo(pedido.shortFem);
+  return {linhas, semFolga, faltando, camisetaTotal, shortTotal};
+}
+
+const saldoBadge=(ped,sol)=>{
+  const s=ped-sol;
+  const cls=s<0?'badge-pink':(s===0?'badge-amber':'badge-lime');
+  const label=s>0?'+'+s:String(s);
+  return`<span class="badge ${cls}">${label}</span>`;
+};
+
+function atualizarUniformeAoVivo(){
+  if(!UNIF_SOL_CACHE)return;
+  const pedido=lerPedidoDosInputs();
+  const st=calcUniformeStats(pedido);
+
+  document.getElementById('unif-metric-camisetas').innerHTML=st.camisetaTotal;
+  document.getElementById('unif-metric-shorts').innerHTML=st.shortTotal;
+  const descasado=st.camisetaTotal!==st.shortTotal;
+  const cardDescasado=document.getElementById('unif-card-descasado');
+  cardDescasado.className='metric-card '+(descasado?'amber':'lime');
+  document.getElementById('unif-metric-descasado').className='mc-value '+(descasado?'amber':'');
+  document.getElementById('unif-metric-descasado').innerHTML=descasado?Math.abs(st.camisetaTotal-st.shortTotal):'—';
+  document.getElementById('unif-metric-semfolga').innerHTML=st.semFolga;
+  document.getElementById('unif-card-semfolga').className='metric-card '+(st.faltando?'pink':'amber');
+  document.getElementById('unif-metric-semfolga').className='mc-value '+(st.faltando?'red':'amber');
+
+  const alertEl=document.getElementById('unif-alert');
+  if(st.faltando){
+    alertEl.innerHTML=`<div class="alert alert-red">⚠️ Faltam peças em ${st.faltando} tamanho${st.faltando!==1?'s':''} — o pedido já não cobre o que foi solicitado.</div>`;
+  }else if(descasado){
+    alertEl.innerHTML=`<div class="alert alert-amber">⚠️ Camisetas (${st.camisetaTotal}) e shorts/calções (${st.shortTotal}) pedidos em quantidades diferentes — cada atleta precisa de 1 de cada.</div>`;
+  }else{
+    const pend=Math.max(UNIF_SOL_CACHE._semTam,UNIF_SOL_CACHE._semShort);
+    alertEl.innerHTML=`<div class="alert alert-green">✅ O pedido cobre toda a demanda atual — ${st.camisetaTotal} uniformes completos.</div>
+      ${pend?`<div class="alert alert-amber">⚠️ ${pend} atleta${pend!==1?'s ainda não escolheram':' ainda não escolheu'} tamanho, e ${st.semFolga} tamanho${st.semFolga!==1?'s já estão':' já está'} sem folga (saldo zero) — cobre essas fichas antes de fechar reposição.</div>`:''}`;
+  }
+
+  UNIF_ATLETA_GRUPOS_DEF.forEach(g=>{
+    const tot=st.linhas[g.chave]._total;
+    document.getElementById('unif-tot-'+g.chave).innerHTML=`Pedido <b style="color:var(--text2);">${tot.ped}</b> · Solicitado <b style="color:var(--text2);">${tot.sol}</b> · Saldo ${saldoBadge(tot.ped,tot.sol)}`;
+    g.tamanhos.forEach(t=>{
+      const l=st.linhas[g.chave][t];
+      document.getElementById(`unif-saldo-${g.chave}-${t}`).innerHTML=saldoBadge(l.ped,l.sol);
+    });
+  });
+
+  UNIFORME_GRUPOS.forEach(g=>{
+    const qtd=qtdGrupo(pedido[g.chave]);
+    const qtdEl=document.getElementById('unif-qtd-'+g.chave);
+    if(qtdEl)qtdEl.innerHTML=qtd;
+    const orcQtd=document.getElementById('unif-orc-qtd-'+g.chave);
+    const orcVal=document.getElementById('unif-orc-val-'+g.chave);
+    if(orcQtd)orcQtd.innerHTML=qtd;
+    if(orcVal)orcVal.innerHTML=fmt(qtd*g.preco);
+  });
+  const total=UNIFORME_GRUPOS.reduce((s,g)=>s+qtdGrupo(pedido[g.chave])*g.preco,0);
+  document.getElementById('unif-orc-total').innerHTML=fmt(total);
+}
+
 function renderUniformeControle(){
   const p=getUniformePedido();
   const solCamM={},solCamF={},solShM={},solShF={};
@@ -1397,52 +1492,39 @@ function renderUniformeControle(){
   const semTam=S.jogadores.filter(j=>!j.tam).length;
   const semShort=S.jogadores.filter(j=>!j.tamShort).length;
   const comTam=S.jogadores.length-semTam;
+  UNIF_SOL_CACHE={camMasc:solCamM,camFem:solCamF,shortMasc:solShM,shortFem:solShF,_semTam:semTam,_semShort:semShort};
 
-  const atletaGrupos=[
-    {chave:'camMasc',  titulo:'Camiseta MC Raglan (masc.)', cor:'var(--purple-light)', sol:solCamM, tamanhos:TAM_CAMISETA},
-    {chave:'camFem',   titulo:'Baby Look Raglan (fem.)',     cor:'var(--pink)',         sol:solCamF, tamanhos:TAM_CAMISETA},
-    {chave:'shortMasc',titulo:'Calção sem bolso (masc.)',    cor:'var(--purple-light)', sol:solShM,  tamanhos:TAM_SHORT},
-    {chave:'shortFem', titulo:'Shorts base curvada (fem.)',  cor:'var(--pink)',         sol:solShF,  tamanhos:TAM_SHORT},
-  ];
-  const pedidoTotalAtletas=atletaGrupos.reduce((s,g)=>s+qtdGrupo(p[g.chave]),0);
-  let semFolga=0, faltando=0;
-  atletaGrupos.forEach(g=>g.tamanhos.forEach(t=>{
-    const ped=(p[g.chave]||{})[t]||0, sol=g.sol[t]||0;
-    if(ped>0&&ped-sol===0)semFolga++;
-    if(ped-sol<0)faltando++;
-  }));
+  const st=calcUniformeStats(p);
+  const descasado=st.camisetaTotal!==st.shortTotal;
 
   document.getElementById('unif-metrics').innerHTML=`
-    <div class="metric-card lime"><div class="mc-label">Pedido total (atletas)</div><div class="mc-value">${pedidoTotalAtletas}</div></div>
+    <div class="metric-card lime"><div class="mc-label">Camisetas pedidas (atletas)</div><div class="mc-value" id="unif-metric-camisetas">${st.camisetaTotal}</div></div>
+    <div class="metric-card lime"><div class="mc-label">Shorts/calções pedidos (atletas)</div><div class="mc-value" id="unif-metric-shorts">${st.shortTotal}</div></div>
+    <div class="metric-card ${descasado?'amber':'lime'}" id="unif-card-descasado"><div class="mc-label">Diferença camiseta × short</div><div class="mc-value ${descasado?'amber':''}" id="unif-metric-descasado">${descasado?Math.abs(st.camisetaTotal-st.shortTotal):'—'}</div></div>
     <div class="metric-card purple"><div class="mc-label">Cadastrados com tamanho</div><div class="mc-value purple">${comTam} / ${S.jogadores.length}</div></div>
-    <div class="metric-card ${faltando?'pink':'amber'}"><div class="mc-label">Tamanhos sem folga</div><div class="mc-value ${faltando?'red':'amber'}">${semFolga}</div></div>`;
+    <div class="metric-card ${st.faltando?'pink':'amber'}" id="unif-card-semfolga"><div class="mc-label">Tamanhos sem folga</div><div class="mc-value ${st.faltando?'red':'amber'}" id="unif-metric-semfolga">${st.semFolga}</div></div>`;
 
   const alertEl=document.getElementById('unif-alert');
-  if(faltando){
-    alertEl.innerHTML=`<div class="alert alert-red">⚠️ Faltam peças em ${faltando} tamanho${faltando!==1?'s':''} — o pedido já não cobre o que foi solicitado. Ajuste as quantidades abaixo.</div>`;
+  if(st.faltando){
+    alertEl.innerHTML=`<div class="alert alert-red">⚠️ Faltam peças em ${st.faltando} tamanho${st.faltando!==1?'s':''} — o pedido já não cobre o que foi solicitado.</div>`;
+  }else if(descasado){
+    alertEl.innerHTML=`<div class="alert alert-amber">⚠️ Camisetas (${st.camisetaTotal}) e shorts/calções (${st.shortTotal}) pedidos em quantidades diferentes — cada atleta precisa de 1 de cada.</div>`;
   }else{
     const pend=Math.max(semTam,semShort);
-    alertEl.innerHTML=`<div class="alert alert-green">✅ O pedido cobre toda a demanda atual.</div>
-      ${pend?`<div class="alert alert-amber">⚠️ ${pend} atleta${pend!==1?'s ainda não escolheram':' ainda não escolheu'} tamanho, e ${semFolga} tamanho${semFolga!==1?'s já estão':' já está'} sem folga (saldo zero) — cobre essas fichas antes de fechar reposição.</div>`:''}`;
+    alertEl.innerHTML=`<div class="alert alert-green">✅ O pedido cobre toda a demanda atual — ${st.camisetaTotal} uniformes completos.</div>
+      ${pend?`<div class="alert alert-amber">⚠️ ${pend} atleta${pend!==1?'s ainda não escolheram':' ainda não escolheu'} tamanho, e ${st.semFolga} tamanho${st.semFolga!==1?'s já estão':' já está'} sem folga (saldo zero) — cobre essas fichas antes de fechar reposição.</div>`:''}`;
   }
 
-  const saldoBadge=(ped,sol)=>{
-    const s=ped-sol;
-    const cls=s<0?'badge-pink':(s===0?'badge-amber':'badge-lime');
-    const label=s>0?'+'+s:String(s);
-    return`<span class="badge ${cls}">${label}</span>`;
-  };
-  const pedInput=(chave,t,ped)=>`<input type="number" min="0" value="${ped}" class="unif-ped-input" data-grp="${chave}" data-size="${t}" style="width:60px;text-align:right;padding:4px 8px;font-size:13px;">`;
+  const pedInput=(chave,t,ped)=>`<input type="number" min="0" value="${ped}" class="unif-ped-input" data-grp="${chave}" data-size="${t}" oninput="atualizarUniformeAoVivo()" style="width:60px;text-align:right;padding:4px 8px;font-size:13px;">`;
   const tabelaControle=(g)=>{
-    let tPed=0,tSol=0;
+    const tot=st.linhas[g.chave]._total;
     const linhas=g.tamanhos.map(t=>{
-      const ped=(p[g.chave]||{})[t]||0, sol=g.sol[t]||0;
-      tPed+=ped; tSol+=sol;
-      return`<tr><td>${t}</td><td style="text-align:right;">${pedInput(g.chave,t,ped)}</td><td style="text-align:right;">${sol}</td><td style="text-align:right;">${saldoBadge(ped,sol)}</td></tr>`;
+      const l=st.linhas[g.chave][t];
+      return`<tr><td>${t}</td><td style="text-align:right;">${pedInput(g.chave,t,l.ped)}</td><td style="text-align:right;">${l.sol}</td><td style="text-align:right;" id="unif-saldo-${g.chave}-${t}">${saldoBadge(l.ped,l.sol)}</td></tr>`;
     }).join('');
     return`<div class="card" style="margin-bottom:12px;">
       <div class="card-header"><div class="card-title"><span style="width:9px;height:9px;border-radius:50%;background:${g.cor};display:inline-block;"></span> ${g.titulo}</div>
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:var(--text3);">Pedido <b style="color:var(--text2);">${tPed}</b> · Solicitado <b style="color:var(--text2);">${tSol}</b> · Saldo ${saldoBadge(tPed,tSol)}</div></div>
+      <div id="unif-tot-${g.chave}" style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:var(--text3);">Pedido <b style="color:var(--text2);">${tot.ped}</b> · Solicitado <b style="color:var(--text2);">${tot.sol}</b> · Saldo ${saldoBadge(tot.ped,tot.sol)}</div></div>
       <div class="card-body" style="padding:0;">
         <div class="table-wrap"><table>
           <thead><tr><th>Tamanho</th><th style="text-align:right;">Pedido</th><th style="text-align:right;">Solicitado</th><th style="text-align:right;">Saldo</th></tr></thead>
@@ -1453,7 +1535,7 @@ function renderUniformeControle(){
   };
   document.getElementById('unif-tabelas').innerHTML=`
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:0 16px;">
-      ${atletaGrupos.map(tabelaControle).join('')}
+      ${UNIF_ATLETA_GRUPOS_DEF.map(tabelaControle).join('')}
     </div>`;
 
   const staffGrupos=UNIFORME_GRUPOS.filter(g=>!g.atleta);
@@ -1467,7 +1549,7 @@ function renderUniformeControle(){
             const v=(p[g.chave]||{})[t]||0;
             return`<span style="display:inline-flex;align-items:center;gap:4px;margin-right:10px;"><span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--text3);">${t}</span>${pedInput(g.chave,t,v)}</span>`;
           }).join('');
-          return`<tr><td>${g.nome}</td><td>${inputs}</td><td style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:16px;">${qtd}</td></tr>`;
+          return`<tr><td>${g.nome}</td><td>${inputs}</td><td style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:16px;" id="unif-qtd-${g.chave}">${qtd}</td></tr>`;
         }).join('')}
       </tbody>
     </table></div>`;
@@ -1479,22 +1561,16 @@ function renderUniformeControle(){
       <tbody>
         ${UNIFORME_GRUPOS.map(g=>{
           const qtd=qtdGrupo(p[g.chave]);
-          return`<tr><td>${g.nome}</td><td style="text-align:right;">${qtd}</td><td style="text-align:right;">${fmt(g.preco)}</td><td style="text-align:right;">${fmt(qtd*g.preco)}</td></tr>`;
+          return`<tr><td>${g.nome}</td><td style="text-align:right;" id="unif-orc-qtd-${g.chave}">${qtd}</td><td style="text-align:right;">${fmt(g.preco)}</td><td style="text-align:right;" id="unif-orc-val-${g.chave}">${fmt(qtd*g.preco)}</td></tr>`;
         }).join('')}
-        <tr><td style="font-weight:700;color:var(--text3);font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;font-size:11px;letter-spacing:.06em;">Total</td><td></td><td></td><td style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--lime2);">${fmt(total)}</td></tr>
+        <tr><td style="font-weight:700;color:var(--text3);font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;font-size:11px;letter-spacing:.06em;">Total</td><td></td><td></td><td style="text-align:right;font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--lime2);" id="unif-orc-total">${fmt(total)}</td></tr>
       </tbody>
     </table></div>
     <div style="margin-top:12px;font-size:12px;color:var(--text3);">Baseado no pedido acordado com a BigWolf — valores unitários fixos, quantidades editáveis acima. Validade do orçamento original: 15 dias. Pagamento: 50% na confirmação + 50% e frete na entrega.</div>`;
 }
 
 function salvarUniformePedido(){
-  const novo={};
-  UNIFORME_GRUPOS.forEach(g=>{ novo[g.chave]={}; g.tamanhos.forEach(t=>novo[g.chave][t]=0); });
-  document.querySelectorAll('.unif-ped-input').forEach(inp=>{
-    const grp=inp.dataset.grp, t=inp.dataset.size;
-    if(novo[grp])novo[grp][t]=parseInt(inp.value)||0;
-  });
-  S.uniformePedido=novo;
+  S.uniformePedido=lerPedidoDosInputs();
   save();
   renderUniformeControle();
   if(document.getElementById('page-financeiro')?.classList.contains('active'))renderFinanceiro();
